@@ -6,9 +6,8 @@
 
     <groupId>allein</groupId>
     <artifactId>bizcorn</artifactId>
-    <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
-
+    <packaging>pom</packaging>
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -18,8 +17,9 @@
 
 
     <modules>
-        <module>eurekaserver</module>
+        <module>eureka-server</module>
         <module>service</module>
+        <module>service-ribbon</module>
     </modules>
 
     <properties>
@@ -48,20 +48,20 @@
                 <scope>import</scope>
             </dependency>
             <!--<dependency>-->
-                <!--<groupId>org.springframework.cloud</groupId>-->
-                <!--<artifactId>spring-cloud-starter-eureka</artifactId>-->
-                <!--<version>1.4.6.RELEASE</version>-->
-                <!--<scope>import</scope>-->
+            <!--<groupId>org.springframework.cloud</groupId>-->
+            <!--<artifactId>spring-cloud-starter-eureka</artifactId>-->
+            <!--<version>1.4.6.RELEASE</version>-->
+            <!--<scope>import</scope>-->
             <!--</dependency>-->
         </dependencies>
     </dependencyManagement>
 
     <!--<build>-->
-        <!--<plugins>-->
-            <!--<plugin>-->
-                <!--<groupId>org.springframework.boot</groupId>-->
-                <!--<artifactId>spring-boot-maven-plugin</artifactId>-->
-            <!--</plugin>-->
-        <!--</plugins>-->
+    <!--<plugins>-->
+    <!--<plugin>-->
+    <!--<groupId>org.springframework.boot</groupId>-->
+    <!--<artifactId>spring-boot-maven-plugin</artifactId>-->
+    <!--</plugin>-->
+    <!--</plugins>-->
     <!--</build>-->
 </project>

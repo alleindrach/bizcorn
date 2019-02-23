@@ -8,20 +8,27 @@
 		<version>1.0-SNAPSHOT</version>
 	</parent>
 	<groupId>allein</groupId>
-	<artifactId>service</artifactId>
-	<name>service</name>
-	<version>1.0-SNAPSHOT</version>
-	<packaging>jar</packaging>
+	<artifactId>service-ribbon</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>service-ribbon</name>
 	<description>Demo project for Spring Boot</description>
+
 
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+			<artifactId>spring-cloud-starter-netflix-ribbon</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-netflix-eureka-client</artifactId>
+			<version>2.1.0.RELEASE</version>
 		</dependency>
 	</dependencies>
 
@@ -30,15 +37,6 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<!--<jvmArguments>-->
-						 <!-- -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8089-->
-					<!--</jvmArguments>-->
-					<!--<arguments>-->
-						<!--&#45;&#45;server.port=8063-->
-					<!--</arguments>-->
-				</configuration>
-
 			</plugin>
 		</plugins>
 	</build>

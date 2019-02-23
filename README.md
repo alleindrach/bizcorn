@@ -7,7 +7,7 @@
         注意其defaultZone指向了EurekaServer的defaultzone
         其自身的服务地址是
         http://127.0.0.1:8762
-    
+    service-ribbon 负载均衡服务，
 2 调试
     <build>
 		<plugins>
@@ -22,7 +22,10 @@
 			</plugin>
 		</plugins>
 	</build>
-	使用maven spring-boot:run运行
+	使用mvn spring-boot:run运行
+	或者
+	spring-boot:run "-Drun.jvmArguments=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8089" "-Darguments=server.port=8063"
+	
 3 版本配合
     注意springcloud Finchley.RELEASE 配合 springframework.boot 2.0.3.RELEASE 版本
     注意springcloud Greenwich.RELEASE 配合 springframework.boot 2.1.3.RELEASE 版本

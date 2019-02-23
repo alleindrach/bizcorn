@@ -8,8 +8,8 @@
 		<version>1.0-SNAPSHOT</version>
 	</parent>
 	<groupId>allein</groupId>
-	<artifactId>eurekaserver</artifactId>
-	<name>eurekaserver</name>
+	<artifactId>eureka-server</artifactId>
+	<name>eureka-server</name>
 	<packaging>jar</packaging>
 	<description>allein project for Spring Boot</description>
 
