@@ -11,7 +11,7 @@
 	<artifactId>eurekaserver</artifactId>
 	<name>eurekaserver</name>
 	<packaging>jar</packaging>
-	<description>Demo project for Spring Boot</description>
+	<description>allein project for Spring Boot</description>
 
 
 	<dependencies>
