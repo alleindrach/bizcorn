@@ -31,9 +31,9 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-					<!--<jvmArguments>-->
-						 <!-- -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8089-->
-					<!--</jvmArguments>-->
+					<jvmArguments>
+						  -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8089
+					</jvmArguments>
 					<!--<arguments>-->
 						<!--&#45;&#45;server.port=8063-->
 					<!--</arguments>-->
