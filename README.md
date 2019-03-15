@@ -84,8 +84,11 @@
                   profile: dev
                   discovery: <--增加项
                     enabled: true 
-                    service-id: config-server
-           
+                    service-id: config-server <-- 这里和config-server的配置项 spring.application.name 一致
+    两种访问配置项的方式
+        @Value("${foo}") 修饰的字段
+        @ConfigurationProperties()  修饰的组件
+        
         
 2 调试
     <build>

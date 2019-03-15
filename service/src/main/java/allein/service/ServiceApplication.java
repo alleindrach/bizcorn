@@ -1,5 +1,7 @@
 package allein.service;
 
+import allein.service.config.Configuration;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 @EnableEurekaClient
 @RestController
 public class ServiceApplication {
+	@Autowired
+	Configuration config;
 
 	public static void main(String[] args) {
 		SpringApplication.run( ServiceApplication.class, args );
@@ -26,7 +30,7 @@ public class ServiceApplication {
 
 	@RequestMapping("/hi")
 	public String home(@RequestParam(value = "name", defaultValue = "forezp") String name) {
-		return "hi " + name+",conf:"+foo + " ,i am from port:" + port;
+		return "hi " + name+",conf:"+foo+", instconfi:"+config.getFoo() + " ,i am from port:" + port;
 	}
 
 }
