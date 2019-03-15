@@ -32,6 +32,10 @@
         
         url:{application}/{profile}/{label}
         file:/application-profile.properties
+        
+        http://localhost:8888/service-dev.properties
+        http://localhost:8888/service/dev
+        
     调用配置服务器的演示：service 调取配置服务器的配置项
         service 增加依赖
             <dependency>
@@ -53,6 +57,36 @@
         引用配置项：
             @Value("${foo}")
         	String foo;
+        	
+    配置服务器config-server向尤里卡服务器注册
+       增加依赖项
+       		<dependency>
+       			<groupId>org.springframework.cloud</groupId>
+       			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+       		</dependency>
+       增加配置项
+           eureka:
+             client:
+               serviceUrl:
+                 defaultZone: http://localhost:8761/eureka/
+       增加尤里卡客户端启动项：
+           ...
+           @EnableEurekaClient
+           public class ServiceApplication {
+           ...
+    Service从尤里卡服务器调用配置服务
+            spring:
+              application:
+                name: service
+              cloud:
+                config:
+                  label: master
+                  profile: dev
+                  discovery: <--增加项
+                    enabled: true 
+                    service-id: config-server
+           
+        
 2 调试
     <build>
 		<plugins>

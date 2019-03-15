@@ -1,0 +1,17 @@
+spring:
+    application:
+        name: config-server
+    cloud:
+        config:
+            server:
+                git:
+                    uri: file://Users/allein/work/springcloud/bizcorn/config.repo
+            label: master
+
+server:
+    port: 8888
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
