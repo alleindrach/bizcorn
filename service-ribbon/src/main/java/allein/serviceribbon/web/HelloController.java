@@ -14,7 +14,8 @@ public class HelloController {
 
     @GetMapping(value = "/hi")
     public String hi(@RequestParam String name) {
-        return serviceGate.hiService( name );
+
+        return serviceGate.hiService( name )+"@Ribbon" ;
     }
 
 }

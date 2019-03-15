@@ -11,9 +11,9 @@ public class HelloController {
     @Autowired
     ServiceGate serviceGate;
 
-    @GetMapping(value = "/hi2")
+    @GetMapping(value = "/hi")
     public String sayHi(@RequestParam String name) {
-        return serviceGate.sayHiFromClientOne( name );
+        return serviceGate.sayHiFromClientOne( name)+"@Feign" ;
     }
 
 }

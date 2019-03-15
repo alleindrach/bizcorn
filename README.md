@@ -8,6 +8,26 @@
         其自身的服务地址是
         http://127.0.0.1:8762
     service-ribbon 负载均衡服务，
+    service-feign:=ribbon+rest 负载均衡的另一种实现
+        @EnableFeignClients
+        定义一个feign接口，通过@ FeignClient（“服务名”），来指定调用哪个服务。
+        比如下面这个注释，@FeignClient(value="service") ,指明其需要从注册服务器寻求service 服务的一个实例，而@RequestMapping(value="/hi"),指明其调用service服务的hi接口。
+        @FeignClient(value = "service",fallback = ServiceGateHystric.class)
+        public interface ServiceGate {
+            @RequestMapping(value = "/hi",method = RequestMethod.GET)
+            String sayHiFromClientOne(@RequestParam(value = "name") String name);
+        }
+    断路器的实现
+        service-ribbon:
+        @HystrixCommand(fallbackMethod = "hiError")
+        service-feign:
+        @FeignClient(value = "service",fallback = ServiceGateHystric.class)
+        
+    路由器实现
+        service-router-zuul
+        类似于nginx的配置
+        Filter ：可以在此实现登录态的校验。
+        
 2 调试
     <build>
 		<plugins>

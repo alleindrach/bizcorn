@@ -8,10 +8,9 @@
 		<version>1.0-SNAPSHOT</version>
 	</parent>
 	<groupId>allein</groupId>
-	<artifactId>service</artifactId>
-	<name>service</name>
+	<artifactId>service-router-zuul</artifactId>
 	<version>1.0-SNAPSHOT</version>
-	<packaging>jar</packaging>
+	<name>service-router-zuul</name>
 	<description>Demo project for Spring Boot</description>
 
 	<dependencies>
@@ -23,6 +22,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-zuul</artifactId>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -37,15 +41,13 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
 					<jvmArguments>
-						  -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8089
+						-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8092
 					</jvmArguments>
 					<!--<arguments>-->
-						<!--&#45;&#45;server.port=8063-->
+					<!--&#45;&#45;server.port=8063-->
 					<!--</arguments>-->
 				</configuration>
-
 			</plugin>
 		</plugins>
 	</build>
-
 </project>
