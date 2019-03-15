@@ -27,6 +27,11 @@
         service-router-zuul
         类似于nginx的配置
         Filter ：可以在此实现登录态的校验。
+    配置服务器实现
+        @EnableConfigServer
+        
+        url:{application}/{profile}/{label}
+        file:/application-profile.properties
         
 2 调试
     <build>
