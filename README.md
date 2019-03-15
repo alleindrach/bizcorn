@@ -32,7 +32,27 @@
         
         url:{application}/{profile}/{label}
         file:/application-profile.properties
-        
+    调用配置服务器的演示：service 调取配置服务器的配置项
+        service 增加依赖
+            <dependency>
+        			<groupId>org.springframework.cloud</groupId>
+        			<artifactId>spring-cloud-starter-config</artifactId>
+        	</dependency>
+        service 配置 配置服务器选项
+            spring:
+              application:
+                name: service
+              cloud:
+                config:
+                  label: master
+                  profile: dev
+                  uri: http://localhost:8888/
+                  
+        对应到服务器上的
+            serive-dev.properties 文件
+        引用配置项：
+            @Value("${foo}")
+        	String foo;
 2 调试
     <build>
 		<plugins>

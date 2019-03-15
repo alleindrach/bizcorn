@@ -21,9 +21,12 @@ public class ServiceApplication {
 	@Value("${server.port}")
 	String port;
 
+	@Value("${foo}")
+	String foo;
+
 	@RequestMapping("/hi")
 	public String home(@RequestParam(value = "name", defaultValue = "forezp") String name) {
-		return "hi " + name + " ,i am from port:" + port;
+		return "hi " + name+",conf:"+foo + " ,i am from port:" + port;
 	}
 
 }
