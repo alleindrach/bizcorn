@@ -2,6 +2,8 @@ package allein.serviceribbon.service;
 
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -9,9 +11,13 @@ import org.springframework.web.client.RestTemplate;
 public class ServiceGate {
     @Autowired
     RestTemplate restTemplate;
+
+
     @HystrixCommand(fallbackMethod = "hiError")
+//    @RefreshScope
     public String hiService(String name) {
-        return restTemplate.getForObject("http://service/hi?name="+name,String.class);
+        String result= restTemplate.getForObject("http://service/hi?name="+name,String.class);
+        return result;
     }
 
     public String hiError(String name) {

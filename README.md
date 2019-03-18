@@ -111,7 +111,88 @@
        
         现在的地址也不是/refresh了,而是/actuator/refresh
          curl -X POST  -H  "Content-Tapplication/json"  "http://127.0.0.1:8762/actuator/refresh"
-        
+        https://docs.spring.io/spring-boot/docs/current/reference/html/production-ready-endpoints.html
+    Cloud Bus:
+         docker-compose.yml 
+         
+         version: '2'
+         
+         services:
+           zookeeper:
+             image: wurstmeister/zookeeper
+             restart: unless-stopped
+             ports:
+               - "2181:2181"
+             container_name: zookeeper
+         
+           # kafka version: 1.1.0
+           # scala version: 2.12
+           kafka:
+             image: wurstmeister/kafka
+             ports:
+               - "9092:9092"
+             environment:
+               KAFKA_ADVERTISED_HOST_NAME: localhost
+               KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+               KAFKA_BROKER_ID: 1
+               KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+               KAFKA_CREATE_TOPICS: "stream-in:1:1,stream-out:1:1"
+             depends_on:
+               - zookeeper
+             container_name: kafka
+             
+         docker-compose build    
+         docker-compose up -d    
+         docker exec -it kafka /bin/bash
+         export ZK=zookeeper:2181
+         $KAFKA_HOME/bin/kafka-topics.sh --create --topic topic --partitions 4 --zookeeper $ZK --replication-factor 1
+         $KAFKA_HOME/bin/kafka-topics.sh --zookeeper $ZK --list
+         
+         
+         Config的server/client 都要加
+         
+         		<dependency>
+         			<groupId>org.springframework.cloud</groupId>
+         			<artifactId>spring-cloud-starter-bus-kafka</artifactId>
+         		</dependency>
+         		
+         server:
+                spring:
+                    cloud:
+                        stream:
+                            kafka:
+                                binder:
+                                    brokers: localhost:9092
+                                    zk-nodes: localhost:2181
+         client:
+         		<dependency>
+         			<groupId>org.springframework.cloud</groupId>
+         			<artifactId>spring-cloud-config-monitor</artifactId>
+         		</dependency>
+
+                spring:
+                   cloud:
+                        config:
+                            label: master
+                            profile: dev
+                            name: service
+                        discovery:
+                            enabled: true
+                            service-id: config-server
+                        stream:
+                            kafka:
+                                binder:
+                                    brokers: localhost:9092
+                                    zk-nodes: localhost:2181
+                management:
+                    endpoints:
+                        web:
+                            exposure:
+                                include: refresh,bus-refresh
+                                
+                调用任何一个client的 bus-refresh,都会刷新其他client端的配置实例
+                     curl -X POST  -H  "Content-Tapplication/json"  "http://127.0.0.1:8762/actuator/bus-refresh"
+                
 2 调试
     <build>
 		<plugins>

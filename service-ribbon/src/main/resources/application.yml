@@ -1,10 +1,30 @@
 eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
+    client:
+        serviceUrl:
+            defaultZone: http://localhost:8761/eureka/
 server:
-  port: 8764
+    port: 8764
+
 
 spring:
-  application:
-    name: service-ribbon
+    application:
+        name: service-ribbon
+    cloud:
+        config:
+            label: master
+            profile: dev
+            name: service
+        discovery:
+            enabled: true
+            service-id: config-server
+#      uri: http://localhost:8888/
+        stream:
+            kafka:
+                binder:
+                    brokers: localhost:9092
+                    zk-nodes: localhost:2181
+#management:
+#    endpoints:
+#        web:
+#            exposure:
+#                include: refresh,health,bus-refresh
