@@ -89,6 +89,28 @@
         @Value("${foo}") 修饰的字段
         @ConfigurationProperties()  修饰的组件
         
+    配置刷新：    
+        cloud 2.0 之前：只要加入依赖:
+        
+        <dependency>
+           <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+         </dependency>
+        
+        并且在类上,变量上打上@RefreshScope的注解,在启动的时候,都会看到
+        
+        RequestMappingHandlerMapping : Mapped "{/refresh,methods=[post]}" 
+        也就是SpringCloud暴露了一个接口 /refresh 来给我们去刷新配置,但是SpringCloud 2.0.0以后,有了改变.
+        
+        我们需要在bootstrap.yml里面加上需要暴露出来的地址
+        management:
+          endpoints:
+            web:
+              exposure:
+                include: refresh,health
+       
+        现在的地址也不是/refresh了,而是/actuator/refresh
+         curl -X POST  -H  "Content-Tapplication/json"  "http://127.0.0.1:8762/actuator/refresh"
         
 2 调试
     <build>
