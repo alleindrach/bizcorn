@@ -1,6 +1,7 @@
 package allein.service;
 
 import allein.service.config.Configuration;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,44 +29,44 @@ import org.springframework.web.bind.annotation.RestController;
 public class ServiceApplication {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ServiceApplication.class);
-
-	@Autowired
-	Configuration config;
-
-	@Autowired
-	private KafkaTemplate<Object, Object> kafkaTemplate;
-
+//
+//	@Autowired
+//	Configuration config;
+//
+//	@Autowired
+//	private KafkaTemplate<Object, Object> kafkaTemplate;
+//
 
 	public static void main(String[] args) {
 		SpringApplication.run( ServiceApplication.class, args );
 	}
-
-	@Value("${server.port}")
-	String port;
-
-	@Value("${foo}")
-	String foo;
-
-
-	@Value("${spring.kafka.template.default-topic}")
-	private String topic;
-
-	@RequestMapping("/hi")
-	public String home(@RequestParam(value = "name", defaultValue = "forezp") String name) {
-		return "hi " + name+",conf:"+foo+", instconfi:"+config.getFoo() + " ,i am from port:" + port;
-	}
-	@RequestMapping("/sendmsg")
-	public void send(String message){
-		LOG.info("sending message='{}' to topic='{}'", message, topic);
-		kafkaTemplate.send(topic, message);
-	}
-
-	@KafkaListener(topics = "${spring.kafka.template.default-topic}")
-	public void receive(@Payload String message,
-						@Headers MessageHeaders headers) {
-		LOG.info("received message='{}'", message);
-		headers.keySet().forEach(key -> LOG.info("{}: {}", key, headers.get(key)));
-	}
+//
+//	@Value("${server.port}")
+//	String port;
+//
+//	@Value("${foo}")
+//	String foo;
+//
+//
+//	@Value("${spring.kafka.template.default-topic}")
+//	private String topic;
+//
+//	@RequestMapping("/hi")
+//	public String home(@RequestParam(value = "name", defaultValue = "forezp") String name) {
+//		return "hi " + name+",conf:"+foo+", instconfi:"+config.getFoo() + " ,i am from port:" + port;
+//	}
+//	@RequestMapping("/sendmsg")
+//	public void send(String message){
+//		LOG.info("sending message='{}' to topic='{}'", message, topic);
+//		kafkaTemplate.send(topic, message);
+//	}
+//
+//	@KafkaListener(topics = "${spring.kafka.template.default-topic}")
+//	public void receive(@Payload String message,
+//						@Headers MessageHeaders headers) {
+//		LOG.info("received message='{}'", message);
+//		headers.keySet().forEach(key -> LOG.info("{}: {}", key, headers.get(key)));
+//	}
 }
 
 

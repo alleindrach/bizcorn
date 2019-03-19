@@ -1,5 +1,9 @@
 server:
     port: 8762
+    session:
+        timeout: 10
+    tomcat:
+        uri-encoding: UTF-8
 
 spring:
     application:
@@ -33,6 +37,19 @@ spring:
             key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
             value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
+    datasource:
+        url: jdbc:mysql://192.168.2.177:3306/for8j_aadai
+        username: root
+        password: 123456
+        driver-class-name: com.mysql.jdbc.Driver
+        max-idle: 10
+        max-wait: 10000
+        min-idle: 5
+        initial-size: 5
+
+mybatis:
+    mapperLocations: classpath:mappers/*.xml
+
 
 eureka:
     client:
@@ -51,6 +68,7 @@ logging:
         root: WARN
         org.springframework.web: INFO
         com.memorynotfound: DEBUG
+        allein.service: DEBUG
 
 #
 #endpoints:
