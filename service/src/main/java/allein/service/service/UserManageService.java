@@ -1,25 +1,20 @@
 package allein.service.service;
 
-import allein.model.user.Result;
+import allein.model.exception.CommonException;
+import allein.model.exception.ErrorCode;
+import allein.model.exception.ExceptionEnum;
+import allein.model.output.Result;
 import allein.model.user.User;
-import allein.service.ServiceApplication;
 import allein.service.config.Configuration;
 import allein.service.mapper.UserMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.SpringApplication;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
-import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.messaging.MessageHeaders;
-import org.springframework.messaging.handler.annotation.Headers;
-import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
@@ -41,7 +36,9 @@ public class UserManageService {
     private UserMapper userMapper;
 
     @RequestMapping("/login")
-    public Result<User> login(
+    public
+    @ResponseBody
+    Result<User> login(
             @RequestParam(value = "name") String name,
             @RequestParam(value = "password") String password,
             HttpServletResponse httpRsp,
@@ -49,8 +46,12 @@ public class UserManageService {
     ) {
 
         User user= userMapper.selectByName(name);
+        if(user==null)
+        {
+            throw new CommonException(ExceptionEnum.USER_ACCOUNT_NOT_EXIST);
+        }
 
-        return new Result<User>(1,"",user);
+        return new Result<User>(1,"",null,user);
     }
 //    @RequestMapping("/sendmsg")
 //    public void send(String message){
