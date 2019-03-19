@@ -17,6 +17,23 @@ spring:
                 binder:
                     brokers: localhost:9092
                     zk-nodes: localhost:2181
+    kafka:
+        bootstrap-servers: localhost:9092
+        template:
+            default-topic: bizcorn-user
+        listener:
+            concurrency: 3
+        producer:
+            batch-size: 1000
+            key-serializer: org.apache.kafka.common.serialization.StringSerializer
+            value-serializer: org.apache.kafka.common.serialization.StringSerializer
+        consumer:
+            group-id: bizcorn
+            auto-offset-reset: latest
+            key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+            value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+
 eureka:
     client:
         serviceUrl:
@@ -27,6 +44,13 @@ management:
         web:
             exposure:
                 include: refresh,health,bus-refresh
+
+
+logging:
+    level:
+        root: WARN
+        org.springframework.web: INFO
+        com.memorynotfound: DEBUG
 
 #
 #endpoints:
