@@ -15,7 +15,7 @@ public class HelloController {
 
     @GetMapping(value = "/hi")
     public String sayHi(@RequestParam String name) {
-        return serviceGate.sayHiFromClientOne( name)+"@Feign" ;
+        return serviceGate.sayHiFromClientOne(name) + "@Feign";
     }
 
 }

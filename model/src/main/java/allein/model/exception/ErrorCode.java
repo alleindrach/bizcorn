@@ -12,22 +12,6 @@ public class ErrorCode implements Serializable {
     private String message;
     private String retcode;
 
-    public static ErrorCode success() {
-        return success;
-    }
-
-    public static ErrorCode code(Object code) {
-        return new ErrorCode(code);
-    }
-
-    public static ErrorCode code(String category, Object code) {
-        return new ErrorCode(category, code);
-    }
-
-    public static ErrorCode code(String category, Object code, String[] args) {
-        return new ErrorCode(category, code, args);
-    }
-
     public ErrorCode() {
         this.category = "default";
         this.code = "";
@@ -46,6 +30,22 @@ public class ErrorCode implements Serializable {
     public ErrorCode(String category, Object code, String[] args) {
         this(category, code);
         this.args = args;
+    }
+
+    public static ErrorCode success() {
+        return success;
+    }
+
+    public static ErrorCode code(Object code) {
+        return new ErrorCode(code);
+    }
+
+    public static ErrorCode code(String category, Object code) {
+        return new ErrorCode(category, code);
+    }
+
+    public static ErrorCode code(String category, Object code, String[] args) {
+        return new ErrorCode(category, code, args);
     }
 
     public String getRetcode() {
@@ -89,7 +89,7 @@ public class ErrorCode implements Serializable {
 //
 //            return this.code.toString();
 //        } else {
-            return this.message;
+        return this.message;
 //        }
     }
 

@@ -1,10 +1,9 @@
 package allein.service.service;
 
+import allein.model.data.user.User;
 import allein.model.exception.CommonException;
 import allein.model.exception.ExceptionEnum;
 import allein.model.output.Result;
-import allein.model.data.user.User;
-import allein.service.config.Configuration;
 import allein.service.dao.UserDAO;
 import allein.util.KeyGenerator;
 import org.slf4j.Logger;
@@ -25,25 +24,19 @@ import javax.servlet.http.HttpSession;
 @EnableEurekaClient
 @RestController
 @RefreshScope
-public class  UserManageService {
+public class UserManageService {
 
 
     private static final Logger LOG = LoggerFactory.getLogger(UserManageService.class);
 
-    @Autowired
-    Configuration config;
-
-
-    @Autowired
-    private UserDAO userDAO;
-
     @Value("${bizcorn.session.prefix}")
-	String sessionPrefix;
+    String sessionPrefix;
     @Value("${bizcorn.session.cookie.name}")
     String sessionCookieName;
     @Value("${bizcorn.session.cookie.user}")
     String sessionCookieUser;
-
+    @Autowired
+    private UserDAO userDAO;
 
     @RequestMapping("/login")
     public
@@ -55,12 +48,10 @@ public class  UserManageService {
             HttpSession session
     ) {
 
-        User user= userDAO.selectByName(name);
-        if(user==null)
-        {
+        User user = userDAO.selectByName(name);
+        if (user == null) {
             throw new CommonException(ExceptionEnum.USER_ACCOUNT_NOT_EXIST);
-        }else
-        {
+        } else {
             String sessionID = sessionPrefix + KeyGenerator.getKey();
 
             // 将 SessionID-UserEntity 存入Redis
@@ -70,11 +61,11 @@ public class  UserManageService {
             // 将SessionID存入HTTP响应头
             Cookie cookie = new Cookie(sessionCookieName, sessionID);
             httpRsp.addCookie(cookie);
-            Cookie cookieUser = new Cookie(sessionCookieUser,((Integer)( user.getId())).toString());
+            Cookie cookieUser = new Cookie(sessionCookieUser, ((Integer) (user.getId())).toString());
             httpRsp.addCookie(cookieUser);
         }
 
-        return new Result<User>(1,"",null,user);
+        return new Result<User>(1, "", null, user);
     }
 //    @RequestMapping("/sendmsg")
 //    public void send(String message){

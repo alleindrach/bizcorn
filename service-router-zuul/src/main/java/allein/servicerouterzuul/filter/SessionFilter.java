@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 public class SessionFilter extends ZuulFilter {
 
     private static Logger log = LoggerFactory.getLogger(SessionFilter.class);
+
     @Override
     public String filterType() {
         return "pre";
@@ -35,7 +36,7 @@ public class SessionFilter extends ZuulFilter {
         log.info(String.format("%s >>> %s", request.getMethod(), request.getRequestURL().toString()));
 
         Object accessToken = request.getParameter("token");
-        if(accessToken == null) {
+        if (accessToken == null) {
             log.warn("token is empty");
 //            ctx.setSendZuulResponse(false);
 //            ctx.setResponseStatusCode(401);

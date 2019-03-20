@@ -53,12 +53,10 @@ spring:
         port: 6379
         #password=bigdata123
         #database=15
-        timeout: 0
+        timeout: 5000
         pool:
             maxTotal: 8
             maxWaitMillis: 1000
-            maxIdle: 8
-            minIdle: 0
 
 mybatis:
 #    mapperLocations: classpath:mappers/*.xml

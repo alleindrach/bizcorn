@@ -204,7 +204,11 @@
         3 配置项
     
     缓存
-    
+        1 增加对data-redis 的依赖
+        2 增加RedisCacheConfig 配置
+        3 在App上增加@EnableCaching标注
+        4 需要缓存的函数上增加 @Cacheable(value="zone")，这里，zone是缓存分区，生成的key是zone::key
+        
     连接池
                 
 2 调试

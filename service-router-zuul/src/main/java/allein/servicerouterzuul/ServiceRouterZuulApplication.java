@@ -12,8 +12,8 @@ import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 @EnableDiscoveryClient
 public class ServiceRouterZuulApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(ServiceRouterZuulApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(ServiceRouterZuulApplication.class, args);
+    }
 
 }

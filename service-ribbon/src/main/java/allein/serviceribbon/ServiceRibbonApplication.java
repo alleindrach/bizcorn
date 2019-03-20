@@ -15,13 +15,13 @@ import org.springframework.web.client.RestTemplate;
 @EnableHystrix
 public class ServiceRibbonApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(ServiceRibbonApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(ServiceRibbonApplication.class, args);
+    }
 
-	@Bean
-	@LoadBalanced
-	RestTemplate restTemplate() {
-		return new RestTemplate();
-	}
+    @Bean
+    @LoadBalanced
+    RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
 }

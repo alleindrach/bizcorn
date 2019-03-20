@@ -17,20 +17,19 @@ import java.sql.SQLException;
 @ControllerAdvice
 public class ExceptionHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(ExceptionHandler.class);
     public static final String DEFAULT_ERROR_VIEW = "error";
-
+    private static final Logger logger = LoggerFactory.getLogger(ExceptionHandler.class);
 
     // Convert a predefined exception to an HTTP Status code
-    @ResponseStatus(value= HttpStatus.CONFLICT,
-            reason="Data integrity violation")  // 409
+    @ResponseStatus(value = HttpStatus.CONFLICT,
+            reason = "Data integrity violation")  // 409
     @org.springframework.web.bind.annotation.ExceptionHandler(DataIntegrityViolationException.class)
     public void conflict() {
         // Nothing to do
     }
 
     // Specify name of a specific view that will be used to display the error:
-    @org.springframework.web.bind.annotation.ExceptionHandler({SQLException.class,DataAccessException.class})
+    @org.springframework.web.bind.annotation.ExceptionHandler({SQLException.class, DataAccessException.class})
     public String databaseError() {
         // Nothing to do.  Returns the logical view name of an error page, passed
         // to the view-resolver(s) in usual way.
@@ -39,23 +38,24 @@ public class ExceptionHandler {
         // below.
         return "databaseError";
     }
+
     @org.springframework.web.bind.annotation.ExceptionHandler(CommonException.class)
     public @ResponseBody
     Result<Object> handleCommonError(HttpServletRequest req, CommonException ex) {
-        logger.error("Request: " + req.getRequestURL() ,  ex);
+        logger.error("Request: " + req.getRequestURL(), ex);
 
         return new Result<Object>(ex);
     }
+
     // Total control - setup a model and return the view name yourself. Or
     // consider subclassing ExceptionHandlerExceptionResolver (see below).
     @org.springframework.web.bind.annotation.ExceptionHandler(Exception.class)
     public @ResponseBody
-    Result<Object>  handleError(HttpServletRequest req, Exception ex) {
-        logger.error("Request: " + req.getRequestURL() ,  ex);
+    Result<Object> handleError(HttpServletRequest req, Exception ex) {
+        logger.error("Request: " + req.getRequestURL(), ex);
 
         return new Result<Object>(ex);
     }
-
 
 
 }
