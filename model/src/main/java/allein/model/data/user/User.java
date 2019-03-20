@@ -1,11 +1,11 @@
-package allein.model.user;
+package allein.model.data.user;
 
 import java.io.Serializable;
 
 public class User  implements Serializable{
     private int id;
     private String name;
-    private String password;
+    private String loginPassword;
     private String mobile;
 
     public int getId() {
@@ -24,12 +24,12 @@ public class User  implements Serializable{
         this.name = name;
     }
 
-    public String getPassword() {
-        return password;
+    public String getLoginPassword() {
+        return loginPassword;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setLoginPassword(String loginPassword) {
+        this.loginPassword = loginPassword;
     }
 
     public String getMobile() {

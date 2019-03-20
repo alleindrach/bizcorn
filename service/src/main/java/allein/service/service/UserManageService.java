@@ -1,12 +1,11 @@
 package allein.service.service;
 
 import allein.model.exception.CommonException;
-import allein.model.exception.ErrorCode;
 import allein.model.exception.ExceptionEnum;
 import allein.model.output.Result;
-import allein.model.user.User;
+import allein.model.data.user.User;
 import allein.service.config.Configuration;
-import allein.service.mapper.UserMapper;
+import allein.service.dao.UserDAO;
 import allein.util.KeyGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +35,7 @@ public class UserManageService {
 
 
     @Autowired
-    private UserMapper userMapper;
+    private UserDAO userDAO;
 
     @Value("${bizcorn.session.prefix}")
 	String sessionPrefix;
@@ -56,7 +55,7 @@ public class UserManageService {
             HttpSession session
     ) {
 
-        User user= userMapper.selectByName(name);
+        User user= userDAO.selectByName(name);
         if(user==null)
         {
             throw new CommonException(ExceptionEnum.USER_ACCOUNT_NOT_EXIST);

@@ -1,6 +1,6 @@
-package allein.service.mapper;
+package allein.service.dao;
 
-public interface BaseMapper<T> {
+public interface BaseDAO<T> {
     T selectById(int id);
     int insert(T entity);
     int update(T entity);
