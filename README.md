@@ -196,7 +196,17 @@
     定时任务：
         application 加标注 @EnableScheduling
         Task类加@component标注，方法加 @Scheduled 标注
-        http://www.cnblogs.com/dannyyao/p/7691871.html            
+        http://www.cnblogs.com/dannyyao/p/7691871.html
+        
+    Mybitis 数据库连接
+        1 用@Mapper/@Select 方法
+        2 用@Mapper/xml方式
+        3 配置项
+    
+    缓存
+    
+    连接池
+                
 2 调试
     <build>
 		<plugins>

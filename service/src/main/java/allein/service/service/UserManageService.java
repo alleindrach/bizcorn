@@ -25,7 +25,7 @@ import javax.servlet.http.HttpSession;
 @EnableEurekaClient
 @RestController
 @RefreshScope
-public class UserManageService {
+public class  UserManageService {
 
 
     private static final Logger LOG = LoggerFactory.getLogger(UserManageService.class);
