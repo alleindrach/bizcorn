@@ -70,6 +70,12 @@ logging:
         com.memorynotfound: DEBUG
         allein.service: DEBUG
 
+bizcorn:
+    session:
+        prefix: uid
+        cookie:
+            name: session
+            user: uid
 #
 #endpoints:
 #  refresh:

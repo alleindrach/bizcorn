@@ -192,7 +192,11 @@
                                 
                 调用任何一个client的 bus-refresh,都会刷新其他client端的配置实例
                      curl -X POST  -H  "Content-Tapplication/json"  "http://127.0.0.1:8762/actuator/bus-refresh"
-                
+             
+    定时任务：
+        application 加标注 @EnableScheduling
+        Task类加@component标注，方法加 @Scheduled 标注
+        http://www.cnblogs.com/dannyyao/p/7691871.html            
 2 调试
     <build>
 		<plugins>

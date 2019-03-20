@@ -16,6 +16,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.Headers;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 @EnableEurekaClient
 @RestController
 @RefreshScope
-
+@EnableScheduling
 public class ServiceApplication {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ServiceApplication.class);

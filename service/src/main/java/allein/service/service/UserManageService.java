@@ -7,9 +7,11 @@ import allein.model.output.Result;
 import allein.model.user.User;
 import allein.service.config.Configuration;
 import allein.service.mapper.UserMapper;
+import allein.util.KeyGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
@@ -35,6 +38,14 @@ public class UserManageService {
     @Autowired
     private UserMapper userMapper;
 
+    @Value("${bizcorn.session.prefix}")
+	String sessionPrefix;
+    @Value("${bizcorn.session.cookie.name}")
+    String sessionCookieName;
+    @Value("${bizcorn.session.cookie.user}")
+    String sessionCookieUser;
+
+
     @RequestMapping("/login")
     public
     @ResponseBody
@@ -49,6 +60,19 @@ public class UserManageService {
         if(user==null)
         {
             throw new CommonException(ExceptionEnum.USER_ACCOUNT_NOT_EXIST);
+        }else
+        {
+            String sessionID = sessionPrefix + KeyGenerator.getKey();
+
+            // 将 SessionID-UserEntity 存入Redis
+//            redisService.set(sessionID, userEntity, sessionExpireTime);
+//        RedisServiceTemp.userMap.put(sessionID, userEntity);
+
+            // 将SessionID存入HTTP响应头
+            Cookie cookie = new Cookie(sessionCookieName, sessionID);
+            httpRsp.addCookie(cookie);
+            Cookie cookieUser = new Cookie(sessionCookieUser,((Integer)( user.getId())).toString());
+            httpRsp.addCookie(cookieUser);
         }
 
         return new Result<User>(1,"",null,user);
