@@ -208,8 +208,10 @@
         2 增加RedisCacheConfig 配置
         3 在App上增加@EnableCaching标注
         4 需要缓存的函数上增加 @Cacheable(value="zone")，这里，zone是缓存分区，生成的key是zone::key
-        
-    连接池
+            redis-cli KEY *
+           
+    数据库连接池
+        默认使用hikariCP ，增加依赖starter-jdbc
                 
 2 调试
     <build>

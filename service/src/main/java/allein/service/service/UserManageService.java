@@ -24,6 +24,7 @@ import javax.servlet.http.HttpSession;
 @EnableEurekaClient
 @RestController
 @RefreshScope
+@RequestMapping("/user")
 public class UserManageService {
 
 
@@ -38,8 +39,8 @@ public class UserManageService {
     @Autowired
     private UserDAO userDAO;
 
-    @RequestMapping("/login")
     public
+    @RequestMapping("/login")
     @ResponseBody
     Result<User> login(
             @RequestParam(value = "name") String name,
@@ -67,6 +68,7 @@ public class UserManageService {
 
         return new Result<User>(1, "", null, user);
     }
+
 //    @RequestMapping("/sendmsg")
 //    public void send(String message){
 //        LOG.info("sending message='{}' to topic='{}'", message, topic);
