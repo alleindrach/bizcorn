@@ -36,12 +36,12 @@ feign:
     httpclient:
         enabled=true
 
-hystrix:
-  command:
-    default:
-      execution:
-        isolation:
-          strategy: SEMAPHORE
+#hystrix:
+#  command:
+#    default:
+#      execution:
+#        isolation:
+#          strategy: SEMAPHORE
 
 logging:
     level:

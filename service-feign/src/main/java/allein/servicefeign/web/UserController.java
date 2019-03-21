@@ -1,7 +1,7 @@
 package allein.servicefeign.web;
 
 import allein.model.output.Result;
-import allein.servicefeign.interceptor.SessionInterceptor;
+import allein.servicefeign.interceptor.SessionReplicateInterceptor;
 import allein.servicefeign.service.ServiceGate;
 import feign.RequestTemplate;
 import org.slf4j.Logger;
