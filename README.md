@@ -263,7 +263,9 @@
                    isolation:
                      strategy: SEMAPHORE
            注入一个SessionInterceptor bean 转发cookie
+           或者使用下面文章中提到的方式：
            https://blog.csdn.net/zl1zl2zl3/article/details/79084368
+           
     去重问题
     身份认证、SSO、OAUTH
     
