@@ -89,6 +89,8 @@ public enum ExceptionEnum {
             "9998", "原始请求记录未找到"),
     USER_ACCOUNT_NOT_EXIST("9999",
             "用户账户不存在"),
+    USER_NOT_LOGIN("1009",
+            "用户未登录"),
     ESCROW_SIGNATURE_FAILURE("10001", "存管签名错误"),
     ESCROW_REQUEST_FAILURE(
             "10002", "存管请求失败"),

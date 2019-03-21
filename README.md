@@ -197,21 +197,59 @@
         application 加标注 @EnableScheduling
         Task类加@component标注，方法加 @Scheduled 标注
         http://www.cnblogs.com/dannyyao/p/7691871.html
-        
+        ?定时服务的线程和并发问题。
+    
+    消息发送、接收：
+        kafka
+        注入kafka 模版
+        	@Autowired
+        	private KafkaTemplate<Object, Object> kafkaTemplate;
+        增加发送器和监听器
+        	@RequestMapping("/sendmsg")
+        	public void send(String message){
+        		LOG.info("sending message='{}' to topic='{}'", message, topic);
+        		kafkaTemplate.send(topic, message);
+        	}
+        //
+        	@KafkaListener(topics = "${spring.kafka.template.default-topic}")
+        	public void receive(@Payload String message,
+        						@Headers MessageHeaders headers) {
+        		LOG.info("received message='{}'", message);
+        		headers.keySet().forEach(key -> LOG.info("{}: {}", key, headers.get(key)));
+        	}
+    
     Mybitis 数据库连接
         1 用@Mapper/@Select 方法
         2 用@Mapper/xml方式
         3 配置项
     
+    数据库连接池
+            默认使用hikariCP ，增加依赖starter-jdbc
+            
+    数据库对象生成代码对象 plugin
+        Entity->Object
     缓存
         1 增加对data-redis 的依赖
         2 增加RedisCacheConfig 配置
         3 在App上增加@EnableCaching标注
         4 需要缓存的函数上增加 @Cacheable(value="zone")，这里，zone是缓存分区，生成的key是zone::key
             redis-cli KEY *
-           
-    数据库连接池
-        默认使用hikariCP ，增加依赖starter-jdbc
+         
+        缓存的超时时间问题？
+        
+    Session管理->Redis
+        增加依赖
+                <dependency>
+                    <groupId>org.springframework.session</groupId>
+                    <artifactId>spring-session-data-redis</artifactId>
+                </dependency>
+        app增加注释
+            @EnableRedisHttpSession
+            
+        
+    去重问题
+    身份认证、SSO、OAUTH
+    
                 
 2 调试
     <build>

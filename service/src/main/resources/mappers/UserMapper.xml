@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="allein.service.dao.UserMapper">
 
-    <resultMap id="UserResultMap" type="allein.model.data.user.User">
+    <resultMap id="UserResultMap" type="allein.model.entity.user.User">
         <id column="id" property="id" jdbcType="INTEGER"/>
         <result column="name" property="name" jdbcType="VARCHAR"/>
         <result column="login_password" property="password" jdbcType="VARCHAR"/>
@@ -24,7 +24,7 @@
         from tad_user
         where name = #{name,jdbcType=VARCHAR}
     </select>
-    <insert id="insert" parameterType="allein.model.data.user.User">
+    <insert id="insert" parameterType="allein.model.entity.user.User">
         insert into tad_user (id, name, password,mobile
         )
         values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR},
@@ -32,7 +32,7 @@
         )
     </insert>
 
-    <update id="update" parameterType="allein.model.data.user.User">
+    <update id="update" parameterType="allein.model.entity.user.User">
         update tad_user
         <set>
             <if test="name != null">
@@ -42,7 +42,7 @@
                 password = #{password,jdbcType=VARCHAR},
             </if>
             <if test="mobile != null">
-                mobile = #{mobile,jdbcType=VARCHAR},
+                mobile = #{mobile,jdbcType=VARCHAR}
             </if>
         </set>
         where id = #{id,jdbcType=INTEGER}

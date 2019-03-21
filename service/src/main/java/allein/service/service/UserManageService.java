@@ -1,23 +1,22 @@
 package allein.service.service;
 
-import allein.model.data.user.User;
+import allein.aspect.AuthLogin;
+import allein.model.entity.user.User;
 import allein.model.exception.CommonException;
 import allein.model.exception.ExceptionEnum;
 import allein.model.output.Result;
 import allein.service.dao.UserDAO;
 import allein.util.KeyGenerator;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
@@ -32,10 +31,14 @@ public class UserManageService {
 
     @Value("${bizcorn.session.prefix}")
     String sessionPrefix;
-    @Value("${bizcorn.session.cookie.name}")
-    String sessionCookieName;
-    @Value("${bizcorn.session.cookie.user}")
-    String sessionCookieUser;
+
+    @Value("${bizcorn.session.attribute.user}")
+    String sessionAttrUser;
+
+    @Value("${bizcorn.session.attribute.timeout}")
+    String sessionAttrTimeout;
+    @Value("${bizcorn.session.timeout}")
+    Long sessionTimeout;
     @Autowired
     private UserDAO userDAO;
 
@@ -49,7 +52,7 @@ public class UserManageService {
             HttpSession session
     ) {
 
-        User user = userDAO.selectByName(name);
+        User user = userDAO.selectByNameCached(name);
         if (user == null) {
             throw new CommonException(ExceptionEnum.USER_ACCOUNT_NOT_EXIST);
         } else {
@@ -58,17 +61,47 @@ public class UserManageService {
             // 将 SessionID-UserEntity 存入Redis
 //            redisService.set(sessionID, userEntity, sessionExpireTime);
 //        RedisServiceTemp.userMap.put(sessionID, userEntity);
+//
+//            // 将SessionID存入HTTP响应头
+//            Cookie cookie = new Cookie(sessionCookieName, sessionID);
+//            httpRsp.addCookie(cookie);
+//            Cookie cookieUser = new Cookie(sessionCookieUser, ((Integer) (user.getId())).toString());
+//            httpRsp.addCookie(cookieUser);
+            session.setAttribute(sessionAttrTimeout,System.currentTimeMillis()/1000L+sessionTimeout);
+            session.setAttribute(sessionAttrUser, JSONObject.toJSONString(user));
 
-            // 将SessionID存入HTTP响应头
-            Cookie cookie = new Cookie(sessionCookieName, sessionID);
-            httpRsp.addCookie(cookie);
-            Cookie cookieUser = new Cookie(sessionCookieUser, ((Integer) (user.getId())).toString());
-            httpRsp.addCookie(cookieUser);
         }
 
         return new Result<User>(1, "", null, user);
     }
+    public
+    @PutMapping("/")
+    @ResponseBody
+    @AuthLogin(injectUidFiled = "userId")
+    Result<User> update(
+            @RequestParam(value = "mobile") String mobile,
+            Long userId,
+            HttpSession session
+    ) {
 
+        Object uo=session.getAttribute(sessionAttrUser);
+
+        User user = (User) JSONObject.parseObject(uo.toString(),User.class);
+        user=userDAO.selectById(user.getId());
+        if (user == null) {
+            throw new CommonException(ExceptionEnum.USER_ACCOUNT_NOT_EXIST);
+        } else {
+            user.setMobile(mobile);
+            int updated=userDAO.update(user);
+            if(updated>0)
+            {
+                return new Result<User>(1, "", null, user);
+            }else
+            {
+                return new Result<User>(0, "", null, user);
+            }
+        }
+    }
 //    @RequestMapping("/sendmsg")
 //    public void send(String message){
 //        LOG.info("sending message='{}' to topic='{}'", message, topic);

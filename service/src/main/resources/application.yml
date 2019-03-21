@@ -116,13 +116,18 @@ logging:
         org.springframework.web: INFO
         com.memorynotfound: DEBUG
         allein.service: DEBUG
-
+        allein.service.exception: DEBUG
 bizcorn:
     session:
+        timeout: 1800
         prefix: uid
         cookie:
             name: session
             user: uid
+        attribute:
+            user: user
+            timeout: timeout
+
 #
 #endpoints:
 #  refresh:

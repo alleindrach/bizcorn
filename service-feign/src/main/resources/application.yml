@@ -1,14 +1,17 @@
 eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
+    client:
+        serviceUrl:
+            defaultZone: http://localhost:8761/eureka/
 server:
-  port: 8765
+    port: 8765
 
 spring:
-  application:
-    name: service-feign
+    application:
+        name: service-feign
 
 feign:
-  hystrix:
-    enabled: true
+    hystrix:
+        enabled: true
+        #使用apache的httpclient，连接池，替换feign原生的httpclient
+    httpclient:
+        enabled=true

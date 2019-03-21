@@ -26,6 +26,8 @@ public class SessionFilter extends ZuulFilter {
 
     @Override
     public boolean shouldFilter() {
+        RequestContext ctx = RequestContext.getCurrentContext();
+
         return true;
     }
 

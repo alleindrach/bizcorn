@@ -9,6 +9,7 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RefreshScope
 @EnableScheduling
 @EnableCaching
+@EnableRedisHttpSession
 public class ServiceApplication {
 
     private static final Logger LOG = LoggerFactory.getLogger(ServiceApplication.class);

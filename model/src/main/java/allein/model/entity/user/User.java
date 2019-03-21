@@ -1,4 +1,4 @@
-package allein.model.data.user;
+package allein.model.entity.user;
 
 import java.io.Serializable;
 

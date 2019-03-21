@@ -24,19 +24,23 @@ public class ExceptionHandler {
     @ResponseStatus(value = HttpStatus.CONFLICT,
             reason = "Data integrity violation")  // 409
     @org.springframework.web.bind.annotation.ExceptionHandler(DataIntegrityViolationException.class)
-    public void conflict() {
-        // Nothing to do
+    public Result conflict( HttpServletRequest req,DataIntegrityViolationException ex) {
+        logger.error("Request: " + req.getRequestURL(), ex);
+
+        return new Result(ex);
     }
 
     // Specify name of a specific view that will be used to display the error:
     @org.springframework.web.bind.annotation.ExceptionHandler({SQLException.class, DataAccessException.class})
-    public String databaseError() {
+    public Result databaseError(HttpServletRequest req, Exception ex) {
         // Nothing to do.  Returns the logical view name of an error page, passed
         // to the view-resolver(s) in usual way.
         // Note that the exception is NOT available to this view (it is not added
         // to the model) but see "Extending ExceptionHandlerExceptionResolver"
         // below.
-        return "databaseError";
+        logger.error("Request: " + req.getRequestURL(), ex);
+
+        return new Result(ex);
     }
 
     @org.springframework.web.bind.annotation.ExceptionHandler(CommonException.class)
