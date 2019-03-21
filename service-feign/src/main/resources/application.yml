@@ -8,6 +8,26 @@ server:
 spring:
     application:
         name: service-feign
+    redis:
+        host: localhost
+        port: 6379
+        #password=bigdata123
+        #database=15
+        timeout: 5000
+        pool:
+            maxTotal: 8
+            maxWaitMillis: 1000
+
+bizcorn:
+    session:
+        timeout: 1800
+        prefix: uid
+        cookie:
+            name: session
+            user: uid
+        attribute:
+            user: user
+            timeout: timeout
 
 feign:
     hystrix:
@@ -15,3 +35,17 @@ feign:
         #使用apache的httpclient，连接池，替换feign原生的httpclient
     httpclient:
         enabled=true
+
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          strategy: SEMAPHORE
+
+logging:
+    level:
+        root: WARN
+        org.springframework.web: INFO
+        com.memorynotfound: DEBUG
+        allein.servicefeign: DEBUG

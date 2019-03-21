@@ -14,7 +14,7 @@ public class ScheduledTask {
     private static final Logger logger = LoggerFactory.getLogger(ScheduledTask.class);
     private static final SimpleDateFormat formate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    @Scheduled(fixedRate = 5000)
+//    @Scheduled(fixedRate = 5000)
     public void scheduledDemo() {
         logger.info("scheduled - fixedRate - print time every 5 seconds:{}", formate.format(new Date()));
     }
@@ -33,7 +33,7 @@ public class ScheduledTask {
      * "0 10,44 14 ? 3 WED"    三月的每周三的14：10和14：44触发
      * "0 15 10 ? * MON-FRI"    每个周一、周二、周三、周四、周五的10：15触发
      */
-    @Scheduled(cron = "0/10 * *  * * ?")
+//    @Scheduled(cron = "0/10 * *  * * ?")
     public void scheduledCronDemo() {
         logger.info("scheduled - cron - print time every 10 seconds:{}", formate.format(new Date()));
     }

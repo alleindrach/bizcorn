@@ -246,7 +246,23 @@
         app增加注释
             @EnableRedisHttpSession
             
+        redis-cli 访问：
+        key *    
+        type  "spring:session:sessions:4a176cbc-6f9a-437b-9cc0-fe6e54746d43"    
+        hgetall  "spring:session:sessions:4a176cbc-6f9a-437b-9cc0-fe6e54746d43"
         
+        
+        session 穿透
+        Client  ---1--->  Router ---2--->  Feign ---3--->  Service
+        2: sensitiveHeaders: "*"
+        3: 如果使用熔断器，熔断器的隔离模式：
+           hystrix:
+             command:
+               default:
+                 execution:
+                   isolation:
+                     strategy: SEMAPHORE
+           注入一个SessionInterceptor bean 转发cookie
     去重问题
     身份认证、SSO、OAUTH
     

@@ -2,7 +2,9 @@ package allein.model.output;
 
 import allein.model.exception.ErrorCodeException;
 
-public class Result<T> {
+import java.io.Serializable;
+
+public class Result<T> implements Serializable{
     final static public int FAILED = 0;
     final static public int SUCCESS = 1;
     int state = 0;
@@ -29,7 +31,9 @@ public class Result<T> {
         this.message = exception.getMessage();
 
     }
+    public Result() {
 
+    }
     public String getReason() {
         return reason;
     }

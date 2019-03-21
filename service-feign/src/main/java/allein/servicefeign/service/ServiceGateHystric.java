@@ -13,4 +13,9 @@ public class ServiceGateHystric implements ServiceGate {
     {
         return new Result(new CommonException("0000","lost connection to service server"));
     }
+    @Override
+    public Result<User> update(@RequestParam(value = "mobile") String mobile)
+    {
+        return new Result(new CommonException("0000","lost connection to service server"));
+    }
 }

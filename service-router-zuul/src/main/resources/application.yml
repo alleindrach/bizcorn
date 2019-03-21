@@ -22,7 +22,9 @@ zuul:
         api-a:
             path: /api-ribbon/**
             serviceId: service-ribbon
+            sensitiveHeaders: "*"
         api-b:
             path: /api-feign/**
             serviceId: service-feign
+            sensitiveHeaders: "*"
 

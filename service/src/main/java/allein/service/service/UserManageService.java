@@ -17,8 +17,11 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.util.Enumeration;
 
 @EnableEurekaClient
 @RestController
@@ -27,7 +30,7 @@ import javax.servlet.http.HttpSession;
 public class UserManageService {
 
 
-    private static final Logger LOG = LoggerFactory.getLogger(UserManageService.class);
+    private static final Logger logger = LoggerFactory.getLogger(UserManageService.class);
 
     @Value("${bizcorn.session.prefix}")
     String sessionPrefix;
@@ -49,14 +52,15 @@ public class UserManageService {
             @RequestParam(value = "name") String name,
             @RequestParam(value = "password") String password,
             HttpServletResponse httpRsp,
-            HttpSession session
+            HttpSession session,
+            HttpServletRequest request
     ) {
 
         User user = userDAO.selectByNameCached(name);
         if (user == null) {
             throw new CommonException(ExceptionEnum.USER_ACCOUNT_NOT_EXIST);
         } else {
-            String sessionID = sessionPrefix + KeyGenerator.getKey();
+//            String sessionID = sessionPrefix + KeyGenerator.getKey();
 
             // 将 SessionID-UserEntity 存入Redis
 //            redisService.set(sessionID, userEntity, sessionExpireTime);
@@ -67,6 +71,18 @@ public class UserManageService {
 //            httpRsp.addCookie(cookie);
 //            Cookie cookieUser = new Cookie(sessionCookieUser, ((Integer) (user.getId())).toString());
 //            httpRsp.addCookie(cookieUser);
+            logger.info(" {} >>> {}",  request.getRequestURL().toString(),session.getId());
+            Enumeration e = request.getSession().getAttributeNames();
+            while (e.hasMoreElements()) {
+                String ename = (String) e.nextElement();
+                logger.info("Session >>>>> {} => {}",ename,request.getSession().getAttribute(ename));
+            }
+            Cookie[] cookies =request.getCookies();
+            if(cookies!=null) {
+                for (int i = 0; i < cookies.length; i++) {
+                    logger.info("Cookie >>>>> {} => {}", cookies[i].getName(), cookies[i].getValue());
+                }
+            }
             session.setAttribute(sessionAttrTimeout,System.currentTimeMillis()/1000L+sessionTimeout);
             session.setAttribute(sessionAttrUser, JSONObject.toJSONString(user));
 
@@ -81,9 +97,21 @@ public class UserManageService {
     Result<User> update(
             @RequestParam(value = "mobile") String mobile,
             Long userId,
-            HttpSession session
+            HttpSession session,
+            HttpServletRequest request
     ) {
-
+        logger.info(" {} >>> {}",  request.getRequestURL().toString(),session.getId());
+        Enumeration e = request.getSession().getAttributeNames();
+        while (e.hasMoreElements()) {
+            String ename = (String) e.nextElement();
+            logger.info("Session >>>>> {} => {}",ename,request.getSession().getAttribute(ename));
+        }
+        Cookie[] cookies =request.getCookies();
+        if(cookies!=null) {
+            for (int i = 0; i < cookies.length; i++) {
+                logger.info("Cookie >>>>> {} => {}", cookies[i].getName(), cookies[i].getValue());
+            }
+        }
         Object uo=session.getAttribute(sessionAttrUser);
 
         User user = (User) JSONObject.parseObject(uo.toString(),User.class);
