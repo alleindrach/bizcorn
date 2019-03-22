@@ -44,7 +44,7 @@ public class CacheServiceControl {
     }
     public
     @GetMapping("/{key}")
-    String get(String key)
+    String get(@PathVariable String key)
     {
         String result=cacheService.get(key);
         return result;
@@ -52,13 +52,13 @@ public class CacheServiceControl {
 
     public
     @RequestMapping("/exists/{key}")
-    Boolean exists(final String key)
+    Boolean exists(@PathVariable final String key)
     {
         return cacheService.exists(key);
     }
     public
     @DeleteMapping("/{key}")
-    Boolean del(String key)
+    Boolean del(@PathVariable String key)
     {
         return cacheService.del(key);
     }
