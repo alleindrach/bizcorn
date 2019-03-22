@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Component
-public class ServiceGateHystric implements ServiceGate {
+public class IUserServiceHystric implements IUserService {
     @Override
     public Result<User> login(@RequestParam(value = "name") String name, @RequestParam(value = "password") String password)
     {

@@ -269,6 +269,8 @@
     去重问题
     身份认证、SSO、OAUTH
     
+    Eueka对服务失效的感知优化：
+        https://yq.aliyun.com/articles/693725
                 
 2 调试
     <build>

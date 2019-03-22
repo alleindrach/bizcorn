@@ -1,8 +1,7 @@
 package allein.servicefeign.web;
 
 import allein.model.output.Result;
-import allein.servicefeign.interceptor.SessionReplicateInterceptor;
-import allein.servicefeign.service.ServiceGate;
+import allein.servicefeign.service.IUserService;
 import feign.RequestTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,13 +19,13 @@ import java.util.Enumeration;
 @RestController
 @RefreshScope
 @RequestMapping("/user")
-public class UserController {
+public class UserServiceControl {
 
-    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+    private static final Logger logger = LoggerFactory.getLogger(UserServiceControl.class);
 
 
     @Autowired
-    ServiceGate serviceGate;
+    IUserService userService;
 
     @Value("${bizcorn.session.attribute.user}")
     String sessionAttrUser;
@@ -53,7 +52,7 @@ public class UserController {
         }
 
 
-        Result x=serviceGate.login(name,password);
+        Result x=userService.login(name,password);
         return x;
     }
 
@@ -63,7 +62,7 @@ public class UserController {
         Object uo=session.getAttribute(sessionAttrUser);
 
 
-        return serviceGate.update(mobile);
+        return userService.update(mobile);
     }
 
 }

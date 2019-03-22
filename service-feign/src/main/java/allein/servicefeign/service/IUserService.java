@@ -9,11 +9,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 //动态注入proxy
 @FeignClient(value = "service"
-        , fallback = ServiceGateHystric.class
+        , fallback = IUserServiceHystric.class
 )
-public interface ServiceGate {
+public interface IUserService {
     @RequestMapping(value = "/user/login", method = RequestMethod.GET)
     Result<User> login(@RequestParam(value = "name") String name, @RequestParam(value = "password") String password);
     @RequestMapping(value = "/user/", method = RequestMethod.PUT)
     Result<User> update(@RequestParam(value = "mobile") String mobile);
+
+
 }
