@@ -7,7 +7,7 @@
         <groupId>allein</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <groupId>allein</groupId>
+    <groupId>allein.bizcorn</groupId>
     <artifactId>config-server</artifactId>
     <version>1.0-SNAPSHOT</version>
     <name>config-server</name>

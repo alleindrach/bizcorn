@@ -267,11 +267,16 @@
            https://blog.csdn.net/zl1zl2zl3/article/details/79084368
            
     去重问题
+        缓存服务
+        注意redisTemplate 的序列化插件，使用string序列化，而不是java序列化，否则会出现key的一些前缀问题。
+        
     身份认证、SSO、OAUTH
     
     Eueka对服务失效的感知优化：
         https://yq.aliyun.com/articles/693725
-                
+    
+    复用：
+       一些可复用的config的类，可以包装成一个jar项目，以依赖方式加入到其他项目中，比如redis、security配置类     
 2 调试
     <build>
 		<plugins>

@@ -18,9 +18,10 @@
 
     <modules>
         <module>eureka-server</module>
-        <module>model</module>
+        <module>common</module>
         <module>service</module>
-        <module>service-ribbon</module>
+        <module>config-server</module>
+        <!--<module>service-ribbon</module>-->
         <module>service-feign</module>
         <module>service-router-zuul</module>
     </modules>
