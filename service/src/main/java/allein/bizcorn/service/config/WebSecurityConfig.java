@@ -5,6 +5,7 @@ import allein.bizcorn.service.security.MD5PasswordEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -29,7 +30,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 //
 //        //允许所有用户访问"/"和"/home"
-        http.authorizeRequests().anyRequest().permitAll();
+        http.authorizeRequests()
+                .antMatchers(HttpMethod.PUT,"/user").authenticated()
+                .antMatchers("/user/login").permitAll()
+                .and()
+                .formLogin()
+                .and()
+                .csrf().disable()
+                ;
+
 //                .antMatchers("/", "/home").permitAll()
 //                //其他地址的访问均需验证权限
 //                .anyRequest().authenticated()

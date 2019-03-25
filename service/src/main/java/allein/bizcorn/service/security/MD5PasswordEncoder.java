@@ -10,7 +10,7 @@ public class MD5PasswordEncoder  implements PasswordEncoder {
     public String encode(CharSequence rawPassword) {
         //对密码进行 md5 加密
         String md5Password = DigestUtils.md5DigestAsHex(rawPassword.toString().getBytes());
-        return null;
+        return md5Password;
     }
 
     @Override
