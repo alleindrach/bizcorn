@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -52,7 +53,19 @@ public class UserManageService {
 
     @Autowired
     private SimpleAuthenticationManager simpleAuthenticationManager;
+
     public
+    @RequestMapping("/logout")
+    @ResponseBody
+    Result<User> logout(
+            HttpServletResponse httpRsp,
+            HttpSession session,
+            HttpServletRequest request
+    ) {
+        SecurityContextHolder.getContext().setAuthentication(null);
+        return new Result(1, "", null, null);
+    }
+        public
     @RequestMapping("/login")
     @ResponseBody
     Result<User> login(
@@ -110,6 +123,7 @@ public class UserManageService {
     public
     @PutMapping("/")
     @ResponseBody
+    @PreAuthorize("hasRole('USER')")
 //    @AuthLogin(injectUidFiled = "userId")
     Result<User> update(
             @RequestParam(value = "mobile") String mobile,

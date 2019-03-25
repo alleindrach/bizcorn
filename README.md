@@ -237,6 +237,8 @@
          
         缓存的超时时间问题？
         
+    事务：
+    
     Session管理->Redis
         增加依赖
                 <dependency>
@@ -271,7 +273,13 @@
         注意redisTemplate 的序列化插件，使用string序列化，而不是java序列化，否则会出现key的一些前缀问题。
         
     身份认证、SSO、OAUTH
-    
+        Security:
+            WebSecurityConfig:注意关闭crsf，否则需要前后端都要配置crsf的token
+            CustomUserDetailsService：负责从数据库里提取需要进行比对的user
+            Login：从数据库中取得user的权限，加到session中。
+        http://www.cnblogs.com/shihuc/p/5051771.html
+        
+        
     Eueka对服务失效的感知优化：
         https://yq.aliyun.com/articles/693725
     
