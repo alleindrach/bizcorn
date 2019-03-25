@@ -238,7 +238,9 @@
         缓存的超时时间问题？
         
     事务：
-    
+        @EnableTransactionManagement 
+        @Transactional
+        
     Session管理->Redis
         增加依赖
                 <dependency>

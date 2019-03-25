@@ -2,12 +2,14 @@ package allein.bizcorn.service.exception;
 
 
 import allein.bizcorn.common.exception.CommonException;
+import allein.bizcorn.common.exception.ExceptionEnum;
 import allein.bizcorn.common.model.output.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -51,7 +53,13 @@ public class ExceptionHandler {
 
         return new Result<Object>(ex);
     }
+    @org.springframework.web.bind.annotation.ExceptionHandler(AccessDeniedException.class)
+    public @ResponseBody
+    Result<Object> handleError(HttpServletRequest req, AccessDeniedException ex) {
+        logger.error("Request: " + req.getRequestURL(), ex);
 
+        return new Result<Object>(new CommonException(ExceptionEnum.USER_ACCOUNT_ID_INVALID));
+    }
     // Total control - setup a model and return the view name yourself. Or
     // consider subclassing ExceptionHandlerExceptionResolver (see below).
     @org.springframework.web.bind.annotation.ExceptionHandler(Exception.class)
@@ -61,6 +69,7 @@ public class ExceptionHandler {
 
         return new Result<Object>(ex);
     }
+
 
 
 }

@@ -12,6 +12,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.session.data.redis.RedisFlushMode;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @EnableCaching
 @EnableRedisHttpSession(redisFlushMode = RedisFlushMode.IMMEDIATE)
 @ComponentScan(basePackages = "allein.bizcorn" )
+@EnableTransactionManagement
 public class ServiceApplication {
 
     private static final Logger LOG = LoggerFactory.getLogger(ServiceApplication.class);
