@@ -14,6 +14,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.Enumeration;
 
@@ -35,7 +36,7 @@ public class UserServiceControl {
     @ResponseBody
     public Result login(
             RequestTemplate requestTemplate,
-            @RequestParam String name, @RequestParam String password, HttpServletRequest request, HttpSession session) {
+            @RequestParam String username, @RequestParam String password, HttpServletRequest request, HttpSession session) {
         String sessionId =  RequestContextHolder.getRequestAttributes().getSessionId();
 
         logger.info(" {} >>> {}",  request.getRequestURL().toString(),sessionId);
@@ -53,7 +54,7 @@ public class UserServiceControl {
         }
 
 
-        Result x=userService.login(name,password);
+        Result x=userService.login(username,password);
         return x;
     }
 
@@ -65,5 +66,21 @@ public class UserServiceControl {
 
         return userService.update(mobile);
     }
-
+    @RequestMapping(value = "/logout")
+    @ResponseBody
+    public Result logout()
+    {
+        return  userService.logout();
+    }
+    @GetMapping("/captcha.jpg")
+    public void captcha(HttpServletRequest request,HttpServletResponse response)
+    {
+        userService.captcha();
+    }
+    @GetMapping("/mobile/captcha")
+    @ResponseBody
+    public Result mobileCaptcha(@RequestParam String mobile)
+    {
+        return userService.mobileCaptcha(mobile);
+    }
 }

@@ -40,4 +40,7 @@ public interface UserDAO extends BaseDAO<User> {
 
     @org.apache.ibatis.annotations.Select("select id,name,login_password , login_password_random,mobile from tad_user where name = #{name}")
     User selectByName(String name);
+
+    @org.apache.ibatis.annotations.Select("select id,name,login_password , login_password_random,mobile from tad_user where mobile = #{mobile}")
+    User selectByMobile(String mobile);
 }

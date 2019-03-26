@@ -2,20 +2,20 @@ package allein.bizcorn.servicefeign.service;
 
 import allein.bizcorn.common.model.entity.user.User;
 import allein.bizcorn.common.model.output.Result;
+import allein.bizcorn.facade.UserServiceFacade;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 //动态注入proxy
 @FeignClient(value = "service"
         , fallback = IUserServiceHystric.class
 )
-public interface IUserService {
+public interface IUserService extends UserServiceFacade{
     @RequestMapping(value = "/user/login", method = RequestMethod.GET)
-    Result<User> login(@RequestParam(value = "name") String name, @RequestParam(value = "password") String password);
-    @RequestMapping(value = "/user/", method = RequestMethod.PUT)
-    Result<User> update(@RequestParam(value = "mobile") String mobile);
-
-
+    Result<User> login(@RequestParam(value = "username") String username, @RequestParam(value = "password") String password);
+    @RequestMapping(value = "/user/logout", method = RequestMethod.GET)
+    Result<User> logout();
 }

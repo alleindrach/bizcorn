@@ -23,7 +23,7 @@ public class CacheServiceControl {
     String sessionAttrUser;
 
     public
-    @PutMapping("/{key}/{expire}/{value}")
+    @PutMapping("/{key}/{value}/{expire}")
     Boolean put(@PathVariable  String key,@PathVariable Long expire,@PathVariable  String value)
     {
         Boolean result=cacheService.put(key,expire,value);

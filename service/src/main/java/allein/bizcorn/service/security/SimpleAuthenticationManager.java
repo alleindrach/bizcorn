@@ -1,6 +1,5 @@
 package allein.bizcorn.service.security;
 
-import allein.bizcorn.common.exception.BizAuthenticationException;
 import allein.bizcorn.common.exception.CommonException;
 import allein.bizcorn.common.exception.ExceptionEnum;
 import allein.bizcorn.common.model.entity.user.User;

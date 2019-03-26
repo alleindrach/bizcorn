@@ -18,13 +18,54 @@ public class CacheAccessor implements ICacheAccessor {
     private RedisTemplate redisTemplate;
 
     public
-    Boolean put(String key,Long expire,String value)
+    Long inc(String key)
+    {
+        return this.inc(key,1L);
+    }
+    public
+    Long inc(String key,Long step)
+    {
+        Long result=null;
+
+        try {
+            ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
+            result=operations.increment(key, step);
+        } catch (Exception e) {
+            logger.error("Cache Error",e);
+        }
+        return result;
+
+    }
+    public
+    Boolean expire(String key,Long expire)
+    {
+        return this.expire(key,expire,TimeUnit.SECONDS);
+    }
+    public
+    Boolean expire(String key,Long expire, TimeUnit tu)
+    {
+        boolean result = false;
+        try {
+            redisTemplate.expire(key, expire,tu);
+            result = true;
+        } catch (Exception e) {
+            logger.error("Cache Error",e);
+        }
+        return result;
+    }
+    public
+    Boolean put(String key,String value,Long expire)
+    {
+        return this.put(key,value,expire,TimeUnit.SECONDS);
+    }
+    public
+    Boolean put(String key,String value,Long expire,TimeUnit tu)
     {
         boolean result = false;
         try {
             ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
             operations.set(key, value);
-            redisTemplate.expire(key, expire, TimeUnit.SECONDS);
+            redisTemplate.expire(key, expire,tu);
             result = true;
         } catch (Exception e) {
            logger.error("Cache Error",e);
@@ -48,7 +89,14 @@ public class CacheAccessor implements ICacheAccessor {
         }
 
     }
-
+    public
+    Long getLong(String key)
+    {
+        String result=this.get(key);
+        if(result!=null)
+            return Long.parseLong(result);
+        return 0L;
+    }
     public
     Boolean exists(final String key)
     {

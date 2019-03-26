@@ -615,7 +615,10 @@ public enum ExceptionEnum {
     ESCROW_JX_RESPONSE_CODE_REQ_SIGNATURE_ERROR(
             "600001", "请求签名校验异常"),
     ESCROW_JX_RESPONSE_CODE_TRANSACTION_CODE_INVALID(
-            "600002", "交易代码不存在"),;
+            "600002", "交易代码不存在"),
+    LOST_CONNECTION_TO_SERVER("0000", "服务失败"),
+    CAPTCH_COOKIE_KEY_INVALID("1002", "图片验证码凭据错误"),
+    ;
 
 
     private final String code;

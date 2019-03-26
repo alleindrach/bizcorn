@@ -65,4 +65,17 @@ public class Result<T> implements Serializable{
     public void setMessage(String message) {
         this.message = message;
     }
+
+    static public Result successWithData(Object data)
+    {
+        return new Result(1,null,null,data);
+    }
+    static public Result failWithException(Exception ex)
+    {
+        return new Result(0,ex.getMessage(),null,null);
+    }
+    static public Result failWithMessage(String message)
+    {
+        return new Result(0,message,null,null);
+    }
 }

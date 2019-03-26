@@ -241,6 +241,7 @@
         @EnableTransactionManagement 
         @Transactional
         
+        
     Session管理->Redis
         增加依赖
                 <dependency>
@@ -281,12 +282,38 @@
             Login：从数据库中取得user的权限，加到session中。
         http://www.cnblogs.com/shihuc/p/5051771.html
         
-        
+    身份认证2
+        增加capthca
+        /user/captcha.jpg 时，生成captcha，key当做cookie穿到前端，后端的redis中保存key：captcha
+        /user/login|POST|username/passwrod/captcha/cookie[key] 时,
+           UsernamePasswordAuthenticationFilter.doFilter 
+           -->attemptAuthentication
+             -->setDetails
+               -->this.authenticationDetailsSource.buildDetails(request)
+                                   |
+                  CustomAuthenticationDetailsSource[WebSecurityConfig.configure]
+                    -->buildDetails  从cookie中取key，从redis中取cachedCaptcha，并保存到request.attributes中,生成一个CustomWebAuthenticationDetails ，中间包含了用户的captcha和缓存中的captcha
+               -->this.getAuthenticationManager().authenticate( UsernamePasswordAuthenticationToken authRequest)  此时authRequest.principal=输入的用户名，credentials=输入的密码，details.inputCaptcha=输入的验证码，details.cacheCapthca=缓存的验证码
+                  -->parent.authenticate(authRequest)
+                        |                    
+                     CustomAuthenticationProvider.retrieveUser()=>userDetails 从数据库取出用户信息，包含角色
+                                               -->additionalAuthenticationChecks(userDetails,authRequest)   ,1 查 authRequest.details 的验证码 2 查userDetails.password和authRequest.credentials是否一致
+                     完成后，返回从数据库取出的用户信息、权限角色，
+                     -->CustomAuthenticationSuccessHandler
+                        302跳转到loginsuccessurl,此处可以加一下跳转到前一页的处理
+                        
+       /user/login|GET 登录页面                          
+                                                                             
+                                                 
     Eueka对服务失效的感知优化：
         https://yq.aliyun.com/articles/693725
     
     复用：
        一些可复用的config的类，可以包装成一个jar项目，以依赖方式加入到其他项目中，比如redis、security配置类     
+       
+    i18n 本地化
+    
+    
 2 调试
     <build>
 		<plugins>

@@ -1,8 +1,8 @@
-package allein.bizcorn.service.config;
+package allein.bizcorn.service.security.config;
 
-import allein.bizcorn.service.security.CustomUserDetailsService;
-import allein.bizcorn.service.security.MD5PasswordEncoder;
+import allein.bizcorn.service.security.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -15,8 +15,22 @@ import org.springframework.security.config.annotation.web.servlet.configuration.
 
 @Configuration
 @EnableWebMvcSecurity
+@EnableConfigurationProperties(SecurityProperties.class)
 @EnableGlobalMethodSecurity(prePostEnabled = true)//开启security注解
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+
+    @Autowired
+    private SecurityProperties properties;
+    @Autowired
+    private CustomAuthenticationDetailsSource authenticationDetailsSource;
+    @Autowired
+    private CustomAuthenticationProvider authenticationProvider;
+    @Autowired
+    private CustomAuthenticationSuccessHandler authenticationSuccessHandler;
+    @Autowired
+    private CustomAuthenticationFailureHandler authenticationFailureHandler;
+
 
     @Bean
     @Override
@@ -32,9 +46,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //        //允许所有用户访问"/"和"/home"
         http.authorizeRequests()
                 .antMatchers(HttpMethod.PUT,"/user").authenticated()
-                .antMatchers("/user/login").permitAll()
+                .antMatchers("/user/login","/user/captcha.jpg","/user/mobile/captcha").permitAll()
                 .and()
-                .formLogin()
+                .formLogin().loginPage("/user/login")
+                .authenticationDetailsSource(authenticationDetailsSource)
+                .successHandler(authenticationSuccessHandler)
+                .failureHandler(authenticationFailureHandler)
                 .and()
                 .csrf().disable()
                 ;
@@ -55,16 +72,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     }
 
-
-
-    @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-
-        auth
-                .userDetailsService(customUserDetailsService())
-                .passwordEncoder(passwordEncoder());
-
+    /**
+     * 设置认证处理器
+     */
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.authenticationProvider(authenticationProvider);
+        super.configure(auth);
     }
+
+//    @Autowired
+//    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+//        auth
+//                .userDetailsService(customUserDetailsService())
+//                .passwordEncoder(passwordEncoder());
+//    }
 
     /**
      * 设置用户密码的加密方式为MD5加密
@@ -80,9 +102,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      * 自定义UserDetailsService，从数据库中读取用户信息
      * @return
      */
-    @Bean
-    public CustomUserDetailsService customUserDetailsService(){
-        return new CustomUserDetailsService();
-    }
+//    @Bean
+//    public CustomUserDetailsService customUserDetailsService(){
+//        return new CustomUserDetailsService();
+//    }
 
 }
