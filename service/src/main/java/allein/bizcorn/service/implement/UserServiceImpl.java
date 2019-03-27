@@ -86,30 +86,6 @@ public class UserServiceImpl implements IUserService {
             }
         }
     }
-    public void captcha(HttpServletRequest request, HttpServletResponse response) {
-        captchaImageHelper.generateAndWriteCaptchaImage(request,response, SecurityConstants.SECURITY_KEY);
-    }
-
-    public Result mobileCaptcha(@RequestParam String mobile) {
-        User params = new User();
-        params.setMobile(mobile);
-        if (userDAO.selectByMobile(mobile) == null) {
-            return new Result();
-        }
-        else
-        {
-            CaptchaResult captchaResult = captchaMessageHelper.generateMobileCaptcha(mobile, SecurityConstants.SECURITY_KEY);
-            if (captchaResult.isSuccess()) {
-                // 模拟发送验证码
-                logger.info("【BizCorn】 您的短信验证码是 {}。若非本人发送，请忽略此短信。", captchaResult.getCaptcha());
-                captchaResult.clearCaptcha();
-                return Result.successWithData(captchaResult);
-            }
-
-            return Result.failWithMessage(captchaResult.getMessage());
-        }
-
-    }
 
     @Override
     public Result<User> getUserByUsername(String userName) {

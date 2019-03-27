@@ -28,14 +28,6 @@ public class UserServiceHystric implements  UserServiceProxy{
 
     }
 
-    public void captcha(HttpServletRequest request, HttpServletResponse response) {
-        return ;
-
-    }
-
-    public Result mobileCaptcha(String mobile) {
-        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
-    }
 
     @Override
     public Result<User> getUserByUsername(String userName) {

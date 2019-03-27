@@ -312,7 +312,9 @@
        一些可复用的config的类，可以包装成一个jar项目，以依赖方式加入到其他项目中，比如redis、security配置类     
        
     i18n 本地化
-    
+    Feign 文件上传
+        https://blog.csdn.net/ytzzh0726/article/details/79467843
+    Feign 穿透，可以使用ResponseEntity
     
 2 调试
     <build>

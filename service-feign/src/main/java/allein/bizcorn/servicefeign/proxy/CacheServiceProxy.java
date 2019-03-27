@@ -4,7 +4,7 @@ import allein.bizcorn.service.facade.ICacheService;
 import org.springframework.cloud.openfeign.FeignClient;
 
 //动态注入proxy
-@FeignClient(value = "proxy"
+@FeignClient(value = "service"
         , fallback = CacheServiceHystric.class
 )
 //@RequestMapping(value = "/cache")

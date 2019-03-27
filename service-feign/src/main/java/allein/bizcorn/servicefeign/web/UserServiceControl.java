@@ -70,15 +70,5 @@ public class UserServiceControl {
     {
         return  userService.logout();
     }
-    @GetMapping("/captcha.jpg")
-    public void captcha(HttpServletRequest request,HttpServletResponse response)
-    {
-        userService.captcha(request,response);
-    }
-    @GetMapping("/mobile/captcha")
-    @ResponseBody
-    public Result mobileCaptcha(@RequestParam String mobile)
-    {
-        return userService.mobileCaptcha(mobile);
-    }
+
 }

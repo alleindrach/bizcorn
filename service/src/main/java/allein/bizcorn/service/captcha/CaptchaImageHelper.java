@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisAccessor;
+import org.springframework.http.*;
 import org.springframework.web.util.WebUtils;
 
 import javax.imageio.ImageIO;
@@ -21,6 +22,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 
 public class CaptchaImageHelper {
 
@@ -81,7 +84,70 @@ public class CaptchaImageHelper {
             }
         }
     }
+    private String getCookieHeader(Cookie cookie) {
+        StringBuilder buf = new StringBuilder();
+        buf.append(cookie.getName()).append('=').append(cookie.getValue() == null ? "" : cookie.getValue());
+        if (org.springframework.util.StringUtils.hasText(cookie.getPath())) {
+            buf.append("; Path=").append(cookie.getPath());
+        }
+        if (org.springframework.util.StringUtils.hasText(cookie.getDomain())) {
+            buf.append("; Domain=").append(cookie.getDomain());
+        }
+        int maxAge = cookie.getMaxAge();
+        if (maxAge >= 0) {
+            buf.append("; Max-Age=").append(maxAge);
+            buf.append("; Expires=");
+            HttpHeaders headers = new HttpHeaders();
+            headers.setExpires(maxAge > 0 ? System.currentTimeMillis() + 1000L * maxAge : 0);
+            buf.append(headers.getFirst(HttpHeaders.EXPIRES));
+        }
 
+        if (cookie.getSecure()) {
+            buf.append("; Secure");
+        }
+        if (cookie.isHttpOnly()) {
+            buf.append("; HttpOnly");
+        }
+        return buf.toString();
+    }
+    public ResponseEntity<byte[]> captchaImage(String captchaCachePrefix) {
+
+        ResponseEntity<byte[]> entity = null;
+        HttpHeaders headers = new HttpHeaders();
+        try {
+            String captcha = captchaProducer.createText();
+            String captchaKey = CaptchaGenerator.generateCaptchaKey();
+            Cookie cookie = new Cookie(CaptchaResult.FIELD_CAPTCHA_KEY, captchaKey);
+            cookie.setPath(StringUtils.defaultIfEmpty("/", "/"));
+            cookie.setMaxAge(-1);
+
+            cacheAccessor.put(captchaCachePrefix + ":captcha:" + captchaKey, captcha,captchaProperties.getImage().getExpire()*60L);
+            headers.add(HttpHeaders.EXPIRES,"0");
+            CacheControl cacheControl=CacheControl.noStore();
+            headers.setCacheControl(CacheControl.noStore());
+            headers.setCacheControl(CacheControl.noCache());
+            headers.setPragma("no-cache");
+            headers.setContentType(MediaType.IMAGE_JPEG);
+//            headers.setCacheControl("Cache-Control", "no-store, no-cache, must-revalidate,post-check=0, pre-check=0");
+            headers.set(HttpHeaders.SET_COOKIE,getCookieHeader(cookie));
+
+            // output
+            BufferedImage bi = captchaProducer.createImage(captcha);
+
+            HttpStatus status = HttpStatus.OK;
+            ByteArrayOutputStream bos=new ByteArrayOutputStream();
+            ImageIO.write(bi,"jpg",bos);
+//            bos.flush();
+            byte[] imageData= bos.toByteArray();
+            entity = new ResponseEntity<byte[]>(imageData, headers, status);
+
+        } catch (Exception e) {
+            LOGGER.info("create captcha fail: {}", e);
+        } finally {
+
+        }
+        return entity;
+    }
     /**
      * 校验验证码
      *

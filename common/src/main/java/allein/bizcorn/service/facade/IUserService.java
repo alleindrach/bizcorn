@@ -23,12 +23,6 @@ public interface IUserService {
             @RequestParam HttpSession session,
             @RequestParam HttpServletRequest request
     );
-    @RequestMapping(value = "/common/captcha.jpg",method = RequestMethod.GET)
-    public void captcha(@RequestParam  HttpServletRequest request,  @RequestParam  HttpServletResponse response) ;
-
-    @RequestMapping(value = "/user/mobile/captcha",method = RequestMethod.GET)
-    @ResponseBody
-    public Result mobileCaptcha(@RequestParam String mobile) ;
 
     @RequestMapping(value = "/user/byname/{username}",method = RequestMethod.GET)
     @ResponseBody
