@@ -8,12 +8,12 @@ server:
 
 spring:
     application:
-        name: service-ribbon
+        name: proxy-ribbon
     cloud:
         config:
             label: master
             profile: dev
-            name: service
+            name: proxy
         discovery:
             enabled: true
             service-id: config-server

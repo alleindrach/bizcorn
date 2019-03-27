@@ -65,6 +65,23 @@ public class RedisCacheConfig
         };
     }
     @Bean
+    public KeyGenerator MethodKeyGeneratorCache30S() {
+        return new KeyGenerator() {
+            @Override
+            public Object generate(Object target, Method method, Object... params) {
+                StringBuilder sb = new StringBuilder();
+                sb.append(target.getClass().getName()).append("$");
+                sb.append(method.getName()).append("$");
+                sb.append(System.currentTimeMillis()/(1000*30));
+                sb.append("$");
+                for (Object obj : params) {
+                    sb.append("$").append(obj.toString());
+                }
+                return sb.toString();
+            }
+        };
+    }
+    @Bean
     public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
         //初始化一个RedisCacheWriter
         RedisCacheWriter redisCacheWriter = RedisCacheWriter.nonLockingRedisCacheWriter(redisConnectionFactory);

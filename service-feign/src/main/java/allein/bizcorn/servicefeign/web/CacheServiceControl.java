@@ -1,6 +1,6 @@
 package allein.bizcorn.servicefeign.web;
 
-import allein.bizcorn.servicefeign.service.ICacheService;
+import allein.bizcorn.servicefeign.proxy.CacheServiceProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,7 @@ public class CacheServiceControl {
 
 
     @Autowired
-    ICacheService cacheService;
+    CacheServiceProxy cacheService;
 
     @Value("${bizcorn.session.attribute.user}")
     String sessionAttrUser;

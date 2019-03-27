@@ -1,9 +1,9 @@
-package allein.bizcorn.servicefeign.service;
+package allein.bizcorn.servicefeign.proxy;
 
 import org.springframework.stereotype.Component;
 
 @Component
-public class CacheServiceHystric implements ICacheService {
+public class CacheServiceHystric implements CacheServiceProxy {
 
     @Override
     public Boolean put(String key, String value, Long expire) {

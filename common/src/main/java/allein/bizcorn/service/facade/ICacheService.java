@@ -1,8 +1,8 @@
-package allein.bizcorn.facade;
+package allein.bizcorn.service.facade;
 
 import org.springframework.web.bind.annotation.*;
 
-public interface CacheServiceFacade {
+public interface ICacheService {
 
     public
     @PutMapping("/cache/{key}/{value}/{expire}")

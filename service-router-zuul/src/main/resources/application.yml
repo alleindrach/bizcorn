@@ -15,7 +15,7 @@ server:
     port: 8769
 spring:
     application:
-        name: service-zuul
+        name: proxy-zuul
     redis:
         host: localhost
         port: 6379
@@ -28,12 +28,12 @@ spring:
 
 zuul:
     routes:
-        api-a:
-            path: /api-ribbon/**
-            serviceId: service-ribbon
-            sensitiveHeaders: "*"
-        api-b:
-            path: /api-feign/**
+        api:
+            path: /api/**
             serviceId: service-feign
+            sensitiveHeaders: "*"
+        api-common:
+            path: /api-common/**
+            serviceId: service
             sensitiveHeaders: "*"
 

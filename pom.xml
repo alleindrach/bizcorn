@@ -21,7 +21,7 @@
         <module>common</module>
         <module>service</module>
         <module>config-server</module>
-        <!--<module>service-ribbon</module>-->
+        <!--<module>proxy-ribbon</module>-->
         <module>service-feign</module>
         <module>service-router-zuul</module>
     </modules>

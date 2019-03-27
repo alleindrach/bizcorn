@@ -1,15 +1,15 @@
-package allein.bizcorn.service.controller;
+package allein.bizcorn.service.implement;
 
 import allein.bizcorn.common.cache.ICacheAccessor;
-import allein.bizcorn.facade.CacheServiceFacade;
+import allein.bizcorn.service.facade.ICacheService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-public class CacheServiceController implements CacheServiceFacade {
-    private static final Logger logger = LoggerFactory.getLogger(CacheServiceController.class);
+public class CacheServiceImpl implements ICacheService {
+    private static final Logger logger = LoggerFactory.getLogger(CacheServiceImpl.class);
 
     @Autowired
     private ICacheAccessor cacheAccessor;

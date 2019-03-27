@@ -1,7 +1,7 @@
 package allein.bizcorn.servicefeign.web;
 
 
-import allein.bizcorn.servicefeign.service.IUserService;
+import allein.bizcorn.servicefeign.proxy.UserServiceProxy;
 import allein.bizcorn.common.model.output.Result;
 import feign.RequestTemplate;
 import org.slf4j.Logger;
@@ -27,7 +27,7 @@ public class UserServiceControl {
 
 
     @Autowired
-    IUserService userService;
+    UserServiceProxy userService;
 
     @Value("${bizcorn.session.attribute.user}")
     String sessionAttrUser;

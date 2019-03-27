@@ -39,7 +39,7 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
                     exception.getMessage());
         }
         if (exception instanceof BadCredentialsException) {
-            User user = userService.getUserByUsername(username);
+            User user = userService.getUserByUsername(username).getData();
             userService.incUserLoginErrorTimes(username);
         }
         redirectStrategy.sendRedirect(request, response, securityProperties.getLoginPage() + "?username=" + username);

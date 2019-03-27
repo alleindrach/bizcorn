@@ -14,7 +14,7 @@ public class ServiceGate {
     @HystrixCommand(fallbackMethod = "hiError")
 //    @RefreshScope
     public String hiService(String name) {
-        String result = restTemplate.getForObject("http://service/hi?name=" + name, String.class);
+        String result = restTemplate.getForObject("http://proxy/hi?name=" + name, String.class);
         return result;
     }
 

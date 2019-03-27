@@ -1,5 +1,4 @@
 package allein.bizcorn.service.implement;
-
 import allein.bizcorn.service.facade.IMessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
