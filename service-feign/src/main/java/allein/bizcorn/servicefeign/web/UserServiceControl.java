@@ -60,11 +60,9 @@ public class UserServiceControl {
 
     @PutMapping(value = "/")
     @ResponseBody
-    public Result update(@RequestParam String mobile,HttpSession session) {
+    public Result update(@RequestParam String mobile,HttpServletRequest request,HttpServletResponse response,HttpSession session) {
         Object uo=session.getAttribute(sessionAttrUser);
-
-
-        return userService.update(mobile);
+        return userService.update(mobile,session,request);
     }
     @RequestMapping(value = "/logout")
     @ResponseBody
@@ -75,7 +73,7 @@ public class UserServiceControl {
     @GetMapping("/captcha.jpg")
     public void captcha(HttpServletRequest request,HttpServletResponse response)
     {
-        userService.captcha();
+        userService.captcha(request,response);
     }
     @GetMapping("/mobile/captcha")
     @ResponseBody

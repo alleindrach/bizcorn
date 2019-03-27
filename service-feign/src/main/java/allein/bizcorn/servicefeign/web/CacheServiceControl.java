@@ -26,7 +26,7 @@ public class CacheServiceControl {
     @PutMapping("/{key}/{value}/{expire}")
     Boolean put(@PathVariable  String key,@PathVariable Long expire,@PathVariable  String value)
     {
-        Boolean result=cacheService.put(key,expire,value);
+        Boolean result=cacheService.put(key,value,expire);
         return result;
     }
     public

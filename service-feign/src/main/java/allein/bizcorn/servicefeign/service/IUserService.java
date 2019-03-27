@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 //动态注入proxy
 @FeignClient(value = "service"
-        , fallback = IUserServiceHystric.class
+        , fallback = UserServiceHystric.class
 )
 public interface IUserService extends UserServiceFacade{
     @RequestMapping(value = "/user/login", method = RequestMethod.GET)

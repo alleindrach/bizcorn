@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 //动态注入proxy
 @FeignClient(value = "service"
-        , fallback = ICacheServiceHystric.class
+        , fallback = CacheServiceHystric.class
 )
 //@RequestMapping(value = "/cache")
 public interface ICacheService extends CacheServiceFacade{

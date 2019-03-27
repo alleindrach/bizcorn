@@ -124,7 +124,6 @@ public class UserServiceController implements UserServiceFacade {
 //    @AuthLogin(injectUidFiled = "userId")
     Result<User> update(
             @RequestParam(value = "mobile") String mobile,
-            Long userId,
             HttpSession session,
             HttpServletRequest request
     ) {

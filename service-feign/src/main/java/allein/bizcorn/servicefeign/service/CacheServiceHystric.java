@@ -3,11 +3,13 @@ package allein.bizcorn.servicefeign.service;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ICacheServiceHystric implements ICacheService {
+public class CacheServiceHystric implements ICacheService {
+
     @Override
-    public Boolean put(String key, Long expire, String value){
+    public Boolean put(String key, String value, Long expire) {
         return null;
     }
+
     @Override
     public String get(String key)
     {
