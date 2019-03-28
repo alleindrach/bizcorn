@@ -1,31 +1,66 @@
-version: '2'
+version: '3.4'
 
 services:
-  zookeeper:
-    image: wurstmeister/zookeeper
-    restart: unless-stopped
+  zoo1:
+    image: zookeeper
+    restart: always
+    hostname: zoo1
+    container_name: zoo1
     ports:
-      - "2181:2181"
-    container_name: zookeeper
-
-  # kafka version: 1.1.0
-  # scala version: 2.12
-  kafka:
-    image: wurstmeister/kafka
-    ports:
-      - "9092:9092"
+    - 2181:2181
     environment:
-      KAFKA_ADVERTISED_HOST_NAME: localhost
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_BROKER_ID: 1
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_CREATE_TOPICS: "stream-in:1:1,stream-out:1:1"
-    depends_on:
-      - zookeeper
-    container_name: kafka
+      ZOO_MY_ID: 1
+      ZOO_SERVERS: server.1=0.0.0.0:2888:3888 
+    networks:
+      default:
+        ipv4_address: 172.23.0.11
 
+  kafka1:
+    image: wurstmeister/kafka
+    restart: always
+    hostname: kafka1
+    container_name: kafka1
+    ports:
+    - "9092:9092"
+    expose: 
+    - "9093"
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka1:9093,OUTSIDE://192.168.2.233:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_LISTENERS: INSIDE://0.0.0.0:9093,OUTSIDE://0.0.0.0:9092
+      KAFKA_ZOOKEEPER_CONNECT: zoo1:2181
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_BROKER_ID: 1
+      JMX_PORT: 9999 
+    networks:
+      default:
+        ipv4_address: 172.23.0.14
   redis:
     image: redis
+    container_name: redis
     ports: 
       - "6379:6379"
-    container_name: redis
+
+  kafka-manager:
+    image: sheepkiller/kafka-manager:latest
+    restart: always
+    container_name: kafa-manager
+    hostname: kafka-manager
+    ports:
+      - "9002:9000"
+    links:            # 连接本compose文件创建的container
+      - kafka1
+      - zoo1
+    environment:
+      ZK_HOSTS: zoo1:2181
+      KAFKA_BROKERS: kafka1:9092
+      APPLICATION_SECRET: letmein
+      KM_ARGS: -Djava.net.preferIPv4Stack=true
+    networks:
+      default:
+        ipv4_address: 172.23.0.10
+
+networks:
+  default:
+    external:
+      name: zookeeper_network
