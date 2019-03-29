@@ -3,7 +3,7 @@ package allein.bizcorn.service.security;
 import allein.bizcorn.common.exception.CommonException;
 import allein.bizcorn.common.exception.ExceptionEnum;
 
-import allein.bizcorn.common.model.entity.user.User;
+import allein.bizcorn.common.model.entity.User;
 
 import allein.bizcorn.service.dao.UserDAO;
 import org.springframework.beans.factory.annotation.Autowired;

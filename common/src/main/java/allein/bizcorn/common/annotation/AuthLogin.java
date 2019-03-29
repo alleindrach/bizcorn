@@ -1,4 +1,4 @@
-package allein.bizcorn.common.aspect;
+package allein.bizcorn.common.annotation;
 
 
 import org.springframework.core.annotation.AliasFor;

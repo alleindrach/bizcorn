@@ -1,1 +1,10 @@
-
+spring:
+    redis:
+        host: 192.168.2.233
+        port: 6379
+        #password=bigdata123
+        #database=15
+        timeout: 5000
+        pool:
+            maxTotal: 8
+            maxWaitMillis: 1000

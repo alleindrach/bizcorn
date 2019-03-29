@@ -38,7 +38,7 @@ public class AuthLoginAspect implements Ordered,InitializingBean {
 	/***
 	 * 检查登录态切面
 	 */
-	@Pointcut("@annotation(allein.bizcorn.common.aspect.AuthLogin)")
+	@Pointcut("@annotation(allein.bizcorn.common.annotation.AuthLogin)")
 	public void allAuthLoginMethod() {
 	};
 

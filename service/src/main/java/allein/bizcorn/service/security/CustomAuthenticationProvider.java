@@ -1,7 +1,7 @@
 package allein.bizcorn.service.security;
 
 
-import allein.bizcorn.common.model.entity.user.User;
+import allein.bizcorn.common.model.entity.User;
 import allein.bizcorn.service.facade.IConfigSerivce;
 import allein.bizcorn.service.facade.IUserService;
 import org.apache.commons.lang.StringUtils;
@@ -58,8 +58,8 @@ public class CustomAuthenticationProvider extends AbstractUserDetailsAuthenticat
         // 检查密码是否正确
         String password = userDetails.getPassword();
         String rawPassword = authentication.getCredentials().toString();
-        String md5PasswordAndRandom= DigestUtils.md5DigestAsHex(rawPassword.getBytes())+user.getLoginPasswordRandom();
-        boolean match = passwordEncoder.matches(md5PasswordAndRandom, password);
+//        String md5PasswordAndRandom= DigestUtils.md5DigestAsHex(rawPassword.getBytes());
+        boolean match = passwordEncoder.matches(rawPassword, password);
         if (!match) {
             throw new BadCredentialsException("login.username-or-password.error");
         }

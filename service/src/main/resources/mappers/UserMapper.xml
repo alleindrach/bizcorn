@@ -4,42 +4,46 @@
 
     <resultMap id="UserResultMap" type="allein.model.entity.user.User">
         <id column="id" property="id" jdbcType="INTEGER"/>
-        <result column="name" property="name" jdbcType="VARCHAR"/>
-        <result column="login_password" property="password" jdbcType="VARCHAR"/>
+        <result column="username" property="username" jdbcType="VARCHAR"/>
+        <result column="password" property="password" jdbcType="VARCHAR"/>
         <result column="mobile" property="mobile" jdbcType="VARCHAR"/>
+        <result column="enabled" property="enabled" jdbcType="INTEGER"/>
     </resultMap>
 
     <sql id="User_Column_List">
-        id, name, login_password,mobile
+        id, username, password,mobile,enabled
     </sql>
     <select id="selectById" resultMap="UserResultMap" parameterType="java.lang.Integer">
         select
         <include refid="User_Column_List"/>
-        from tad_user
+        from users
         where id = #{id,jdbcType=INTEGER}
     </select>
     <select id="selectByName" resultMap="UserResultMap" parameterType="java.lang.String">
         select
         <include refid="User_Column_List"/>
-        from tad_user
-        where name = #{name,jdbcType=VARCHAR}
+        from users
+        where username = #{username,jdbcType=VARCHAR}
     </select>
     <insert id="insert" parameterType="allein.model.entity.user.User">
-        insert into tad_user (id, name, password,mobile
+        insert into users (id, username, password,mobile,enabled
         )
-        values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR},
-        #{password,jdbcType=VARCHAR},#{mobile,jdbcType=VARCHAR}
+        values (#{id,jdbcType=INTEGER}, #{username,jdbcType=VARCHAR},
+        #{password,jdbcType=VARCHAR},#{mobile,jdbcType=VARCHAR},#{enabled,jdbcType=INTEGER}
         )
     </insert>
 
     <update id="update" parameterType="allein.model.entity.user.User">
-        update tad_user
+        update users
         <set>
-            <if test="name != null">
-                name = #{name,jdbcType=VARCHAR},
+            <if test="username != null">
+                username = #{username,jdbcType=VARCHAR},
             </if>
             <if test="password != null">
                 password = #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="enabled != null">
+                enabled = #{enabled,jdbcType=INTEGER},
             </if>
             <if test="mobile != null">
                 mobile = #{mobile,jdbcType=VARCHAR}

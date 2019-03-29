@@ -3,7 +3,7 @@ package allein.bizcorn.service.implement;
 import allein.bizcorn.common.cache.ICacheAccessor;
 import allein.bizcorn.common.exception.CommonException;
 import allein.bizcorn.common.exception.ExceptionEnum;
-import allein.bizcorn.common.model.entity.user.User;
+import allein.bizcorn.common.model.entity.User;
 import allein.bizcorn.common.model.output.Result;
 import allein.bizcorn.common.util.SecurityUtil;
 import allein.bizcorn.service.captcha.CaptchaImageHelper;

@@ -1,6 +1,6 @@
 package allein.bizcorn.service.security;
 
-import allein.bizcorn.common.model.entity.user.User;
+import allein.bizcorn.common.model.entity.User;
 import allein.bizcorn.service.facade.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;

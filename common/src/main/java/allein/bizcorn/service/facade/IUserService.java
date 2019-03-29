@@ -1,6 +1,6 @@
 package allein.bizcorn.service.facade;
 
-import allein.bizcorn.common.model.entity.user.User;
+import allein.bizcorn.common.model.entity.User;
 import allein.bizcorn.common.model.output.Result;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;

@@ -142,7 +142,7 @@
                     <!-- 数据源配置，( **必配** ) -->
                     <dataSource>
                         <driverName>com.mysql.jdbc.Driver</driverName>
-                        <url>jdbc:mysql://192.168.2.177:3306/for8j_aadai?useUnicode=true&amp;useSSL=false</url>
+                        <url>jdbc:mysql://192.168.2.177:3306/bizcorn?useUnicode=true&amp;useSSL=false</url>
                         <username>root</username>
                         <password>123456</password>
                     </dataSource>
