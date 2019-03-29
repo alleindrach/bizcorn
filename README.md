@@ -729,3 +729,266 @@
     否则会出现抽象函数空的问题。
     
 REF https://blog.csdn.net/forezp/article/details/81040925
+
+## Step 15th 基于Stomp/SockJS的WebSocket
+* 增加依赖
+```
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
+```
+    注：实际上还要导入spring-messaging 
+
+* 使用配置类方式进行配置 WebSocketConfig
+
+```
+    @Configuration
+    @EnableWebSocketMessageBroker //这个配置类不仅配置了 WebSocket，还配置了基于代理的 STOMP 消息
+    public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
+
+```
+        注意此处扩展了AbstractWebSocketMessageBrokerConfigurer，其中的几个函数
+   
+```
+    @Override
+    public void configureMessageBroker(MessageBrokerRegistry config) {
+        //定义了一个客户端订阅地址的前缀信息，也就是客户端接收服务端发送消息的前缀信息
+        config.enableSimpleBroker("/topic","/user");
+
+        config.setUserDestinationPrefix("/user/");
+        //定义了服务端接收地址的前缀，也即客户端给服务端发消息的地址前缀
+        config.setApplicationDestinationPrefixes("/center");
+
+    }
+    
+    
+    @Override
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+
+// 添加一个服务端点，来接收客户端的连接。将 “/websocket” 路径注册为 STOMP 端点。
+// 这个路径与之前发送和接收消息的目的路径有所不同， 这是一个端点，
+// 客户端在订阅或发布消息到目的地址前，要连接该端点，
+// 即用户使用sockjs发送请求 ：url=’http://127.0.0.1:8762/websocket 与 STOMP server 进行连接，之后再转发到订阅url
+// withSockJS作用是添加SockJS支持
+// setAllowedOrigins("*") 是保证比如127.0.0.1/websocket.html 这种不同domain 的代码也可以访问127.0.0.1:8762的web socket
+
+        registry.addEndpoint("/websocket").setHandshakeHandler(new WebSocketHandshakeHandler()).setAllowedOrigins("*").withSockJS();
+    }
+    
+//    添加对WebSocket的一些配置
+    @Bean
+    public ServletServerContainerFactoryBean createWebSocketContainer() {
+        ServletServerContainerFactoryBean container = new ServletServerContainerFactoryBean();
+        
+        container.setMaxTextMessageBufferSize(8192*4);
+        container.setMaxBinaryMessageBufferSize(8192*4);//比如二进制图片、音频文件
+
+        return container;
+    }
+    //客户化JSON的反串行化插件
+   
+    @Override
+    public boolean configureMessageConverters(
+            List<MessageConverter> messageConverters) {
+        MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
+        ObjectMapper objectMapper = new ObjectMapper();
+        SimpleDateFormat smt = new SimpleDateFormat("yyyy-MM-dd");
+        objectMapper.setDateFormat(smt);
+        //允许JSON使用单引号进行字段标注
+        objectMapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES,true);
+
+        converter.setObjectMapper(objectMapper);
+        DefaultContentTypeResolver resolver = new DefaultContentTypeResolver();
+        resolver.setDefaultMimeType(MimeTypeUtils.APPLICATION_JSON);
+        converter.setContentTypeResolver(resolver);
+        messageConverters.add(new StringMessageConverter());
+        messageConverters.add(new ByteArrayMessageConverter());
+        messageConverters.add(converter);
+        return false;
+    }
+
+```   
+* 配置消息处理器MessageController
+```
+
+@Controller
+public class MessageController {
+
+    @Autowired
+    private SimpMessagingTemplate msgTemplate;
+// @MessageMapping 标识客户端发来消息的请求地址，前面我们全局配置中制定了服务端接收的地址以“/center”开头，
+// 所以客户端发送消息的请求连接是：/center/message；
+    @MessageMapping("/message")
+    @SendToUser("/topic/message") //可以将消息只返回给发送者
+    //@SendTo("/topic/message") //会将消息广播给所有订阅/message这个路径的用户
+    public JSONObject chat(JSONObject message, Principal user) throws Exception {
+        return JSONObject.parseObject("{responseto:"+message.toJSONString()+"}");
+    }
+    //定向发送
+    @RequestMapping(value = "/msg/send/{username}/{message}")
+    public String sendTo(@PathVariable  String username,@PathVariable  String message)
+    {
+        msgTemplate.convertAndSendToUser(username, "/topic/message",message);
+        return "success";
+    }
+    //群聊
+    @MessageMapping("/group/{groupId}")
+    public void groupMessage(String message, @DestinationVariable String groupId){
+        String dest = "/topic/" + groupId + "/" + "message";
+        msgTemplate.convertAndSend(dest, message);
+    }
+}
+```
+
+* 客户端javascript 代码
+  * websocket-spring-test.js
+
+```javascript
+(function() {
+var springWs = {
+    socket:null,
+    stompClient:null,
+    status:0,
+    status_idle:0,
+    status_connected:1,
+    wsEndPoint:'http://127.0.0.1:8762/websocket',
+    wsSubscribePoint:'/user/topic/message',
+    wsBroadcastPoint:'/topic/message',
+    wsRequestPoint:"/center/message",
+    retryCount:0,
+    heartBeatTimer:null,
+    heartBeatMissed:0,
+    recentHeartBeat:0,
+    connect:function()
+    {
+        if(springWs.socket==null || springWs.socket.readyState==SockJS.CONNECTING||springWs.socket.readyState==SockJS.CLOSED ){
+
+            springWs.socket= new SockJS(springWs.wsEndPoint,null,{transports:"websocket"});
+            springWs.stompClient = Stomp.over(springWs.socket);
+            springWs.stompClient.connect({}, springWs.connectCallback,springWs.connectErrorCallback);
+            springWs.retryCount=springWs.retryCount+1;
+            springWs.socket.onheartbeat = function() {
+                springWs.recentHeartBeat= Date.parse(new Date());
+                springWs.stopHeartBeat();
+            };
+        }
+    },
+    connectCallback:function(frame) {
+
+      console.log('Connected: ' + frame);
+      springWs.retryCount=0;
+      var uid=cookieHandle.getCookie('cookie_user_id');
+      springWs.stompClient.subscribe(springWs.wsSubscribePoint, function (message) {
+          springWs.dispatchMessage(message.body);
+      });
+      springWs.stompClient.subscribe(springWs.wsBroadcastPoint, function (message) {
+          springWs.dispatchMessage(message.body);
+      });
+      springWs.shakehand();
+    },
+    shakehand:function(){
+        var uid=cookieHandle.getCookie('cookie_user_id');
+        var sid=cookieHandle.getCookie('ci_session_id');
+        springWs.send("{'action':'hello','uid':'"+uid+"','sid':'"+sid+"'}");
+    },
+    connectErrorCallback:function(frame)
+    {
+
+        if(springWs.retryCount>4)
+        {
+            var jsonMessage={'action':'error','message':'连接服务器错误'};
+            console.log('error: ' + frame);
+            springWs.dispatchMessage(JSON.stringify(jsonMessage));
+        }
+        else {
+            setTimeout(springWs.connect,5000);//隔5秒重新连接一次
+        }
+    },
+    disconnect:function() {
+        if (springWs.stompClient != null) {
+            springWs.stompClient.disconnect(function(){
+                console.log("Disconnected");
+            });
+        }
+    },
+    startHeartBeat:function(){
+        springWs.heartBeatTimer=setInterval(springWs.heartBeatCheck,10000);
+    },
+    stopHeartBeat:function(){
+        clearInterval(springWs.heartBeatTimer);
+    },
+    heartBeatCheck:function(){
+        var now = Date.parse(new Date());
+        var diff=now-springWs.recentHeartBeat;
+        console.log("heartBeatCheck:"+diff);
+        if(diff>=30000) //超过30秒没有收到任何数据
+        {
+            springWs.close();
+            setTimeout(springWs.connect,1000);//1秒后连接一次
+            springWs.stopHeartBeat();
+        }
+    },
+    close:function(){
+        springWs.disconnect();
+        springWs.dispatchMessage(JSON.stringify({action:'close'}));
+    },
+    dispatchMessage:function(jsonMessage)
+    {
+        console.log("recevied:"+jsonMessage);
+    },
+    send:function(message)
+    {
+        springWs.stompClient.send(springWs.wsRequestPoint, {}, message);
+    },
+    dispatchMessage:function(message)
+    {
+      console.log((new Date()) + ' received message: ' + message);
+      springWs.recentHeartBeat=Date.parse(new Date());
+      console.log("update heartbeat:"+springWs.recentHeartBeat);
+      var json=JSON.parse(message);
+      switch(json.action)
+      {
+            case 'hello' ://握手
+            
+           break;
+        //    case 'heartBeat':
+        //    springWs.heartBeatAck();
+          default:
+          break;
+      }
+
+    }
+
+}
+if (typeof exports !== "undefined" && exports !== null) {
+  exports.springWs = springWs;
+}
+
+if (typeof window !== "undefined" && window !== null) {
+
+  window.springWs = springWs;
+} else if (!exports) {
+  self.springWs = springWs;
+}
+    window.websocket=springWs;
+}).call(this);
+```
+* * socketjs.min.js
+  * stomp.min.js
+  * test.html
+```
+            <head>
+                <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+                <script src="https://cdn.bootcss.com/sockjs-client/1.1.4/sockjs.min.js"></script>
+                <script src="https://cdn.bootcss.com/stomp.js/2.3.3/stomp.min.js"></script>
+                <script src="js/websocket-spring-test.js"></script>
+            
+                <script type="text/javascript">
+                    $(document).ready(function($) {
+                        websocket.connect();
+                    });
+                </script>
+            </head>
+
+```  

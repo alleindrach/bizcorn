@@ -74,7 +74,7 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 // 即用户发送请求 ：url=’/127.0.0.1:8080/gs-guide-websocket 与 STOMP server 进行连接，之后再转发到订阅url
 // withSockJS作用是添加SockJS支持
 
-        registry.addEndpoint("/gs-guide-websocket").setHandshakeHandler(new WebSocketHandshakeHandler()).setAllowedOrigins("*").withSockJS();
+        registry.addEndpoint("/websocket").setHandshakeHandler(new WebSocketHandshakeHandler()).setAllowedOrigins("*").withSockJS();
     }
 
 //
