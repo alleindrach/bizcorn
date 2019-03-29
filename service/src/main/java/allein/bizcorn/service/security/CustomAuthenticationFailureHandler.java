@@ -34,7 +34,8 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
         HttpSession session = request.getSession(false);
 
         if (session != null) {
-            session.setAttribute("username", username);
+            session.removeAttribute("username");
+//            session.setAttribute("username", username);
             session.setAttribute(WebAttributes.AUTHENTICATION_EXCEPTION,
                     exception.getMessage());
         }

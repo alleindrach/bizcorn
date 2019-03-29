@@ -112,41 +112,74 @@
         现在的地址也不是/refresh了,而是/actuator/refresh
          curl -X POST  -H  "Content-Tapplication/json"  "http://127.0.0.1:8762/actuator/refresh"
         https://docs.spring.io/spring-boot/docs/current/reference/html/production-ready-endpoints.html
+    
+    
     Cloud Bus:
-         docker-compose.yml 
-         
-         version: '2'
-         
-         services:
-           zookeeper:
-             image: wurstmeister/zookeeper
-             restart: unless-stopped
-             ports:
-               - "2181:2181"
-             container_name: zookeeper
-         
-           # kafka version: 1.1.0
-           # scala version: 2.12
-           kafka:
-             image: wurstmeister/kafka
-             ports:
-               - "9092:9092"
-             environment:
-               KAFKA_ADVERTISED_HOST_NAME: localhost
-               KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-               KAFKA_BROKER_ID: 1
-               KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-               KAFKA_CREATE_TOPICS: "stream-in:1:1,stream-out:1:1"
-             depends_on:
-               - zookeeper
-             container_name: kafka
-             
+        https://www.kaaproject.org/kafka-docker/ kafka的docker方式配置
+        
+        docker network create --driver bridge --subnet 172.23.0.0/25 --gateway 172.23.0.1  zookeeper_network
+            
+        docker-compose.yml
+        
+        version: '3.4'
+        
+        services:
+          zoo1:
+            image: zookeeper
+            restart: always
+            hostname: zoo1
+            container_name: zoo1
+            ports:
+            - 2181:2181
+            environment:
+              ZOO_MY_ID: 1
+              ZOO_SERVERS: server.1=0.0.0.0:2888:3888 
+            networks:
+              default:
+                ipv4_address: 172.23.0.11
+        
+          kafka1:
+            image: wurstmeister/kafka
+            restart: always
+            hostname: kafka1
+            container_name: kafka1
+            ports:
+            - "9092:9092"
+            expose: 
+            - "9093"
+            environment:
+              KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka1:9093,OUTSIDE://192.168.2.233:9092
+              KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+              KAFKA_LISTENERS: INSIDE://0.0.0.0:9093,OUTSIDE://0.0.0.0:9092
+              KAFKA_ZOOKEEPER_CONNECT: zoo1:2181
+              KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+              KAFKA_BROKER_ID: 1
+              JMX_PORT: 9999 
+            networks:
+              default:
+                ipv4_address: 172.23.0.14
+          redis:
+            image: redis
+            container_name: redis
+            ports: 
+              - "6379:6379"
+        
+        networks:
+          default:
+            external:
+              name: zookeeper_network
+              
+              
          docker-compose build    
          docker-compose up -d    
          docker exec -it kafka /bin/bash
          export ZK=zookeeper:2181
          $KAFKA_HOME/bin/kafka-topics.sh --create --topic topic --partitions 4 --zookeeper $ZK --replication-factor 1
          $KAFKA_HOME/bin/kafka-topics.sh --zookeeper $ZK --list
+         
+         
+         
+         
          
          
          Config的server/client 都要加
@@ -283,6 +316,66 @@
         http://www.cnblogs.com/shihuc/p/5051771.html
         
     身份认证2
+        数据库模型
+        https://docs.spring.io/spring-security/site/docs/current/reference/htmlsingle/
+        drop table if exists  users cascade ;
+        create table users(
+            id int(16) auto_increment  primary key,
+            username varchar(50) not null unique ,
+            password varchar(50) not null,
+            enabled boolean not null
+        );
+        
+        drop table if exists  authorities cascade ;
+        create table authorities (
+            id int(16) auto_increment  primary key,
+            username varchar(50) not null,
+            authority varchar(50) not null,
+            constraint fk_authorities_users foreign key(username) references users(username)
+        );
+        
+        create unique index ix_auth_username on authorities (username,authority);
+        
+        
+        # Spring Security 2.0 introduced support for group authorities in JdbcDaoImpl. The table structure if groups are enabled is as follows. You will need to adjust this schema to match the database dialect you are using.
+        
+        
+        drop table if exists  groups cascade ;
+        create table groups (
+            id int(16) auto_increment  primary key,
+            group_name varchar(50) not null
+        );
+        create unique index ix_group_name on groups (group_name);
+        
+        drop table if exists  group_authorities cascade ;
+        create table group_authorities (
+            id int(16) auto_increment  primary key,
+            group_id bigint not null,
+            authority varchar(50) not null,
+            constraint fk_group_authorities_group foreign key(group_id) references groups(id)
+        );
+        
+        drop table if exists  group_members cascade ;
+        create table group_members (
+            id int(16) auto_increment  primary key,
+            username varchar(50) not null,
+            group_id bigint not null,
+            constraint fk_group_members_group foreign key(group_id) references groups(id)
+        );
+        
+        # Persistent Login (Remember-Me) Schema
+        drop table if exists  persistent_logins cascade ;
+        create table persistent_logins (
+            id int(16) auto_increment  primary key,
+            username varchar(64) not null,
+            series varchar(64)  not null unique ,
+            token varchar(64) not null,
+            last_used timestamp not null
+        );
+
+
+
+        https://www.cnblogs.com/chiangchou/p/springboot-2.html
         增加capthca
         /user/captcha.jpg 时，生成captcha，key当做cookie穿到前端，后端的redis中保存key：captcha
         /user/login|POST|username/passwrod/captcha/cookie[key] 时,
@@ -315,6 +408,10 @@
     Feign 文件上传
         https://blog.csdn.net/ytzzh0726/article/details/79467843
     Feign 穿透，可以使用ResponseEntity
+        https://blog.csdn.net/Wetsion/article/details/80012823
+        
+    Websocket    
+        https://blog.csdn.net/pacosonswjtu/article/details/51914567
     
 2 调试
     <build>

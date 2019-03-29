@@ -11,7 +11,6 @@ import allein.bizcorn.service.captcha.CaptchaImageHelper;
 import allein.bizcorn.service.captcha.CaptchaMessageHelper;
 import allein.bizcorn.service.captcha.CaptchaResult;
 import allein.bizcorn.service.dao.UserDAO;
-import allein.bizcorn.service.security.SimpleAuthenticationManager;
 import allein.bizcorn.service.security.config.SecurityConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,9 +48,6 @@ public class UserServiceImpl implements IUserService {
 
     @Autowired
     UserDAO userDAO;
-
-    @Autowired
-    private SimpleAuthenticationManager simpleAuthenticationManager;
 
     @Autowired
     private CaptchaImageHelper captchaImageHelper;

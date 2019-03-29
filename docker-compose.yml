@@ -2,7 +2,7 @@ version: '3.4'
 
 services:
   zoo1:
-    image: zookeeper
+    image: wurstmeister/zookeeper 
     restart: always
     hostname: zoo1
     container_name: zoo1

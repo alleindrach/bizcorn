@@ -12,7 +12,6 @@ import allein.bizcorn.service.captcha.CaptchaResult;
 import allein.bizcorn.service.dao.UserDAO;
 import allein.bizcorn.service.facade.ICommonService;
 import allein.bizcorn.service.facade.IUserService;
-import allein.bizcorn.service.security.SimpleAuthenticationManager;
 import allein.bizcorn.service.security.config.SecurityConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,9 +50,6 @@ public class CommonServiceImpl implements ICommonService {
 
     @Autowired
     UserDAO userDAO;
-
-    @Autowired
-    private SimpleAuthenticationManager simpleAuthenticationManager;
 
     @Autowired
     private CaptchaImageHelper captchaImageHelper;
