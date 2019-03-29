@@ -22,7 +22,7 @@ public class MessageController {
     @MessageMapping("/message")
     @SendToUser("/topic/message") //可以将消息只返回给发送者
     //@SendTo("/topic/message") //会将消息广播给所有订阅/message这个路径的用户
-    public JSONObject chat(JSONObject message, Principal user) throws Exception {
+    public JSONObject chat(JSONObject message) throws Exception {
         return JSONObject.parseObject("{responseto:"+message.toJSONString()+"}");
     }
     //定向发送

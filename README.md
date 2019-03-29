@@ -589,61 +589,67 @@
                 
       [参考文档]https://docs.spring.io/spring-security/site/docs/current/reference/htmlsingle/
 ```        
-        drop table if exists  users cascade ;
-        create table users(
-            id int(16) auto_increment  primary key,
-            username varchar(50) not null unique ,
-            password varchar(50) not null,
-            mobile varchar(20) not null unique ,
-            enabled boolean not null
-        );
-        
-        drop table if exists  authorities cascade ;
-        create table authorities (
-            id int(16) auto_increment  primary key,
-            username varchar(50) not null,
-            authority varchar(50) not null,
-            constraint fk_authorities_users foreign key(username) references users(username)
-        );
-        
-        create unique index ix_auth_username on authorities (username,authority);
-        
-        
-        # Spring Security 2.0 introduced support for group authorities in JdbcDaoImpl. The table structure if groups are enabled is as follows. You will need to adjust this schema to match the database dialect you are using.
-        
-        
-        drop table if exists  groups cascade ;
-        create table groups (
-            id int(16) auto_increment  primary key,
-            group_name varchar(50) not null
-        );
-        create unique index ix_group_name on groups (group_name);
-        
-        drop table if exists  group_authorities cascade ;
-        create table group_authorities (
-            id int(16) auto_increment  primary key,
-            group_id bigint not null,
-            authority varchar(50) not null,
-            constraint fk_group_authorities_group foreign key(group_id) references groups(id)
-        );
-        
-        drop table if exists  group_members cascade ;
-        create table group_members (
-            id int(16) auto_increment  primary key,
-            username varchar(50) not null,
-            group_id bigint not null,
-            constraint fk_group_members_group foreign key(group_id) references groups(id)
-        );
-        
-        # Persistent Login (Remember-Me) Schema
-        drop table if exists  persistent_logins cascade ;
-        create table persistent_logins (
-            id int(16) auto_increment  primary key,
-            username varchar(64) not null,
-            series varchar(64)  not null unique ,
-            token varchar(64) not null,
-            last_used timestamp not null
-        );
+    drop table if exists  users cascade ;
+    create table users(
+        id bigint auto_increment  primary key,
+        username varchar(50) not null unique ,
+        password varchar(50) not null,
+        mobile varchar(20) not null unique ,
+        enabled boolean not null
+    );
+    
+    drop table if exists  authorities cascade ;
+    create table authorities (
+        id bigint auto_increment  primary key,
+        user_id bigint not null,
+        authority varchar(50) not null,
+        constraint fk_authorities_users foreign key(user_id) references users(id)
+    );
+    
+    create unique index ix_auth_username on authorities (user_id,authority);
+    
+    
+    # Spring Security 2.0 introduced support for group authorities in JdbcDaoImpl. The table structure if groups are enabled is as follows. You will need to adjust this schema to match the database dialect you are using.
+    
+    
+    drop table if exists  groups cascade ;
+    create table groups (
+        id bigint auto_increment  primary key,
+        group_name varchar(50) not null
+    );
+    create unique index ix_group_name on groups (group_name);
+    
+    drop table if exists  group_authorities cascade ;
+    create table group_authorities (
+        id bigint auto_increment  primary key,
+        group_id bigint not null,
+        authority varchar(50) not null,
+        constraint fk_group_authorities_group foreign key(group_id) references groups(id)
+    );
+    
+    drop table if exists  group_members cascade ;
+    create table group_members (
+        id bigint auto_increment  primary key,
+        user_id bigint not null,
+        group_id bigint not null,
+        constraint fk_group_members_group foreign key(group_id) references groups(id),
+        constraint fk_group_members_user foreign key(user_id) references users(id)
+    );
+    
+    # Persistent Login (Remember-Me) Schema
+    drop table if exists  persistent_logins cascade ;
+    create table persistent_logins (
+        id bigint auto_increment  primary key,
+        user_id bigint not null,
+        series varchar(64)  not null unique ,
+        token varchar(64) not null,
+        last_used timestamp not null
+    );
+    
+    insert into users(id,username,password,mobile,enabled)
+    values
+    (1,	'allein'	,'e10adc3949ba59abbe56e057f20f883e',	'18666221946',	1),
+    (2, 'lily'	,'e10adc3949ba59abbe56e057f20f883e',	'13590270778',	1);
 ```        
         Security:
             WebSecurityConfig:注意关闭crsf，否则需要前后端都要配置crsf的token

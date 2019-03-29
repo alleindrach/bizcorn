@@ -23,7 +23,9 @@ public class WebSocketHandshakeHandler extends DefaultHandshakeHandler {
     }
     @Override
     protected Principal determineUser(ServerHttpRequest request, WebSocketHandler wsHandler, Map<String, Object> attributes) {
-       return super.determineUser(request,wsHandler,attributes);
+       Principal user= super.determineUser(request,wsHandler,attributes);
+
+       return user;
     }
 //    @Override
 //    public boolean doHandshake(ServerHttpRequest serverHttpRequest, ServerHttpResponse serverHttpResponse, WebSocketHandler webSocketHandler, Map<String, Object> map) throws HandshakeFailureException {
