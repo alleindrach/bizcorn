@@ -100,7 +100,7 @@
    ```
 
 
-##StepByStep
+## StepByStep
 ### Step 1st 调用配置服务器的演示：service 调取配置服务器的配置项
 #### service 
 * 增加依赖:
@@ -145,7 +145,7 @@
 * 引用配置项方式2：  
 
  	    `@ConfigurationProperties()`  修饰的组件
-####配置服务器config-server
+#### 配置服务器config-server
 * 向尤里卡服务器注册
 
       增加依赖项 
@@ -175,7 +175,7 @@
         @Value("${foo}") 修饰的字段
         @ConfigurationProperties()  修饰的组件
         
-####配置刷新    
+#### 配置刷新    
 * cloud 2.0 之前
 
       只要加入依赖:
@@ -211,7 +211,7 @@
         
         这里存在的问题是对每个需要进行刷新的服务，都调吊用一次刷新地址。
     
-####使用Cloud Bus进行配置统一刷新:
+#### 使用Cloud Bus进行配置统一刷新:
 * 使用docker 安装配置kafka/redis等
         
         [参考文档] https://www.kaaproject.org/kafka-docker/ kafka的docker方式配置
@@ -339,7 +339,7 @@
          curl -X POST  -H  "Content-Tapplication/json"  "http://127.0.0.1:8762/actuator/bus-refresh"
     ```
 
-###Step2nd:定时任务
+### Step 2nd 定时任务
 
 * application 加标注 
     ```
@@ -353,7 +353,7 @@
       [遗留问题]定时服务的线程和并发问题。
     
     
-###Step3rd:消息发送、接收
+### Step 3rd 消息发送、接收
 >使用kafka实现
 
         注入kafka 模版 
@@ -376,7 +376,7 @@
         		headers.keySet().forEach(key -> LOG.info("{}: {}", key, headers.get(key)));
         	}
 ``` 
-###Step4rd:使用Mybitis连接Mysql
+### Step 4th 使用Mybitis连接Mysql
 * 增加依赖
 ```
         <dependency>
@@ -469,13 +469,13 @@
 
         mybatisplus-maven-plugin
         
-###Step 4th 事务：
+### Step 5th 事务：
    
      @EnableTransactionManagement 
      @Transactional
         
         
-###Step5th 缓存
+### Step 6th 缓存
 * 增加对data-redis 的依赖
     
       加在common模块里，其他模块从此导入
@@ -549,7 +549,7 @@
       
 
         
-###Step6th Session管理
+### Step 7th Session管理
 *增加依赖
 ```
     <dependency>
@@ -584,7 +584,7 @@
            
            或者使用下面文章中提到的方式：
            https://blog.csdn.net/zl1zl2zl3/article/details/79084368
-###Step 7th 使用Security进行身份认证
+### Step 8th 使用Security进行身份认证
 * 数据模型
                 
       [参考文档]https://docs.spring.io/spring-security/site/docs/current/reference/htmlsingle/
@@ -678,7 +678,7 @@
 * + 调用 `/user/login` GET方法 显示登录页面                          
                                                                              
                                                  
-###Step 8th Eueka对服务失效的感知优化：
+### Step 9th Eueka对服务失效的感知优化：
         [参考文档] https://yq.aliyun.com/articles/693725
 ```        
     eureka:
@@ -688,14 +688,14 @@
         enable-self-preservation: false # 设为false，关闭自我保护
         eviction-interval-timer-in-ms: 5000 # 清理间隔（单
 ```
-###Step 9th 代码复用：
+### Step 10th 代码复用：
 
        一些可复用的config的类，可以包装成一个jar项目common，以依赖方式加入到其他项目中，比如redis、security配置类     
        服务接口的复用，参见common模块的service.facade包
        
-###Step 10th i18n 本地化
+### Step 11th i18n 本地化
 
-###Step 11th Feign的穿透
+### Step 12th Feign的穿透
 
 *    Feign 文件上传
         https://blog.csdn.net/ytzzh0726/article/details/79467843
@@ -704,7 +704,7 @@
         
     Websocket    
         https://blog.csdn.net/pacosonswjtu/article/details/51914567
-###Step 12th maven调试配置
+### Step 13th maven调试配置
     <build>
 		<plugins>
 			<plugin>
@@ -722,7 +722,7 @@
 	或者
 	spring-boot:run "-Drun.jvmArguments=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8089" "-Darguments=server.port=8063"
 	
-###Step 13th 版本配合
+### Step 14th 版本配合
 * springcloud Finchley.RELEASE 配合 springframework.boot 2.0.3.RELEASE 版本
 * springcloud Greenwich.RELEASE 配合 springframework.boot 2.1.3.RELEASE 版本
     
