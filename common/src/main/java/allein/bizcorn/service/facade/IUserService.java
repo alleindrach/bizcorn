@@ -11,10 +11,14 @@ import javax.servlet.http.HttpSession;
 
 
 public interface IUserService {
-//    @RequestMapping(value = "/user/login", method = RequestMethod.GET)
-//    Result<User> login(@RequestParam(value = "username") String username, @RequestParam(value = "password") String password);
-//    @RequestMapping(value = "/user/logout", method = RequestMethod.GET)
-//    Result<User> logout();
+    @RequestMapping(value = "/user/login", method = RequestMethod.POST)
+    Result<User> login(
+            @RequestParam(value = "username") String username,
+            @RequestParam(value = "password") String password,
+            @RequestParam(value = "captcha") String captcha,
+            @RequestParam(value = "original-url") String oriurl);
+    @RequestMapping(value = "/user/logout", method = RequestMethod.GET)
+    Result<User> logout(@RequestParam(value = "to-url") String toUrl);
 
     @RequestMapping(value = "/user",method = RequestMethod.PUT)
     @ResponseBody

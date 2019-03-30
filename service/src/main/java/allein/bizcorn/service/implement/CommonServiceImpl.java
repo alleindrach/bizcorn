@@ -57,10 +57,10 @@ public class CommonServiceImpl implements ICommonService {
     @Autowired
     private CaptchaMessageHelper captchaMessageHelper;
 
-    public void captcha(HttpServletRequest request, HttpServletResponse response) {
-        captchaImageHelper.generateAndWriteCaptchaImage(request,response, SecurityConstants.SECURITY_KEY);
-    }
-    public ResponseEntity<byte[]> captcha2() {
+//    public void captcha(HttpServletRequest request, HttpServletResponse response) {
+//        captchaImageHelper.generateAndWriteCaptchaImage(request,response, SecurityConstants.SECURITY_KEY);
+//    }
+    public ResponseEntity<byte[]> captcha() {
         return captchaImageHelper.captchaImage(SecurityConstants.SECURITY_KEY);
     }
     public Result mobileCaptcha(@RequestParam String mobile) {

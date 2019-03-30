@@ -20,6 +20,8 @@ services:
     restart: always
     hostname: kafka1
     container_name: kafka1
+    depends_on: 
+     - zoo1
     ports:
     - "9092:9092"
     expose: 
@@ -40,7 +42,9 @@ services:
     container_name: redis
     ports: 
       - "6379:6379"
-
+    depends_on: 
+      - zoo1
+      - kafka1
 networks:
   default:
     external:

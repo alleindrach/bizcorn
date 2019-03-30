@@ -24,6 +24,7 @@ public class MessageController {
     //@SendTo("/topic/message") //会将消息广播给所有订阅/message这个路径的用户
     public JSONObject chat(JSONObject message) throws Exception {
         return JSONObject.parseObject("{responseto:"+message.toJSONString()+"}");
+
     }
     //定向发送
     @RequestMapping(value = "/msg/send/{username}/{message}")
@@ -35,7 +36,7 @@ public class MessageController {
     //群聊
     @MessageMapping("/group/{groupId}")
     public void groupMessage(String message, @DestinationVariable String groupId){
-        String dest = "/topic/" + groupId + "/" + "message";
+        String dest = "/group/" + groupId + "/message" ;
         msgTemplate.convertAndSend(dest, message);
     }
 }

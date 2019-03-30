@@ -3,6 +3,7 @@ package allein.bizcorn.service.security;
 import allein.bizcorn.common.exception.CommonException;
 import allein.bizcorn.common.exception.ExceptionEnum;
 
+import allein.bizcorn.common.model.entity.Authority;
 import allein.bizcorn.common.model.entity.User;
 
 import allein.bizcorn.service.dao.UserDAO;
@@ -36,7 +37,15 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         // SecurityUser实现UserDetails并将SUser的Email映射为username
         ArrayList<SimpleGrantedAuthority> authorities= new ArrayList<SimpleGrantedAuthority>();
-        authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+        ArrayList<Authority> authoritiesInDB= (ArrayList<Authority>) userDAO.selectAuthorities(user.getId());
+        if(authoritiesInDB!=null && authoritiesInDB.size()>0)
+        {
+            for (Authority authority:authoritiesInDB) {
+                authorities.add(new SimpleGrantedAuthority(authority.getAuthority()));
+            }
+        }
+        else
+            authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
         allein.bizcorn.service.security.UserDetails userDetails = new allein.bizcorn.service.security.UserDetails(user,authorities);
         return userDetails;
 

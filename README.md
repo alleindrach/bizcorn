@@ -998,3 +998,25 @@ if (typeof window !== "undefined" && window !== null) {
             </head>
 
 ```  
+
+* 测试
+  * 启动eureka-server
+  * 启动config-server
+  * 启动service
+  
+        设置断点在WebSocketHandshakeHandler.determineUser
+  
+  * 获取验证码
+   
+        http://127.0.0.1:8762/common/captcha.jpg
+ 
+  * 登录
+ 
+        同一浏览器内（cookie ） 
+        http://127.0.0.1:8762/user/login
+          username=allein
+          password=123456
+          capthca=xxxx
+          
+  * 获取身份凭据：
+    principal 是 UsernamePasswordAuthenticationToken,其principal字段是CustomUserDetailsService.loadUserByUsername 获取到的UserDetails

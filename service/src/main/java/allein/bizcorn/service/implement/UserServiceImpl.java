@@ -11,6 +11,7 @@ import allein.bizcorn.service.captcha.CaptchaImageHelper;
 import allein.bizcorn.service.captcha.CaptchaMessageHelper;
 import allein.bizcorn.service.captcha.CaptchaResult;
 import allein.bizcorn.service.dao.UserDAO;
+import allein.bizcorn.service.security.UserDetails;
 import allein.bizcorn.service.security.config.SecurityConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +19,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -114,4 +119,28 @@ public class UserServiceImpl implements IUserService {
     {
         return Result.successWithData(userDAO.selectByMobile(mobile));
     }
+    @Override
+    public Result<User> login(
+            @RequestParam(value = "username") String username,
+            @RequestParam(value = "password") String password,
+            @RequestParam(value = "captcha") String captcha,
+            @RequestParam(value = "original-url") String oriurl)
+    {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if(auth!=null && auth.getPrincipal() instanceof UserDetails)
+        {
+            User user=userDAO.selectByName(((UserDetails) auth.getPrincipal()).getUsername());
+            if(user!=null)
+                return Result.successWithData(user);
+        }
+
+            return Result.failWithException(new CommonException(ExceptionEnum.USER_ACCOUNT_ID_INVALID));
+    }
+    @Override
+    public Result<User> logout(@RequestParam(value = "to-url") String toUrl)
+    {
+        return Result.successWithData(null);
+    }
+
 }

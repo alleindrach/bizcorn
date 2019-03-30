@@ -23,9 +23,11 @@ public class WebSocketHandshakeHandler extends DefaultHandshakeHandler {
     }
     @Override
     protected Principal determineUser(ServerHttpRequest request, WebSocketHandler wsHandler, Map<String, Object> attributes) {
-       Principal user= super.determineUser(request,wsHandler,attributes);
-
-       return user;
+        Principal user= super.determineUser(request,wsHandler,attributes);
+//        principal 是 UsernamePasswordAuthenticationToken,其principal字段是CustomUserDetailsService.loadUserByUsername 获取到的UserDetails
+        if(user==null)
+            throw new HandshakeFailureException("未取得用户凭据");
+        return user;
     }
 //    @Override
 //    public boolean doHandshake(ServerHttpRequest serverHttpRequest, ServerHttpResponse serverHttpResponse, WebSocketHandler webSocketHandler, Map<String, Object> map) throws HandshakeFailureException {

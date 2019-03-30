@@ -18,12 +18,12 @@ public class Authority implements Serializable {
 	 * 
 	 */
 
-	private Integer id;
+	private Long id;
 
 	/**
 	 * 
 	 */
-	private String username;
+	private Long userId;
 
 	/**
 	 * 
@@ -32,20 +32,20 @@ public class Authority implements Serializable {
 
 
 
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
-	public String getUsername() {
-		return username;
+	public Long getUserId() {
+		return userId;
 	}
 
-	public void setUsername(String username) {
-		this.username = username;
+	public void setUserId(Long userId) {
+		this.userId = userId;
 	}
 
 	public String getAuthority() {

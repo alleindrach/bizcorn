@@ -1,7 +1,10 @@
 package allein.bizcorn.service.dao;
 
+import allein.bizcorn.common.model.entity.Authority;
 import allein.bizcorn.common.model.entity.User;
 import org.springframework.cache.annotation.Cacheable;
+
+import java.util.List;
 
 @org.apache.ibatis.annotations.Mapper
 public interface UserDAO extends BaseDAO<User> {
@@ -45,4 +48,9 @@ public interface UserDAO extends BaseDAO<User> {
 
     @org.apache.ibatis.annotations.Select("select id,username,password,enabled,mobile from users where mobile = #{mobile}")
     User selectByMobile(String mobile);
+
+
+
+    @org.apache.ibatis.annotations.Select("select id,user_id,authority  from authorities where user_id = #{userId}")
+    List<Authority> selectAuthorities(Long userId);
 }

@@ -1,7 +1,9 @@
 package allein.bizcorn.service.security;
 
 import allein.bizcorn.common.model.entity.User;
+import allein.bizcorn.common.model.output.Result;
 import allein.bizcorn.service.facade.IUserService;
+import com.alibaba.fastjson.JSON;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
@@ -43,6 +45,9 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
             User user = userService.getUserByUsername(username).getData();
             userService.incUserLoginErrorTimes(username);
         }
-        redirectStrategy.sendRedirect(request, response, securityProperties.getLoginPage() + "?username=" + username);
+
+        response.getWriter().append(JSON.toJSONString(Result.failWithMessage("认证失败"))).flush();
+
+//        redirectStrategy.sendRedirect(request, response, securityProperties.getLoginPage() + "?username=" + username);
     }
 }
