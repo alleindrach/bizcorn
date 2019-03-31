@@ -70,6 +70,10 @@ public class Result<T> implements Serializable{
     {
         return new Result(1,null,null,data);
     }
+    static public Result successWithMessage(String msg)
+    {
+        return new Result(1,msg,null,null);
+    }
     static public Result failWithException(Exception ex)
     {
         return new Result(0,ex.getMessage(),null,null);

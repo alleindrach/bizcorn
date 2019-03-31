@@ -21,12 +21,14 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.List;
 
@@ -59,6 +61,20 @@ public class UserServiceMysqlImpl implements IUserService {
 
     @Autowired
     private CaptchaMessageHelper captchaMessageHelper;
+
+    @Override
+    public Result<IUser> login(String username, String password, String captcha) {
+        return null;
+    }
+
+    @Override
+    public Result<IUser> logout(HttpServletRequest request , HttpServletResponse response) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null){
+            new SecurityContextLogoutHandler().logout(request, response, auth);
+        }
+        return null;
+    }
 
     public
     @PreAuthorize("hasRole('USER')")

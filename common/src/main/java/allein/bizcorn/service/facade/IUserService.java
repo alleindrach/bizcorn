@@ -7,18 +7,19 @@ import allein.bizcorn.model.output.Result;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.List;
 
 
 public interface IUserService {
-//    @RequestMapping(value = "/user/login", method = RequestMethod.POST)
-//    Result<User> login(
-//            @RequestParam(value = "username") String username,
-//            @RequestParam(value = "password") String password,
-//            @RequestParam(value = "captcha") String captcha);
-//    @RequestMapping(value = "/user/logout", method = RequestMethod.GET)
-//    Result<User> logout();
+    @RequestMapping(value = "/user/login", method = RequestMethod.POST)
+    Result<IUser> login(
+            @RequestParam(value = "username") String username,
+            @RequestParam(value = "password") String password,
+            @RequestParam(value = "captcha") String captcha);
+    @RequestMapping(value = "/user/logout", method = RequestMethod.GET)
+    Result logout(HttpServletRequest request, HttpServletResponse response);
 
     @RequestMapping(value = "/user",method = RequestMethod.PUT)
     @ResponseBody
