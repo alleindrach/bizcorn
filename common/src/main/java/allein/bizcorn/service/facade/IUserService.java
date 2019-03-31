@@ -19,7 +19,7 @@ public interface IUserService {
             @RequestParam(value = "password") String password,
             @RequestParam(value = "captcha") String captcha);
     @RequestMapping(value = "/user/logout", method = RequestMethod.GET)
-    Result logout(HttpServletRequest request, HttpServletResponse response);
+    Result logout(@RequestParam HttpServletRequest request,@RequestParam HttpServletResponse response);
 
     @RequestMapping(value = "/user",method = RequestMethod.PUT)
     @ResponseBody
