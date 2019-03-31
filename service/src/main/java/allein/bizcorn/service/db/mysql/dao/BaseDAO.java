@@ -1,4 +1,4 @@
-package allein.bizcorn.service.dao;
+package allein.bizcorn.service.db.mysql.dao;
 
 public interface BaseDAO<T> {
     T selectById(int id);

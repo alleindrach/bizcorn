@@ -2,22 +2,22 @@ package allein.bizcorn.servicefeign.proxy;
 
 import allein.bizcorn.common.exception.CommonException;
 import allein.bizcorn.common.exception.ExceptionEnum;
-import allein.bizcorn.common.model.entity.user.User;
-import allein.bizcorn.common.model.output.Result;
+import allein.bizcorn.model.entity.User;
+import allein.bizcorn.model.output.Result;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 @Component
 public class UserServiceHystric implements  UserServiceProxy{
-    public Result<User> login(@RequestParam(value = "name") String name, @RequestParam(value = "password") String password)
+    @Override
+    public Result<User> login(String username, String password, String captcha) 
     {
         return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
     }
 
+    @Override
     public Result<User> logout() {
         return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
     }
@@ -64,4 +64,6 @@ public class UserServiceHystric implements  UserServiceProxy{
         return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
 
     }
+
+
 }

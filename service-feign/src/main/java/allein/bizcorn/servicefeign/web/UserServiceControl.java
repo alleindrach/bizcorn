@@ -2,7 +2,7 @@ package allein.bizcorn.servicefeign.web;
 
 
 import allein.bizcorn.servicefeign.proxy.UserServiceProxy;
-import allein.bizcorn.common.model.output.Result;
+import allein.bizcorn.model.output.Result;
 import feign.RequestTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +36,7 @@ public class UserServiceControl {
     @ResponseBody
     public Result login(
             RequestTemplate requestTemplate,
-            @RequestParam String username, @RequestParam String password, HttpServletRequest request, HttpSession session) {
+            @RequestParam String username, @RequestParam String password, @RequestParam String captcha, HttpServletRequest request, HttpSession session) {
         String sessionId =  RequestContextHolder.getRequestAttributes().getSessionId();
 
         logger.info(" {} >>> {}",  request.getRequestURL().toString(),sessionId);
@@ -54,7 +54,7 @@ public class UserServiceControl {
         }
 
 
-        Result x=userService.login(username,password);
+        Result x=userService.login(username,password,captcha);
         return x;
     }
 

@@ -122,7 +122,7 @@ logging:
     level:
         root: WARN
         org.springframework.web: INFO
-        org.springframework.web.socket: DEBUGa
+        org.springframework.web.socket: DEBUG
         com.memorynotfound: DEBUG
         allein.service: DEBUG
         allein.service.exception: DEBUG

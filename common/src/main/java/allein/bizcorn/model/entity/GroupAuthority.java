@@ -1,4 +1,6 @@
-package allein.bizcorn.common.model.entity;
+package allein.bizcorn.model.entity;
+
+import allein.bizcorn.model.facade.IGroupAuthority;
 
 import java.io.Serializable;
 
@@ -11,7 +13,7 @@ import java.io.Serializable;
  * @since 2019-03-29
  */
 
-public class GroupAuthority implements Serializable {
+public class GroupAuthority implements IGroupAuthority {
 
     private static final long serialVersionUID = 1L;
 
@@ -19,13 +21,13 @@ public class GroupAuthority implements Serializable {
 	 * 
 	 */
 
-	private Long id;
+	private String id;
 
 	/**
 	 * 
 	 */
 
-	private Long groupId;
+	private String groupId;
 
 	/**
 	 * 
@@ -34,19 +36,19 @@ public class GroupAuthority implements Serializable {
 
 
 
-	public Long getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
-	public Long getGroupId() {
+	public String getGroupId() {
 		return groupId;
 	}
 
-	public void setGroupId(Long groupId) {
+	public void setGroupId(String groupId) {
 		this.groupId = groupId;
 	}
 

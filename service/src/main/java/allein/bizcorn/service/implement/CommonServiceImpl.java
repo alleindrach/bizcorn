@@ -1,17 +1,13 @@
 package allein.bizcorn.service.implement;
 
 import allein.bizcorn.common.cache.ICacheAccessor;
-import allein.bizcorn.common.exception.CommonException;
-import allein.bizcorn.common.exception.ExceptionEnum;
-import allein.bizcorn.common.model.entity.User;
-import allein.bizcorn.common.model.output.Result;
-import allein.bizcorn.common.util.SecurityUtil;
+import allein.bizcorn.model.entity.User;
+import allein.bizcorn.model.output.Result;
 import allein.bizcorn.service.captcha.CaptchaImageHelper;
 import allein.bizcorn.service.captcha.CaptchaMessageHelper;
 import allein.bizcorn.service.captcha.CaptchaResult;
-import allein.bizcorn.service.dao.UserDAO;
+import allein.bizcorn.service.db.mysql.dao.UserDAO;
 import allein.bizcorn.service.facade.ICommonService;
-import allein.bizcorn.service.facade.IUserService;
 import allein.bizcorn.service.security.config.SecurityConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,14 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 @RestController
 @RefreshScope

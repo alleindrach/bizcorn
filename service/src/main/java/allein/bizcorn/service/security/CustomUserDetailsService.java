@@ -1,12 +1,10 @@
 package allein.bizcorn.service.security;
 
-import allein.bizcorn.common.exception.CommonException;
-import allein.bizcorn.common.exception.ExceptionEnum;
+import allein.bizcorn.model.entity.Authority;
 
-import allein.bizcorn.common.model.entity.Authority;
-import allein.bizcorn.common.model.entity.User;
-
-import allein.bizcorn.service.dao.UserDAO;
+import allein.bizcorn.model.facade.IUser;
+import allein.bizcorn.service.db.mysql.dao.UserDAO;
+import allein.bizcorn.service.facade.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,34 +12,29 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
+
 @Component
 public class CustomUserDetailsService implements UserDetailsService {
     @Autowired  //数据库服务类
-    private UserDAO userDAO;
+    private IUserService userService;
 
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
         //SUser对应数据库中的用户表，是最终存储用户和密码的表，可自定义
         //本例使用SUser中的email作为用户名:
-        User user = userDAO.selectByNameCached(userName);
-
+        IUser user = userService.getUserByUsername(userName).getData();
         if (user == null) {
-
             throw new UsernameNotFoundException("用户名密码错误！");
-
         }
-
-
         // SecurityUser实现UserDetails并将SUser的Email映射为username
         ArrayList<SimpleGrantedAuthority> authorities= new ArrayList<SimpleGrantedAuthority>();
-        ArrayList<Authority> authoritiesInDB= (ArrayList<Authority>) userDAO.selectAuthorities(user.getId());
+        List<String> authoritiesInDB=   userService.getUserAuthorities(user.getId()).getData();
         if(authoritiesInDB!=null && authoritiesInDB.size()>0)
         {
-            for (Authority authority:authoritiesInDB) {
-                authorities.add(new SimpleGrantedAuthority(authority.getAuthority()));
+            for (String authority:authoritiesInDB) {
+                authorities.add(new SimpleGrantedAuthority(authority));
             }
         }
         else

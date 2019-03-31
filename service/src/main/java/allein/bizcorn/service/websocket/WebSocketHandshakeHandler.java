@@ -3,6 +3,8 @@ package allein.bizcorn.service.websocket;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeFailureException;
 import org.springframework.web.socket.server.HandshakeHandler;
@@ -23,6 +25,8 @@ public class WebSocketHandshakeHandler extends DefaultHandshakeHandler {
     }
     @Override
     protected Principal determineUser(ServerHttpRequest request, WebSocketHandler wsHandler, Map<String, Object> attributes) {
+        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
+
         Principal user= super.determineUser(request,wsHandler,attributes);
 //        principal 是 UsernamePasswordAuthenticationToken,其principal字段是CustomUserDetailsService.loadUserByUsername 获取到的UserDetails
         if(user==null)

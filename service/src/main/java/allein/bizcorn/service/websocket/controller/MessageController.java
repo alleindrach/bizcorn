@@ -20,9 +20,16 @@ public class MessageController {
 // @MessageMapping 标识客户端发来消息的请求地址，前面我们全局配置中制定了服务端接收的地址以“/center”开头，
 // 所以客户端发送消息的请求连接是：/center/message；
     @MessageMapping("/message")
-    @SendToUser("/topic/message") //可以将消息只返回给发送者
+    @SendToUser(value = "/topic/message",broadcast = false) //可以将消息只返回给发送者
     //@SendTo("/topic/message") //会将消息广播给所有订阅/message这个路径的用户
-    public JSONObject chat(JSONObject message) throws Exception {
+    public JSONObject selftalk(JSONObject message) throws Exception {
+        return JSONObject.parseObject("{responseto:"+message.toJSONString()+"}");
+
+    }
+    @MessageMapping("/brodcast/message")
+    @SendToUser(value = "/topic/message",broadcast = true) //可以将消息广播给该用户的所有终端
+    //@SendTo("/topic/message") //会将消息广播给所有订阅/message这个路径的用户
+    public JSONObject selftalkb(JSONObject message) throws Exception {
         return JSONObject.parseObject("{responseto:"+message.toJSONString()+"}");
 
     }

@@ -1,9 +1,9 @@
 package allein.bizcorn.service.security;
 
-import allein.bizcorn.common.model.entity.User;
+
+import allein.bizcorn.model.facade.IUser;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.util.DigestUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,7 +17,7 @@ public class UserDetails extends  org.springframework.security.core.userdetails.
         super(username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);
     }
 
-    public UserDetails(User user,ArrayList<SimpleGrantedAuthority> authorities )
+    public UserDetails(IUser user, ArrayList<SimpleGrantedAuthority> authorities )
     {
 
         super(user.getUsername(),

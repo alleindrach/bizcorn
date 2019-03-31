@@ -38,7 +38,7 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
         //定义了一个客户端订阅地址的前缀信息，也就是客户端接收服务端发送消息的前缀信息
-        config.enableSimpleBroker("/topic","/user");
+        config.enableSimpleBroker("/topic","/user","/group");
 
         config.setUserDestinationPrefix("/user/");
         //定义了服务端接收地址的前缀，也即客户端给服务端发消息的地址前缀

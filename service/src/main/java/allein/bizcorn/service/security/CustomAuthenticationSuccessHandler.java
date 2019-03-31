@@ -1,16 +1,12 @@
 package allein.bizcorn.service.security;
 
-import allein.bizcorn.common.exception.CommonException;
-import allein.bizcorn.common.exception.ExceptionEnum;
-import allein.bizcorn.common.model.entity.User;
-import allein.bizcorn.common.model.output.Result;
+import allein.bizcorn.model.facade.IUser;
+import allein.bizcorn.model.output.Result;
 import allein.bizcorn.service.facade.IUserService;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.WebAttributes;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
@@ -37,14 +33,19 @@ public class CustomAuthenticationSuccessHandler extends SavedRequestAwareAuthent
         }
         this.clearAuthenticationAttributes(request);
 
-        if(authentication!=null && authentication.getPrincipal() instanceof UserDetails)
-        {
-            Result<User> user=userService.getUserByUsername(((UserDetails) authentication.getPrincipal()).getUsername());
+        String ajaxHeader = ((HttpServletRequest) request).getHeader("X-Requested-With");
+        boolean isAjax = "XMLHttpRequest".equals(ajaxHeader);
+        if (isAjax) {
+            Result<IUser> user=userService.getUserByUsername(((UserDetails) authentication.getPrincipal()).getUsername());
             if(user!=null)
-                response.getWriter().append(JSON.toJSONString(user)).flush();
+            {
+                response.getWriter().print(JSON.toJSONString(user));
+                response.getWriter().flush();
+            }
+
+        } else {
+            super.onAuthenticationSuccess(request, response, authentication);
         }
 
-
-//        super.onAuthenticationSuccess(request, response, authentication);
     }
 }

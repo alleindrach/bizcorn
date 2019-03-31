@@ -46,7 +46,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //        //允许所有用户访问"/"和"/home"
         http.authorizeRequests()
                 .antMatchers(HttpMethod.PUT,"/user").authenticated()
-                .antMatchers("/user/login","/user/captcha.jpg","/user/mobile/captcha").permitAll()
+                .antMatchers("/user/login","/user/captcha.jpg","/user/mobile/captcha","/user/new").permitAll()
                 .and()
                 .formLogin().loginPage("/user/login")
                 .authenticationDetailsSource(authenticationDetailsSource)
@@ -54,6 +54,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .failureHandler(authenticationFailureHandler)
                 .and()
                 .csrf().disable()
+                .anonymous().disable()
                 ;
 
 //                .antMatchers("/", "/home").permitAll()

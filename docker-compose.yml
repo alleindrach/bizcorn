@@ -45,7 +45,23 @@ services:
     depends_on: 
       - zoo1
       - kafka1
+    networks:
+      default:
+        ipv4_address: 172.23.0.15
+
+  mongodb:
+    image: mongo
+    restart: always
+    hostname: mongodb
+    container_name: mongodb
+    ports:
+    - "27017:27017"
+    networks:
+      default:
+        ipv4_address: 172.23.0.16
+
 networks:
   default:
     external:
       name: zookeeper_network
+

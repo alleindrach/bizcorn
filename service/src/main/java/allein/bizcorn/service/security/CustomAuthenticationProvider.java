@@ -1,7 +1,8 @@
 package allein.bizcorn.service.security;
 
 
-import allein.bizcorn.common.model.entity.User;
+import allein.bizcorn.model.entity.User;
+import allein.bizcorn.model.facade.IUser;
 import allein.bizcorn.service.facade.IConfigSerivce;
 import allein.bizcorn.service.facade.IUserService;
 import org.apache.commons.lang.StringUtils;
@@ -13,7 +14,6 @@ import org.springframework.security.authentication.dao.AbstractUserDetailsAuthen
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.springframework.util.DigestUtils;
 
 
 @Component
@@ -40,7 +40,7 @@ public class CustomAuthenticationProvider extends AbstractUserDetailsAuthenticat
     @Override
     protected void additionalAuthenticationChecks(org.springframework.security.core.userdetails.UserDetails  userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
         String username = userDetails.getUsername();
-        User user = userSerivce.getUserByUsername(username).getData();
+        IUser user = userSerivce.getUserByUsername(username).getData();
 
         // 检查验证码
         if (authentication.getDetails() instanceof CustomWebAuthenticationDetails) {

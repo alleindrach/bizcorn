@@ -1,5 +1,7 @@
-package allein.bizcorn.common.model.entity;
+package allein.bizcorn.model.entity;
 
+
+import allein.bizcorn.model.facade.IUser;
 
 import java.io.Serializable;
 
@@ -11,7 +13,7 @@ import java.io.Serializable;
  * @author allein
  * @since 2019-03-29
  */
-public class User implements Serializable {
+public class User implements IUser {
 
     private static final long serialVersionUID = 1L;
 
@@ -19,7 +21,7 @@ public class User implements Serializable {
 	 * 
 	 */
 
-	private Long id;
+	private String id;
 
 	/**
 	 * 
@@ -39,11 +41,11 @@ public class User implements Serializable {
 
 
 
-	public Long getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 

@@ -3,16 +3,16 @@ package allein.bizcorn.service.implement;
 import allein.bizcorn.common.cache.ICacheAccessor;
 import allein.bizcorn.common.exception.CommonException;
 import allein.bizcorn.common.exception.ExceptionEnum;
-import allein.bizcorn.common.model.entity.User;
-import allein.bizcorn.common.model.output.Result;
+import allein.bizcorn.model.entity.User;
+import allein.bizcorn.model.facade.IAuthority;
+import allein.bizcorn.model.facade.IUser;
+import allein.bizcorn.model.output.Result;
 import allein.bizcorn.common.util.SecurityUtil;
 import allein.bizcorn.service.facade.IUserService;
 import allein.bizcorn.service.captcha.CaptchaImageHelper;
 import allein.bizcorn.service.captcha.CaptchaMessageHelper;
-import allein.bizcorn.service.captcha.CaptchaResult;
-import allein.bizcorn.service.dao.UserDAO;
+import allein.bizcorn.service.db.mysql.dao.UserDAO;
 import allein.bizcorn.service.security.UserDetails;
-import allein.bizcorn.service.security.config.SecurityConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,18 +23,18 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
-@RestController
+//@RestController
 @RefreshScope
-public class UserServiceImpl implements IUserService {
-    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
+//@RequestMapping("/mysql")
+public class UserServiceMysqlImpl implements IUserService {
+    private static final Logger logger = LoggerFactory.getLogger(UserServiceMysqlImpl.class);
 
     @Value("${bizcorn.session.prefix}")
     String sessionPrefix;
@@ -64,7 +64,7 @@ public class UserServiceImpl implements IUserService {
     @PreAuthorize("hasRole('USER')")
     @Transactional
 //    @AuthLogin(injectUidFiled = "userId")
-    Result<User> update(
+    Result<IUser> update(
             @RequestParam(value = "mobile") String mobile,
             HttpSession session,
             HttpServletRequest request
@@ -80,16 +80,16 @@ public class UserServiceImpl implements IUserService {
             int updated=userDAO.update(user);
             if(updated>0)
             {
-                return new Result<User>(1, "", null, user);
+                return new Result<IUser>(1, "", null, user);
             }else
             {
-                return new Result<User>(0, "", null, user);
+                return new Result<IUser>(0, "", null, user);
             }
         }
     }
 
     @Override
-    public Result<User> getUserByUsername(String userName) {
+    public Result<IUser> getUserByUsername(String userName) {
         return Result.successWithData( userDAO.selectByName(userName));
     }
     @Value("${bizcorn.user.login.errortimes.cache.key.prefix}")
@@ -110,37 +110,19 @@ public class UserServiceImpl implements IUserService {
         return Result.successWithData(cacheAccessor.del(this.ErrorTimesKey+userName));
     }
     @Override
-    public Result<Integer> updateUser(User user)
+    public Result<Integer> updateUser(IUser user)
     {
-        return Result.successWithData(userDAO.update(user));
+        return Result.successWithData(userDAO.update((User) user));
     }
     @Override
-    public Result<User> getUserByMobile(String mobile)
+    public Result<IUser> getUserByMobile(String mobile)
     {
         return Result.successWithData(userDAO.selectByMobile(mobile));
     }
-    @Override
-    public Result<User> login(
-            @RequestParam(value = "username") String username,
-            @RequestParam(value = "password") String password,
-            @RequestParam(value = "captcha") String captcha,
-            @RequestParam(value = "original-url") String oriurl)
-    {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        if(auth!=null && auth.getPrincipal() instanceof UserDetails)
-        {
-            User user=userDAO.selectByName(((UserDetails) auth.getPrincipal()).getUsername());
-            if(user!=null)
-                return Result.successWithData(user);
-        }
-
-            return Result.failWithException(new CommonException(ExceptionEnum.USER_ACCOUNT_ID_INVALID));
-    }
     @Override
-    public Result<User> logout(@RequestParam(value = "to-url") String toUrl)
-    {
-        return Result.successWithData(null);
+    public Result<List<String>> getUserAuthorities(String userId) {
+        return Result.successWithData(userDAO.selectAuthorities(userId));
     }
 
 }

@@ -1,10 +1,7 @@
-package allein.bizcorn.service.dao;
+package allein.bizcorn.service.db.mysql.dao;
 
-import allein.bizcorn.common.model.entity.Authority;
-import allein.bizcorn.common.model.entity.User;
+import allein.bizcorn.model.entity.Authority;
 import org.springframework.cache.annotation.Cacheable;
-
-import java.util.List;
 
 @org.apache.ibatis.annotations.Mapper
 public interface AuthorityDAO extends BaseDAO<Authority> {

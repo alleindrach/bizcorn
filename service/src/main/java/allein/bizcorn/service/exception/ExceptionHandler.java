@@ -3,7 +3,7 @@ package allein.bizcorn.service.exception;
 
 import allein.bizcorn.common.exception.CommonException;
 import allein.bizcorn.common.exception.ExceptionEnum;
-import allein.bizcorn.common.model.output.Result;
+import allein.bizcorn.model.output.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;

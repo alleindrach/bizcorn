@@ -1,4 +1,6 @@
-package allein.bizcorn.common.model.entity;
+package allein.bizcorn.model.entity;
+
+import allein.bizcorn.model.facade.IAuthority;
 
 import java.io.Serializable;
 
@@ -10,7 +12,7 @@ import java.io.Serializable;
  * @author allein
  * @since 2019-03-29
  */
-public class Authority implements Serializable {
+public class Authority implements IAuthority {
 
     private static final long serialVersionUID = 1L;
 
@@ -18,12 +20,12 @@ public class Authority implements Serializable {
 	 * 
 	 */
 
-	private Long id;
+	private String id;
 
 	/**
 	 * 
 	 */
-	private Long userId;
+	private String userId;
 
 	/**
 	 * 
@@ -32,19 +34,19 @@ public class Authority implements Serializable {
 
 
 
-	public Long getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
-	public Long getUserId() {
+	public String getUserId() {
 		return userId;
 	}
 
-	public void setUserId(Long userId) {
+	public void setUserId(String userId) {
 		this.userId = userId;
 	}
 

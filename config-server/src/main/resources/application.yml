@@ -5,7 +5,7 @@ spring:
         config:
             server:
                 git:
-                    uri: file://Users/allein/work/springcloud/bizcorn/config.repo
+                    uri: file://Users/allein/work/springcloud/bizcorn/
             label: master
         stream:
             kafka:

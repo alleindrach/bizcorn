@@ -1,4 +1,4 @@
-package allein.bizcorn.common.model.output;
+package allein.bizcorn.model.output;
 
 import allein.bizcorn.common.exception.ErrorCodeException;
 

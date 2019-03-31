@@ -1020,3 +1020,32 @@ if (typeof window !== "undefined" && window !== null) {
           
   * 获取身份凭据：
     principal 是 UsernamePasswordAuthenticationToken,其principal字段是CustomUserDetailsService.loadUserByUsername 获取到的UserDetails
+
+
+### Step 16th MongoDB 
+* 增加依赖
+```
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
+        </dependency>
+```
+* 使用git库和配置对象进行连接参数配置
+
+  * service.properties
+```
+            mongo.host=192.168.2.233
+            mongo.port=27017
+            mongo.connectionsPerHost=8
+            mongo.threadsAllowedToBlockForConnectionMultiplier=4
+            mongo.connectTimeout=1000
+            mongo.maxWaitTime=1500
+            mongo.autoConnectRetry=true
+            mongo.socketKeepAlive=true
+            mongo.socketTimeout=1500
+            mongo.slaveOk=true
+            mongo.writeNumber=1
+            mongo.riteTimeout=0
+            mongo.writeFsync=true
+```  
+   * * 
