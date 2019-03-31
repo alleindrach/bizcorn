@@ -10,6 +10,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.servlet.configuration.EnableWebMvcSecurity;
 
@@ -37,16 +38,22 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected AuthenticationManager authenticationManager() throws Exception {
         return super.authenticationManager();
     }
-
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+//        WebSecurity主要是配置跟web资源相关的，比如css、js、images等等，但是这个还不是本质的区别，关键的区别如下：
+//        ingore是完全绕过了spring security的所有filter，相当于不走spring security
+//        https://www.baeldung.com/security-none-filters-none-access-permitAll
+        web.ignoring().antMatchers("/user/login","/common/captcha.jpg","/user/mobile/captcha","/user/new");
+    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-//
-//        //允许所有用户访问"/"和"/home"
+//      permitAll没有绕过spring security，其中包含了登录的以及匿名的，此处禁止了匿名，所以即使permitall也会被deny
+//        AnonymousAuthenticationFilter 的 主要功能就是给没有登陆的用户，填充AnonymousAuthenticationToken到SecurityContextHolder的Authentication，后续依赖Authentication的代码可以统一处理。
+//        参见 SecurityFilters.class,FilterComparator
         http.authorizeRequests()
                 .antMatchers(HttpMethod.PUT,"/user").authenticated()
-                .antMatchers("/user/login","/user/captcha.jpg","/user/mobile/captcha","/user/new").permitAll()
                 .and()
                 .formLogin().loginPage("/user/login")
                 .authenticationDetailsSource(authenticationDetailsSource)

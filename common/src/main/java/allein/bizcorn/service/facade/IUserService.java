@@ -36,18 +36,23 @@ public interface IUserService {
     @RequestMapping(value = "/user/login/errortimes/{username}",method = RequestMethod.GET)
     @ResponseBody
     public Result<Long> getUserLoginErrorTimes(@PathVariable("username") String userName);
+
     @PostMapping("/user/login/errortimes/inc/{username}")
     @ResponseBody
     public Result<Long> incUserLoginErrorTimes(@PathVariable("username")  String userName);
+
     @PostMapping("/user/login/errortimes/rst/{username}")
     @ResponseBody
     public Result<Boolean> rstUserLoginErrorTimes(@PathVariable("username")String userName);
+
     @PostMapping("/user/update")
     @ResponseBody
     public Result<Integer> updateUser(@RequestParam  IUser user);
+
     @PostMapping("/user/bymobile/{mobile}")
     @ResponseBody
     public Result<IUser> getUserByMobile(@PathVariable("mobile") String mobile);
+
     @PostMapping("/user/authorities/id")
     @ResponseBody
     public Result<List<String>> getUserAuthorities(@PathVariable("id")  String userId);
