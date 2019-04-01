@@ -1030,7 +1030,9 @@ if (typeof window !== "undefined" && window !== null) {
             <artifactId>spring-boot-starter-data-mongodb</artifactId>
         </dependency>
 ```
-* 使用git库和配置对象进行连接参数配置
+* 使用配置类，git库和配置对象进行连接参数配置
+
+      https://blog.csdn.net/daibang2182/article/details/80585004
 
   * service.properties
 ```
@@ -1049,3 +1051,6 @@ if (typeof window !== "undefined" && window !== null) {
             mongo.writeFsync=true
 ```  
    * * 
+* 或直接使用配置项
+
+      spring.data.mongodb.uri=mongodb://user:pwd@ip1:port1,ip2:port2/database

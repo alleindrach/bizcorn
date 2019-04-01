@@ -2,21 +2,20 @@ package allein.bizcorn.service.facade;
 
 import allein.bizcorn.model.output.Result;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-public interface ICommonService {
-//    @RequestMapping(value = "/common/captcha.jpg",method = RequestMethod.GET)
-//    public void captcha(@RequestParam HttpServletRequest request, @RequestParam HttpServletResponse response) ;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
 
-    @RequestMapping(value = "/common/captcha.jpg",method = RequestMethod.GET)
-    public ResponseEntity<byte[]> captcha() ;
+public interface IFileService {
 
-    @RequestMapping(value = "/common/mobile/captcha",method = RequestMethod.GET)
-    @ResponseBody
-    public Result mobileCaptcha(@RequestParam String mobile) ;
+    @RequestMapping(value = "/file/upload",method = RequestMethod.POST)
+    public Result upload(HttpServletRequest request) ;
+
+    @RequestMapping(value = "/file/download",method = RequestMethod.GET)
+    public void download(@RequestParam String filename,@RequestParam HttpServletResponse response) ;
 
 
 }

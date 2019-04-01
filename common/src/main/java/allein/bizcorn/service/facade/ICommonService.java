@@ -18,4 +18,5 @@ public interface ICommonService {
     @ResponseBody
     public Result mobileCaptcha(@RequestParam String mobile) ;
 
+
 }

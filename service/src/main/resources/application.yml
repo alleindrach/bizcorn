@@ -58,7 +58,11 @@ spring:
 # 配置一个连接在池中最小生存的时间，单位是毫秒
         minEvictableIdleTimeMillis: 300000
 
+    data:
+        mongodb:
+            uri: mongodb://192.168.2.233:27018/bizcorn
 #redis
+
     redis:
         host: 192.168.2.233
         port: 6379

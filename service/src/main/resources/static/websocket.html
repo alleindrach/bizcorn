@@ -9,7 +9,7 @@
     <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdn.bootcss.com/sockjs-client/1.1.4/sockjs.min.js"></script>
     <script src="https://cdn.bootcss.com/stomp.js/2.3.3/stomp.min.js"></script>
-
+    <script src="ajaxfileupload.js"></script>
 </head>
 <body>
 <noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being
@@ -18,6 +18,15 @@
 <div id="main-content" class="container">
     <div class="row">
         <div class="col-md-6">
+            <form method="POST" id="uploadform" enctype="multipart/form-data"
+                  action="/file/upload">
+                <p>多文件上传：</p>
+                <p>文件1：<input type="file" name="file" class="form-control"/></p>
+                <p>文件2：<input type="file" name="file" class="form-control"/></p>
+                <p>
+                    <button id="upload" type="submit" class="btn" value="上传">上传</button>
+                </p>
+            </form>
             <form class="form-inline">
                 <input class="form-group">
                 <label for="username">username:</label>
@@ -31,10 +40,10 @@
                 <p/>
                 <input type="text" id="captcha" class="form-control" placeholder="Your captcha here...">
                 <p/>
-
                 <button id="login" class="btn btn-default" type="submit">login</button>
-
                 <p/>
+
+
                 <label for="connect">WebSocket connection:</label>
                 <p/>
                 <button id="connect" class="btn btn-default" type="submit">Connect</button>
@@ -46,9 +55,9 @@
                 <button id="send" class="btn btn-default" type="submit">Send</button>
                 <button id="send-to-all-me" class="btn btn-default" type="submit">SendToAllMe</button>
                 <button id="send-to-group" class="btn btn-default" type="submit">SendToGroup</button>
-        </div>
+            </form>
 
-        </form>
+        </div>
     </div>
 
 </div>
@@ -135,6 +144,7 @@
     function showGreeting(message) {
         $("#greetings").append("<tr><td>" + message + "</td></tr>");
     }
+
     function login()
     {
         $.ajax({
@@ -142,6 +152,10 @@
             data:{username:$('#username').val(),password:$('#password').val(),captcha:$('#captcha').val()},
             type:'POST',
             success:function(result){
+                if(result.state == 1)
+                {
+                    alert("登录成功");
+                }
             },
             complete:function(xhr,ts){
 
@@ -158,9 +172,14 @@
         $( "#send-to-all-me" ).click(function() { sendToAllMe(); });
         $( "#send-to-group" ).click(function() { sendToGroup(); });
         $( "#login" ).click(function() { login(); });
+        $( "#upload" ).click(function() {
+
+                document.getElementById("uploadform").submit()
+
+        });
 //        $("#confirm").click(function(){username=$("#username").val();connect();});
 
-
+        $("")
     });
 </script>
 </body>
