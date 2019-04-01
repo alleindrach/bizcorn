@@ -36,13 +36,12 @@ public class CustomAuthenticationSuccessHandler extends SavedRequestAwareAuthent
         String ajaxHeader = ((HttpServletRequest) request).getHeader("X-Requested-With");
         boolean isAjax = "XMLHttpRequest".equals(ajaxHeader);
         if (isAjax) {
-            Result<IUser> user=userService.getUserByUsername(((UserDetails) authentication.getPrincipal()).getUsername());
-            if(user!=null)
-            {
-                response.getWriter().print(JSON.toJSONString(user));
-                response.getWriter().flush();
-            }
 
+            response.setCharacterEncoding("UTF-8");
+            response.setContentType("application/json; charset=utf-8");
+            Result<IUser> user=Result.successWithData( ((UserDetails) authentication.getPrincipal()).getUsername());
+            response.getWriter().print(JSON.toJSONString(user));
+            response.getWriter().flush();
         } else {
             super.onAuthenticationSuccess(request, response, authentication);
         }

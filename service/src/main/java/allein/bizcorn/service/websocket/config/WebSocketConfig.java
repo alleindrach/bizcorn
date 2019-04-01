@@ -1,5 +1,7 @@
 package allein.bizcorn.service.websocket.config;
 
+
+import allein.bizcorn.service.websocket.CustomWebSocketHandlerDecoratorFactory;
 import allein.bizcorn.service.websocket.WebSocketHandshakeHandler;
 import allein.bizcorn.service.websocket.WebSocketHandshakeInterceptor;
 import allein.bizcorn.service.websocket.msghandler.BinaryMessageHandler;
@@ -11,8 +13,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.converter.*;
+import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.messaging.support.ChannelInterceptorAdapter;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.config.annotation.*;
@@ -33,6 +40,13 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
     private BinaryMessageHandler blobHandler;
     @Autowired
     private WebSocketHandshakeInterceptor webSocketHandshakeInterceptor;
+
+    @Autowired
+    private CustomWebSocketHandlerDecoratorFactory customWebSocketHandlerDecoratorFactory;
+    @Override
+    public void configureWebSocketTransport(WebSocketTransportRegistration registration) {
+        registration.addDecoratorFactory(customWebSocketHandlerDecoratorFactory);
+    }
 
 
     @Override
@@ -77,7 +91,7 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
         registry.addEndpoint("/websocket").setHandshakeHandler(new WebSocketHandshakeHandler()).setAllowedOrigins("*").withSockJS();
     }
 
-//
+    //
 //    @Override
 ////    重写 registerWebSocketHandlers 方法，这是一个核心实现方法，配置 websocket 入口，允许访问的域、注册 Handler、SockJs 支持和拦截器。
 //    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
@@ -96,6 +110,20 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 
         return container;
     }
+    @Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+        registration.setInterceptors(new ChannelInterceptorAdapter() {
+            @Override
+            public Message<?> preSend(Message<?> message, MessageChannel channel) {
+                System.out.println("recv : "+message);
+                StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+
+                return super.preSend(message, channel);
+            }
+
+        });
+    }
+
     @Bean
     public MappingJackson2MessageConverter getMappingJackson2MessageConverter() {
         MappingJackson2MessageConverter mappingJackson2MessageConverter = new MappingJackson2MessageConverter();

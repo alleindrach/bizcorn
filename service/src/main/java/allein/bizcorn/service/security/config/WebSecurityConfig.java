@@ -32,6 +32,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private CustomAuthenticationFailureHandler authenticationFailureHandler;
 
+    @Autowired
+    private CustomAuthenticationLogoutHandler authenticationLogoutHandler;
+
+    @Autowired
+    private CustomAuthenticationLogoutSuccessHandler authenticationLogoutSuccessHandler;
 
     @Bean
     @Override
@@ -59,6 +64,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authenticationDetailsSource(authenticationDetailsSource)
                 .successHandler(authenticationSuccessHandler)
                 .failureHandler(authenticationFailureHandler)
+                .and()
+                .logout().logoutUrl("/user/logout").addLogoutHandler(authenticationLogoutHandler).logoutSuccessHandler(authenticationLogoutSuccessHandler)
                 .and()
                 .csrf().disable()
                 .anonymous().disable()

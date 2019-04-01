@@ -49,6 +49,8 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
         String ajaxHeader = ((HttpServletRequest) request).getHeader("X-Requested-With");
         boolean isAjax = "XMLHttpRequest".equals(ajaxHeader);
         if (isAjax) {
+            response.setCharacterEncoding("UTF-8");
+            response.setContentType("application/json; charset=utf-8");
             Result error=Result.failWithException(new CommonException(ExceptionEnum.USER_NOT_LOGIN));
             response.getWriter().print(JSON.toJSONString(error));
             response.getWriter().flush();
