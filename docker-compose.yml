@@ -55,7 +55,7 @@ services:
     hostname: mongodb
     container_name: mongodb
     ports:
-    - "27017:27017"
+    - "27018:27017"
     networks:
       default:
         ipv4_address: 172.23.0.16
