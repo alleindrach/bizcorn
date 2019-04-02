@@ -550,26 +550,27 @@
 
         
 ### Step 7th Session管理
-*增加依赖
+https://www.cnblogs.com/lxyit/p/9672097.html
+* 增加依赖
 ```
     <dependency>
         <groupId>org.springframework.session</groupId>
         <artifactId>spring-session-data-redis</artifactId>
     </dependency>
 ```                
-*app增加注释
+* app增加注释
             
             `@EnableRedisHttpSession`
             
             
-*redis-cli 访问：
+* redis-cli 访问：
 ```
         key *    
         type  "spring:session:sessions:4a176cbc-6f9a-437b-9cc0-fe6e54746d43"    
         hgetall  "spring:session:sessions:4a176cbc-6f9a-437b-9cc0-fe6e54746d43"
 ```        
         
-*session 穿透
+* session 穿透
 
         Client  ---1--->  Router ---2--->  Feign ---3--->  Service
         2: sensitiveHeaders: "*"

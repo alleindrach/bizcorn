@@ -5,6 +5,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
@@ -38,7 +39,14 @@ public class User  implements  IUser {
      */
     private Integer enabled;
 
+    private UserInfo userInfo;
+
     Set<Authority> Authorities;
+
+    private int type=0;//0=mobile,1=device
+
+    @DBRef
+    Set<IUser> friends;
 
     public String getId() {
         return id;
@@ -86,5 +94,21 @@ public class User  implements  IUser {
 
     public void setAuthoritys(Set<Authority> authoritys) {
         Authorities = authoritys;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    public Set<IUser> getFriends() {
+        return friends;
+    }
+
+    public void setFriends(Set<IUser> friends) {
+        this.friends = friends;
     }
 }

@@ -36,7 +36,7 @@ public class CustomWebSocketHandlerDecoratorFactory implements WebSocketHandlerD
             Principal user = wsSession.getPrincipal();
 
             logger.debug(  "wsSession {} connected with  user {} ",wsSession.getId(),user.getName());
-            
+
             super.afterConnectionEstablished(wsSession);
 
         }
