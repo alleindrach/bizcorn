@@ -35,10 +35,10 @@ public class MessageController {
     }
     //定向发送
     @RequestMapping(value = "/msg/send/{username}/{message}")
-    public String sendTo(@PathVariable  String username,@PathVariable  String message)
+    public void sendTo(@PathVariable  String username,@PathVariable  String message)
     {
         msgTemplate.convertAndSendToUser(username, "/topic/message",message);
-        return "success";
+
     }
     //群聊
     @MessageMapping("/group/{groupId}")

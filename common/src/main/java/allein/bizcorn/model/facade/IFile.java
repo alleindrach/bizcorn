@@ -2,6 +2,6 @@ package allein.bizcorn.model.facade;
 
 import java.io.Serializable;
 
-public interface IDevice extends IUser {
+public interface IFile extends Serializable {
 
 }

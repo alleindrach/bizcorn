@@ -7,15 +7,22 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 
 public interface IFileService {
 
-    @RequestMapping(value = "/file/upload",method = RequestMethod.POST)
+    @RequestMapping(value = "/files",method = RequestMethod.POST)
     public Result upload(HttpServletRequest request) ;
 
-    @RequestMapping(value = "/file/download",method = RequestMethod.GET)
-    public void download(@RequestParam String filename,@RequestParam HttpServletResponse response) ;
+    @RequestMapping(value = "/file/{id}",method = RequestMethod.GET)
+    public void downloadById(@PathVariable("id") String fileId,
+                             @RequestParam HttpServletResponse response,
+                             @RequestParam HttpServletRequest request)
+            throws IOException;
 
-
+    @RequestMapping(value = "/file/{id}",method = RequestMethod.DELETE)
+    public void deleteById(@PathVariable("id") String fileId)
+            throws IOException;
 }

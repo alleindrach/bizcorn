@@ -35,7 +35,7 @@ import java.util.List;
 //@RestController
 @RefreshScope
 //@RequestMapping("/mysql")
-public class UserServiceMysqlImpl implements IUserService {
+public abstract  class UserServiceMysqlImpl implements IUserService {
     private static final Logger logger = LoggerFactory.getLogger(UserServiceMysqlImpl.class);
 
     @Value("${bizcorn.session.prefix}")

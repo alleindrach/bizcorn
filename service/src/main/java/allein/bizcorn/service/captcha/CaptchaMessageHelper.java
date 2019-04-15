@@ -64,7 +64,7 @@ public class CaptchaMessageHelper {
      * 生成手机验证码，缓存验证码。返回captcha、captchaKey，需自己调用消息服务发送消息。无论成功与否，都会返回对应的消息。
      *
      * @param mobile 手机号
-     * @param captchaCachePrefix 缓存前缀
+     * @param captchaCachePrefix 缓存前缀 SecurityConstants.SECURITY_KEY
      * @return Captcha 封装
      */
     public CaptchaResult generateMobileCaptcha(String mobile, String captchaCachePrefix) {
@@ -167,10 +167,10 @@ public class CaptchaMessageHelper {
     /**
      * 验证验证码，必须传入手机号。验证通过返回success=true，否则返回相应的错误信息。
      *
-     * @param captchaKey 缓存KEY
+     * @param captchaKey 缓存KEY uuid
      * @param captcha 验证码
      * @param number 手机号/邮箱
-     * @param captchaCachePrefix 验证码缓存前缀
+     * @param captchaCachePrefix 验证码缓存前缀 SecurityConstants.SECURITY_KEY
      * @param cacheCheckResult 是否缓存验证结果，缓存则返回缓存了验证结果的KEY
      */
     public CaptchaResult checkCaptcha(String captchaKey, String captcha, String number, String captchaCachePrefix, boolean cacheCheckResult) {

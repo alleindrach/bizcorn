@@ -7,6 +7,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 public interface ICommonService {
 //    @RequestMapping(value = "/common/captcha.jpg",method = RequestMethod.GET)
 //    public void captcha(@RequestParam HttpServletRequest request, @RequestParam HttpServletResponse response) ;
@@ -14,9 +17,8 @@ public interface ICommonService {
     @RequestMapping(value = "/common/captcha.jpg",method = RequestMethod.GET)
     public ResponseEntity<byte[]> captcha() ;
 
-    @RequestMapping(value = "/common/mobile/captcha",method = RequestMethod.GET)
-    @ResponseBody
-    public Result mobileCaptcha(@RequestParam String mobile) ;
+    @RequestMapping(value = "/common/mobile/captcha")
+    public Result mobileCaptcha(@RequestParam HttpServletRequest request,@RequestParam HttpServletResponse response , @RequestParam String mobile, @RequestParam String captcha) ;
 
 
 }

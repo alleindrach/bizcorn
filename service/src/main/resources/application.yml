@@ -129,7 +129,7 @@ logging:
         org.springframework.web.socket: DEBUG
         org.springframework.security: DEBUG
         com.memorynotfound: DEBUG
-        allein.service: DEBUG
+        allein.bizcorn.service: DEBUG
         allein.service.exception: DEBUG
 bizcorn:
     session:

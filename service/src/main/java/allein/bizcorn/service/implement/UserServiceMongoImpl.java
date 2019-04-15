@@ -12,9 +12,11 @@ import allein.bizcorn.model.mongo.User;
 import allein.bizcorn.model.output.Result;
 import allein.bizcorn.service.captcha.CaptchaImageHelper;
 import allein.bizcorn.service.captcha.CaptchaMessageHelper;
+import allein.bizcorn.service.captcha.CaptchaResult;
 import allein.bizcorn.service.db.mongo.dao.UserDAO;
 import allein.bizcorn.service.facade.IUserService;
 import allein.bizcorn.service.security.UserDetails;
+import allein.bizcorn.service.security.config.SecurityConstants;
 import com.netflix.ribbon.proxy.annotation.Http;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,10 +33,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -147,7 +148,7 @@ public class UserServiceMongoImpl implements IUserService {
 
     @Override
     public Result<List<String>> getUserAuthorities(String userId) {
-        User user=userDAO.selectById(userId);
+        User user=userDAO.get(userId);
         List<String> auths=new ArrayList<>();
         for (Authority auth:user.getAuthoritys()
              ) {
@@ -157,22 +158,55 @@ public class UserServiceMongoImpl implements IUserService {
     }
 
 
-    @RequestMapping("/user/new")
-    public Result<IUser> addUser(
-            @RequestParam(value = "username") String username,
-            @RequestParam(value = "password") String password,
-            @RequestParam(value = "authority") String authority)
+
+    public Result<IUser> register(
+           HttpServletRequest request,
+           String username,
+           String password,
+           String captcha,
+           String mobile)
     {
     
         User newuser=new User();
         newuser.setUsername(username);
+        String mobileCaptchaKey=null;
+        for ( Cookie cookie:request.getCookies()
+             ) {
+            if(cookie.getName().compareToIgnoreCase(SecurityConstants.MOBILE_CAPTCHA_KEY_COOKIE_NAME)==0)
+            {
+                mobileCaptchaKey=cookie.getValue();
+            }
+        }
+        CaptchaResult captchaResult=captchaMessageHelper.checkCaptcha(mobileCaptchaKey,captcha,mobile,SecurityConstants.SECURITY_KEY,true);
+        if(!captchaResult.isSuccess())
+            Result.failWithException(new CommonException(ExceptionEnum.CAPTCH_INVALID));
+
         newuser.setPassword( DigestUtils.md5DigestAsHex(password.toString().getBytes()));
-        Authority authorityx=  new Authority();
-        authorityx.setAuthority(authority);
+        newuser.setMobile(mobile);
+
         HashSet<Authority> auths=new HashSet<Authority>();
-        auths.add(authorityx);
+        auths.add(new Authority().setAuthority("ROLE_USER"));
         newuser.setAuthoritys(auths);
         userDAO.save(newuser);
         return  Result.successWithData(newuser);
     }
+    @PreAuthorize("hasRole('USER')")
+    @PostMapping("/user/homepage")
+    @ResponseBody
+    public Result<IUser> fetchHomepage()
+    {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if(auth.getPrincipal() instanceof UserDetails )
+        {
+            try {
+                UserDetails userDetails = (UserDetails) auth.getPrincipal();
+                User user = userDAO.selectByName(userDetails.getUsername());
+                return Result.successWithData(user);
+            }catch(Exception ex) {
+                return Result.failWithException(ex);
+            }
+        }
+        return  Result.failWithException(new CommonException(ExceptionEnum.USER_NOT_LOGIN));
+    }
+
 }

@@ -1,27 +1,81 @@
 package allein.bizcorn.model.mongo;
 
-import allein.bizcorn.model.facade.IUserInfo;
+import allein.bizcorn.model.facade.IProfile;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
-public class UserInfo  implements IUserInfo {
-
+public class Profile  implements IProfile {
+    String kindGarden;//幼儿园id
     String face;//头像地址
     String mail;//邮件地址
-    String phone;//电话
+    List phones;//电话
     String sex;//性别 F=女性，M=男性
-    String name; //真实姓名
+    String realname; //真实姓名
+    String gender;
+    Double lat;//经度
+    Double lng;//纬度
     Date brithDay;//出生日期
     String address;//地址
     Long point=0L;//积分
     Date lastvisit;//最近访问时间
     Integer  moodstate= 0;//当前表情
     String inviterId;//邀请人
+    String desc;//个人简介
     List<Tag> tags;//标签组
+
+    public String getKindGarden() {
+        return kindGarden;
+    }
+
+    public void setKindGarden(String kindGarden) {
+        this.kindGarden = kindGarden;
+    }
+
+    public String getRealname() {
+        return realname;
+    }
+
+    public void setRealname(String realname) {
+        this.realname = realname;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public Double getLat() {
+        return lat;
+    }
+
+    public void setLat(Double lat) {
+        this.lat = lat;
+    }
+
+    public Double getLng() {
+        return lng;
+    }
+
+    public void setLng(Double lng) {
+        this.lng = lng;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
+
     public String getFace() {
         return face;
     }
@@ -38,12 +92,12 @@ public class UserInfo  implements IUserInfo {
         this.mail = mail;
     }
 
-    public String getPhone() {
-        return phone;
+    public List getPhones() {
+        return phones;
     }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
+    public void setPhones(List phones) {
+        this.phones = phones;
     }
 
     public String getSex() {
@@ -54,13 +108,6 @@ public class UserInfo  implements IUserInfo {
         this.sex = sex;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 
     public Date getBrithDay() {
         return brithDay;

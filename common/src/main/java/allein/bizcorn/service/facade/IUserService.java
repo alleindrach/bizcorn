@@ -56,4 +56,20 @@ public interface IUserService {
     @PostMapping("/user/authorities/id")
     @ResponseBody
     public Result<List<String>> getUserAuthorities(@PathVariable("id")  String userId);
+
+
+    @PostMapping("/user/homepage")
+    @ResponseBody
+    public Result<IUser> fetchHomepage();
+
+    @RequestMapping(value = "/user/register",method = RequestMethod.PUT)
+    @ResponseBody
+    Result<IUser> register(
+            @RequestParam HttpServletRequest request,
+            @RequestParam(value = "username") String username,
+            @RequestParam(value = "password") String password,
+            @RequestParam(value = "mobileCaptcha") String captcha,
+            @RequestParam(value = "mobile") String mobile
+    );
+
 }

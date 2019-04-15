@@ -1,6 +1,8 @@
 package allein.bizcorn.service.implement;
 
 import allein.bizcorn.common.cache.ICacheAccessor;
+import allein.bizcorn.common.exception.CommonException;
+import allein.bizcorn.common.exception.ExceptionEnum;
 import allein.bizcorn.model.entity.User;
 import allein.bizcorn.model.output.Result;
 import allein.bizcorn.service.captcha.CaptchaImageHelper;
@@ -17,6 +19,10 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @RefreshScope
@@ -53,24 +59,33 @@ public class CommonServiceImpl implements ICommonService {
     public ResponseEntity<byte[]> captcha() {
         return captchaImageHelper.captchaImage(SecurityConstants.SECURITY_KEY);
     }
-    public Result mobileCaptcha(@RequestParam String mobile) {
-        User params = new User();
-        params.setMobile(mobile);
-        if (userDAO.selectByMobile(mobile) == null) {
-            return  Result.failWithMessage("用户不存在或者未登录");
-        }
-        else
+    public Result mobileCaptcha( HttpServletRequest request,  HttpServletResponse response,  String mobile,  String captcha) {
+
+        String cacheCaptcha = captchaImageHelper.getCaptcha(request, SecurityConstants.SECURITY_KEY);
+        if(cacheCaptcha==null || cacheCaptcha.isEmpty()||cacheCaptcha.compareToIgnoreCase(captcha)!=0)
         {
+            return Result.failWithException(new CommonException(ExceptionEnum.CAPTCH_INVALID));
+        }
+//
+//        User params = new User();
+//        params.setMobile(mobile);
+//        if (userDAO.selectByMobile(mobile) == null) {
+//            return  Result.failWithMessage("用户不存在或者未登录");
+//        }
+//        else
+//        {
             CaptchaResult captchaResult = captchaMessageHelper.generateMobileCaptcha(mobile, SecurityConstants.SECURITY_KEY);
             if (captchaResult.isSuccess()) {
                 // 模拟发送验证码
                 logger.info("【BizCorn】 您的短信验证码是 {}。若非本人发送，请忽略此短信。", captchaResult.getCaptcha());
                 captchaResult.clearCaptcha();
+                Cookie captchaKeyCookie=new Cookie(SecurityConstants.MOBILE_CAPTCHA_KEY_COOKIE_NAME,captchaResult.getCaptchaKey());
+                captchaKeyCookie.setPath("/");
+                response.addCookie(captchaKeyCookie);
                 return Result.successWithData(captchaResult);
             }
-
             return Result.failWithMessage(captchaResult.getMessage());
-        }
+//        }
 
     }
 

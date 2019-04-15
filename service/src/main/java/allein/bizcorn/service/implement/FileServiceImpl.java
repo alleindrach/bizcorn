@@ -11,13 +11,26 @@ import allein.bizcorn.service.db.mysql.dao.UserDAO;
 import allein.bizcorn.service.facade.ICommonService;
 import allein.bizcorn.service.facade.IFileService;
 import allein.bizcorn.service.security.config.SecurityConstants;
+import com.alibaba.fastjson.JSONObject;
+import com.mongodb.client.gridfs.GridFSBucket;
+import com.mongodb.client.gridfs.GridFSDownloadStream;
+import com.mongodb.client.gridfs.model.GridFSFile;
+import com.mongodb.gridfs.GridFSDBFile;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.gridfs.GridFsCriteria;
+import org.springframework.data.mongodb.gridfs.GridFsOperations;
+import org.springframework.data.mongodb.gridfs.GridFsResource;
+import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,14 +40,24 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
 @RefreshScope
 public class FileServiceImpl implements IFileService {
     private static final Logger logger = LoggerFactory.getLogger(FileServiceImpl.class);
+
+    @Autowired
+    private GridFsTemplate gridFsTemplate;
+    @Autowired
+    private GridFsOperations operations;
+    @Autowired
+    private GridFSBucket gridFSBucket;
+
     @Value("${file.uploadRoot}")
     private String FileRoot;
+
 
     @Override
     @PreAuthorize("hasRole('USER')")
@@ -46,6 +69,7 @@ public class FileServiceImpl implements IFileService {
         MultipartFile file = null;
         BufferedOutputStream stream = null;
         Result r= Result.successWithMessage("Success!");
+        HashMap<String,Result > result=new HashMap<>();
         for (int i = 0; i < files.size(); ++i) {
             file = files.get(i);
             if (!file.isEmpty()) {
@@ -63,11 +87,26 @@ public class FileServiceImpl implements IFileService {
                     logger.debug("uploadFileSuffix:{}" , uploadFileSuffix);
                     stream = new BufferedOutputStream(new FileOutputStream(new File(
                             FileRoot + uploadFileName + "." + uploadFileSuffix)));
-                    byte[] bytes = file.getBytes();
-                    stream.write(bytes,0,bytes.length);
+
+
+                    String md5Name= DigestUtils.md5DigestAsHex(file.getBytes());
+                    GridFSFile gridFSFile=gridFsTemplate.findOne(Query.query(GridFsCriteria.whereFilename() .is(md5Name)));
+
+                    if(gridFSFile!=null) {
+                        result.put(file.getOriginalFilename(),Result.successWithData(gridFSFile.getId().toString()));
+                    }
+                    else{
+                        InputStream ins = file.getInputStream();
+                        String contentType = file.getContentType();
+                        ObjectId gridFSFileId = gridFsTemplate.store(ins, md5Name, contentType);
+                        result.put(file.getOriginalFilename(),Result.successWithData(gridFSFileId.toString()));
+                    }
+//
+//                    byte[] bytes = file.getBytes();
+//                    stream.write(bytes,0,bytes.length);
                 } catch (Exception e) {
                     logger.debug("上传文件错误:",e);
-                    r= Result.failWithException(e);
+                    result.put(file.getOriginalFilename(),Result.failWithException(e));
                 } finally {
                     try {
                         if (stream != null) {
@@ -82,39 +121,48 @@ public class FileServiceImpl implements IFileService {
             }
         }
 
-        return r;
+        return Result.successWithData(result);
     }
     @Override
-    public void download(@RequestParam String fileName,@RequestParam HttpServletResponse response) {
+    public void downloadById(@RequestParam String fileId,@RequestParam HttpServletResponse response,@RequestParam HttpServletRequest request) throws IOException {
 
-        response.setHeader("content-type", "application/octet-stream");
-        response.setContentType("application/octet-stream");
-        response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
-        byte[] buff = new byte[1024];
-        BufferedInputStream bis = null;
-        OutputStream os = null;
-        try {
-            os = response.getOutputStream();
-            bis = new BufferedInputStream(new FileInputStream(new File(FileRoot
-                    + fileName)));
-            int i = bis.read(buff);
-            while (i != -1) {
-                os.write(buff, 0, buff.length);
-                os.flush();
-                i = bis.read(buff);
-            }
-        } catch (IOException e) {
-            logger.debug("下载错误",e);
-        } finally {
-            if (bis != null) {
-                try {
-                    bis.close();
-                } catch (IOException e) {
-                    logger.debug("下载错误",e);
-                }
-            }
+        Query query = Query.query(Criteria.where("_id").is(fileId));
+// 查询单个文件
+        GridFSFile gfsfile = gridFsTemplate.findOne(query);
+        if (gfsfile == null) {
+            return;
         }
+        String fileName = gfsfile.getFilename().replace(",", "");
+        //处理中文文件名乱码
+        if (request.getHeader("User-Agent").toUpperCase().contains("MSIE") ||
+                request.getHeader("User-Agent").toUpperCase().contains("TRIDENT")
+                || request.getHeader("User-Agent").toUpperCase().contains("EDGE")) {
+            fileName = java.net.URLEncoder.encode(fileName, "UTF-8");
+        } else {
+            //非IE浏览器的处理：
+            fileName = new String(fileName.getBytes("UTF-8"), "ISO-8859-1");
+        }
+        // 通知浏览器进行文件下载
+        response.setContentType(gfsfile.getContentType());
+        response.setHeader("Content-Disposition", "attachment;filename=\"" + fileName + "\"");
+//        GridFSDownloadStream in = gridFSBucket.openDownloadStream(gfsfile.getObjectId());
+
+//        GridFsResource gridFsResource=new GridFsResource(gfsfile,in);
+
+        gridFSBucket.downloadToStream(gfsfile.getObjectId(), response.getOutputStream());
+//        byte[] b = new byte[1024];
+//        int  i = 0;
+//        while (-1!=(i=in.read(b))){
+//            response.getOutputStream().write(b,0,i);
+//        }
+
+
         logger.debug("success");
+    }
+
+    @Override
+    public void deleteById(String fileId) throws IOException {
+        gridFsTemplate.delete(Query.query(Criteria.where("_id").is(fileId)));
     }
 
 

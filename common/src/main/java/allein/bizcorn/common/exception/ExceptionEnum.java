@@ -8,6 +8,9 @@ public enum ExceptionEnum {
     USER_ACCOUNT_NOT_EXIST("0004","用户名或者密码错误"),
     LOST_CONNECTION_TO_SERVER("1000", "服务失败"),
     CAPTCH_COOKIE_KEY_INVALID("2001", "图片验证码凭据错误"),
+    CAPTCH_INVALID("2002", "图片验证码错误"),
+    FILE_UPLOAD_FAIL("3001", "文件传输错误"),
+    BUNDLE_NOT_EXISTS("3002", "素材包不存在"),
     ;
 
 
