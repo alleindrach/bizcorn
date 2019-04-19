@@ -1,6 +1,5 @@
 package allein.bizcorn.model.mongo;
 
-import allein.bizcorn.model.facade.IBundle;
 import allein.bizcorn.model.facade.IDeviceInfo;
 import allein.bizcorn.model.facade.IKid;
 import allein.bizcorn.model.facade.IUser;

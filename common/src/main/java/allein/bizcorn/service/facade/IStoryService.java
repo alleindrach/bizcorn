@@ -9,15 +9,11 @@ import javax.websocket.server.PathParam;
 import java.io.IOException;
 
 public interface IStoryService {
-    @PutMapping("/story/{detail}")
-    @ResponseBody
-    public Result newStory(@RequestParam HttpServletRequest request,@RequestParam HttpServletResponse response ,
-                           @PathParam("detail") String  detail);
 
-    @PutMapping("/story/{id}/{detail}")
+    @PutMapping("/story/sync")
     @ResponseBody
-    public Result updateStory(@RequestParam HttpServletRequest request,@RequestParam HttpServletResponse response ,
-                              @PathParam("id") String id,@PathParam("detail") String detail);
+    public Result syncStory(@RequestParam HttpServletRequest request,@RequestParam HttpServletResponse response ,
+                            @RequestParam("id") String id,@RequestParam("work") String detail);
 
 
     @PostMapping("/story/{id}")

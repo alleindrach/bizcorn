@@ -1,6 +1,5 @@
 package allein.bizcorn.model.mongo;
 
-import allein.bizcorn.model.facade.IBundle;
 import allein.bizcorn.model.facade.IMessage;
 import allein.bizcorn.model.facade.IUser;
 import org.springframework.data.annotation.Id;

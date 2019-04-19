@@ -2,6 +2,6 @@ package allein.bizcorn.model.facade;
 
 import java.io.Serializable;
 
-public interface IBundle extends Serializable {
+public interface IComment extends Serializable {
 
 }

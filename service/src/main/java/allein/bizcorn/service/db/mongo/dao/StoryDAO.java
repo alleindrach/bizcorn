@@ -1,13 +1,15 @@
 package allein.bizcorn.service.db.mongo.dao;
 
-import allein.bizcorn.model.facade.IBundle;
-import allein.bizcorn.model.mongo.Bundle;
+
+
+import allein.bizcorn.model.facade.IStory;
+import allein.bizcorn.model.mongo.Story;
 
 import java.util.List;
 
 
-public interface StoryDAO extends  BaseDAO<Bundle> {
+public interface StoryDAO extends  BaseDAO<Story> {
 
-    List<IBundle> selectByUid(String uid);
+    List<IStory> selectByUid(String uid);
 
 }

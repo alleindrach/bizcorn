@@ -1,6 +1,6 @@
 package allein.bizcorn.model.mongo;
 
-import allein.bizcorn.model.facade.IBundle;
+import allein.bizcorn.model.facade.IStory;
 import allein.bizcorn.model.facade.IFavoriate;
 import allein.bizcorn.model.facade.IUser;
 import org.springframework.data.annotation.Id;
@@ -12,7 +12,7 @@ public class Favoriate implements IFavoriate {
     @DBRef
     private IUser favoriator;
     @DBRef
-    private IBundle story;
+    private IStory story;
     private Date createTime;
 
 }

@@ -1,6 +1,5 @@
 package allein.bizcorn.model.mongo;
 
-import allein.bizcorn.model.facade.IBundle;
 import allein.bizcorn.model.facade.IFile;
 import allein.bizcorn.model.facade.IToy;
 import allein.bizcorn.model.facade.IUser;
@@ -18,8 +17,6 @@ public class Toy implements IToy {
     private Date createTime;
     private String name;
     private String desc;
-    @DBRef
-    private IBundle bundle;
 
     public String getId() {
         return id;
@@ -61,11 +58,4 @@ public class Toy implements IToy {
         this.desc = desc;
     }
 
-    public IBundle getBundle() {
-        return bundle;
-    }
-
-    public void setBundle(IBundle bundle) {
-        this.bundle = bundle;
-    }
 }
