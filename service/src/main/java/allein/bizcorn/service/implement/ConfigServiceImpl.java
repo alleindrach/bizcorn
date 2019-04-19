@@ -6,9 +6,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class ConfigServiceImpl implements IConfigSerivce {
 
-    @Value("${foo}")
-	String foo;
-
     public boolean isEnableCaptcha(Long errorTime)
     {
         return true;

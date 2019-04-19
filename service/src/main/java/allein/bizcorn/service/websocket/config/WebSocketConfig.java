@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Configuration
-//@EnableWebSocket
+@EnableWebSocket
 //这个配置类不仅配置了 WebSocket，还配置了基于代理的 STOMP 消息
 @EnableWebSocketMessageBroker
 public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
