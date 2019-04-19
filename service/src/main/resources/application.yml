@@ -123,9 +123,9 @@ management:
 
 
 logging:
+    path: /data/log
+    file: service.log
     level:
-        path: /data/log
-        file: /service.log
         root: WARN
         org.springframework.web: INFO
         org.springframework.web.socket: DEBUG
