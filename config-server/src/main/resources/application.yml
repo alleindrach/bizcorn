@@ -32,3 +32,10 @@ management:
         web:
             exposure:
                 include: refresh,bus-refresh
+logging:
+    level:
+        path: /data/log
+        file: /config-server.log
+        root: DEBUG
+        allein.bizcorn.service: DEBUG
+        allein.bizcorn.exception: DEBUG
