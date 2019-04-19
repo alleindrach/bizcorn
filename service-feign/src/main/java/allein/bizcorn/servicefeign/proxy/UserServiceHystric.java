@@ -70,5 +70,15 @@ public class UserServiceHystric implements  UserServiceProxy{
         return null;
     }
 
+    @Override
+    public Result<IUser> fetchHomepage() {
+        return null;
+    }
+
+    @Override
+    public Result<IUser> register(HttpServletRequest request, String username, String password, String captcha, String mobile) {
+        return null;
+    }
+
 
 }

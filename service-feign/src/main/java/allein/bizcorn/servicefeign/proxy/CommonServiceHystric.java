@@ -6,17 +6,18 @@ import allein.bizcorn.model.output.Result;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 @Component
 public class CommonServiceHystric implements  CommonServiceProxy{
-    public ResponseEntity<byte[]> captcha2() {
-        return  null;
-    }
-    public Result mobileCaptcha(String mobile) {
-        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
+    @Override
+    public ResponseEntity<byte[]> captcha() {
+        return null;
     }
 
     @Override
-    public ResponseEntity<byte[]> captcha() {
+    public Result mobileCaptcha(HttpServletRequest request, HttpServletResponse response, String mobile, String captcha) {
         return null;
     }
 
