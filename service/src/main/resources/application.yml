@@ -72,6 +72,9 @@ spring:
         pool:
             maxTotal: 8
             maxWaitMillis: 1000
+    profiles:
+        active: dev
+
 
 mybatis:
 #    mapperLocations: classpath:mappers/*.xml
