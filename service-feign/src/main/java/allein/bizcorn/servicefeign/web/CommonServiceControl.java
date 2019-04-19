@@ -33,8 +33,8 @@ public class CommonServiceControl {
     }
     @GetMapping("/mobile/captcha")
     @ResponseBody
-    public Result mobileCaptcha(@RequestParam String mobile)
+    public Result mobileCaptcha(@RequestParam String mobile,@RequestParam String captcha)
     {
-        return commonService.mobileCaptcha(mobile);
+        return commonService.mobileCaptcha(null, null,mobile,captcha);
     }
 }
