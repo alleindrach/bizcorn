@@ -1,7 +1,12 @@
 package allein.bizcorn.model.mongo;
 
+import allein.bizcorn.common.util.UrlUtil;
 import allein.bizcorn.model.facade.IStory;
 import allein.bizcorn.model.facade.IUser;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -15,7 +20,7 @@ public class Story implements IStory {
     private String id;
     @DBRef
     private IUser author;
-    private List<Scene> sceneList;
+    private List<Scene> scenes;
     private List<Tag> tags;
     private String channel;
     private Date createTime;
@@ -26,6 +31,7 @@ public class Story implements IStory {
     private Integer published;
     private String title;
     private String description;
+
 
     public Integer getDownloads() {
         return downloads;
@@ -99,12 +105,12 @@ public class Story implements IStory {
         this.author = author;
     }
 
-    public List<Scene> getSceneList() {
-        return sceneList;
+    public List<Scene> getScenes() {
+        return scenes;
     }
 
-    public void setSceneList(List<Scene> sceneList) {
-        this.sceneList = sceneList;
+    public void setScenes(List<Scene> scenes) {
+        this.scenes = scenes;
     }
 
     public List<Tag> getTags() {
@@ -121,5 +127,40 @@ public class Story implements IStory {
 
     public void setChannel(String channel) {
         this.channel = channel;
+    }
+
+    public String toString(String filebase){
+
+            Story story=this;
+            JSONObject jsonObject= (JSONObject) JSON.toJSON(story);
+            jsonObject.put("author",story.getAuthor().getId());
+////            story.getAuthor().setPassword("*");
+////            story.getAuthor().setMobile("*");
+            JSONArray scenes=jsonObject.getJSONArray("scenes");
+            scenes.forEach(
+                    scene-> {
+                        String imageSource=((JSONObject) scene).getString("imageSource");
+                        String soundSource=((JSONObject) scene).getString("soundSource");
+                        if(!UrlUtil.isUrl(imageSource))
+                        {
+                            imageSource=filebase+imageSource;
+                        }
+                        if(!UrlUtil.isUrl(soundSource))
+                        {
+                            soundSource=filebase+soundSource;
+                        }
+                        ((JSONObject) scene).put("img",imageSource);
+                        ((JSONObject) scene).put("snd",soundSource);
+                    }
+            );
+//            if(story.getSceneList()!=null&& story.getSceneList().size()>0){
+//                story.getSceneList().forEach(scene->{
+//                    scene.setSoundSource(this.filebase+scene.getSoundSource());
+//                    scene.setImageSource(this.filebase+scene.getImageSource());
+//                });
+//            }
+            String result=jsonObject.toJSONString();// JSON.toJSONString(story);
+            return result;
+
     }
 }

@@ -19,10 +19,12 @@
     <div class="row">
         <div class="col-md-6">
             <form method="POST" id="uploadform" enctype="multipart/form-data"
-                  action="/file/upload">
+                  action="/story/sync">
                 <p>多文件上传：</p>
                 <p>文件1：<input type="file" name="file" class="form-control"/></p>
                 <p>文件2：<input type="file" name="file" class="form-control"/></p>
+                <input type="hidden" name="id" value=""/>
+                <input type="hidden" name="work" value="xxx"/>
                 <p>
                     <button id="upload" type="submit" class="btn" value="上传">上传</button>
                 </p>

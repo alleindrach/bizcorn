@@ -16,6 +16,7 @@ import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import com.mongodb.gridfs.GridFSDBFile;
+import org.bson.BsonObjectId;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,12 +37,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.multipart.MultipartResolver;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
+import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RefreshScope
@@ -64,14 +69,19 @@ public class FileServiceImpl implements IFileService {
     public Result upload(HttpServletRequest request) {
         String username= SecurityUtil.getUserName();
         logger.debug("upload by {}",username);
-        List<MultipartFile> files = ((MultipartHttpServletRequest) request)
-                .getFiles("file");
-        MultipartFile file = null;
+//        MultipartResolver resolver = new CommonsMultipartResolver(request.getSession().getServletContext());
+//        resolver.resolveMultipart(request);
+        //
+        MultipartHttpServletRequest multipartRequest =  ((MultipartHttpServletRequest) request);
+
+
+        Map<String, MultipartFile> fileMap =((StandardMultipartHttpServletRequest) multipartRequest).getFileMap();
+//        MultipartFile file = null;
         BufferedOutputStream stream = null;
         Result r= Result.successWithMessage("Success!");
         HashMap<String,Result > result=new HashMap<>();
-        for (int i = 0; i < files.size(); ++i) {
-            file = files.get(i);
+
+        for (MultipartFile file:fileMap.values()) {
             if (!file.isEmpty()) {
                 try {
                     String uploadFilePath = file.getOriginalFilename();
@@ -93,7 +103,7 @@ public class FileServiceImpl implements IFileService {
                     GridFSFile gridFSFile=gridFsTemplate.findOne(Query.query(GridFsCriteria.whereFilename() .is(md5Name)));
 
                     if(gridFSFile!=null) {
-                        result.put(file.getOriginalFilename(),Result.successWithData(gridFSFile.getId().toString()));
+                        result.put(file.getOriginalFilename(),Result.successWithData(((BsonObjectId) gridFSFile.getId()).getValue().toString()));
                     }
                     else{
                         InputStream ins = file.getInputStream();

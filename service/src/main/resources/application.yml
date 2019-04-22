@@ -144,6 +144,8 @@ bizcorn:
         attribute:
             user: user
             timeout: timeout
+    filebase: http://192.168.2.233:8762/file/
+
 
 #
 #endpoints:

@@ -11,6 +11,7 @@ import allein.bizcorn.service.facade.IFileService;
 import allein.bizcorn.service.facade.IStoryService;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
+import org.apache.commons.io.FilenameUtils;
 @RestController
 @RefreshScope
 public class StoryServiceMongoImpl implements IStoryService{
@@ -33,8 +35,11 @@ public class StoryServiceMongoImpl implements IStoryService{
     StoryDAO storyDAO;
     @Autowired
     IFileService fileService;
+    @Value("${bizcorn.filebase}")
+    private String filebase;
 
-//    {
+
+    //    {
 //      titleIcon:{source},
 //      title:'作品',
 //      titleDescription:'作品描述',
@@ -59,10 +64,15 @@ public class StoryServiceMongoImpl implements IStoryService{
 //      ]
 //
 //    }
+
+
     private String getUploadFileSource(Result uploadResult,String filename)
     {
+
         String fileSource=null;
-        Object dbFileUploadResult=((HashMap<String, String>) uploadResult.getData()).get(filename);
+        String fileBaseName = FilenameUtils.getName(filename);
+
+        Object dbFileUploadResult=((HashMap<String, String>) uploadResult.getData()).get(fileBaseName);
         if(dbFileUploadResult!=null && ((Result)dbFileUploadResult).isSuccess())
         {
             fileSource=(String)((Result)dbFileUploadResult).getData();
@@ -81,11 +91,11 @@ public class StoryServiceMongoImpl implements IStoryService{
 
         for (Object sceneObj:jsonDetail.getJSONArray("scenes").toArray()) {
             JSONObject jsonScene=(JSONObject) sceneObj;
-            List<Scene> sceneList= story.getSceneList();
+            List<Scene> sceneList= story.getScenes();
             if(sceneList==null)
             {
                 sceneList=new ArrayList<Scene>();
-                story.setSceneList(sceneList);
+                story.setScenes(sceneList);
             }
             Scene scene=new Scene();
             sceneList.add(scene);
@@ -115,13 +125,13 @@ public class StoryServiceMongoImpl implements IStoryService{
 //        bundle.setAuthor(user);
 //        bundle=storyDAO.save(bundle);
 //        return Result.successWithData(bundle.getId());
-//
+//`
 //    }
 
     @Override
     @PreAuthorize("hasRole('USER')")
     public Result syncStory(HttpServletRequest request, HttpServletResponse response ,
-                            String id,String detail){
+                            String id,String work){
         String username= SecurityUtil.getUserName();
 
         User user=userDAO.selectByName(username);
@@ -130,14 +140,14 @@ public class StoryServiceMongoImpl implements IStoryService{
         }
 
         Story story= null;
-        if(id!=null && id.isEmpty())
+        if(id!=null && !id.isEmpty())
             story=storyDAO.get(id);
         if(story==null)
         {
             Result uploadResult=fileService.upload(request);
             if(!uploadResult.isSuccess())
                 return Result.failWithException(new CommonException(ExceptionEnum.FILE_UPLOAD_FAIL));
-            story=process(uploadResult,detail);
+            story=process(uploadResult,work);
             story.setAuthor(user);
             story=storyDAO.save(story);
         }
@@ -150,13 +160,11 @@ public class StoryServiceMongoImpl implements IStoryService{
             Result uploadResult=fileService.upload(request);
             if(!uploadResult.isSuccess())
                 return Result.failWithException(new CommonException(ExceptionEnum.FILE_UPLOAD_FAIL));
-            Story bundle2=process(uploadResult,detail);
+            Story bundle2=process(uploadResult,work);
             bundle2.setAuthor(user);
             storyDAO.updateById(id,bundle2);
         }
-
-
-        return Result.successWithData(story.getId());
+        return Result.successWithData(story.toString(this.filebase));
 
     }
 

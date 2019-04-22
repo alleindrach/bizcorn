@@ -10,10 +10,10 @@ import java.io.IOException;
 
 public interface IStoryService {
 
-    @PutMapping("/story/sync")
+    @PostMapping("/story/sync")
     @ResponseBody
     public Result syncStory(@RequestParam HttpServletRequest request,@RequestParam HttpServletResponse response ,
-                            @RequestParam("id") String id,@RequestParam("work") String detail);
+                            @RequestParam("id") String id,@RequestParam("work") String work);
 
 
     @PostMapping("/story/{id}")
