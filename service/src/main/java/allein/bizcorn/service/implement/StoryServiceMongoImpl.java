@@ -101,8 +101,8 @@ public class StoryServiceMongoImpl implements IStoryService{
             sceneList.add(scene);
             scene.setTitle(jsonScene.getString("title"));
             String fileSource=null;
-            scene.setImageSource(getUploadFileSource(uploadResult,jsonScene.getString("img")));
-            scene.setSoundSource(getUploadFileSource(uploadResult,jsonScene.getString("snd")));
+            scene.setImg(getUploadFileSource(uploadResult,jsonScene.getString("img")));
+            scene.setSnd(getUploadFileSource(uploadResult,jsonScene.getString("snd")));
 
         }
         return story;
