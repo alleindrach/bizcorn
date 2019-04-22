@@ -139,8 +139,8 @@ public class Story implements IStory {
             JSONArray scenes=jsonObject.getJSONArray("scenes");
             scenes.forEach(
                     scene-> {
-                        String imageSource=((JSONObject) scene).getString("imageSource");
-                        String soundSource=((JSONObject) scene).getString("soundSource");
+                        String imageSource=((JSONObject) scene).getString("img");
+                        String soundSource=((JSONObject) scene).getString("snd");
                         if(!UrlUtil.isUrl(imageSource))
                         {
                             imageSource=filebase+imageSource;

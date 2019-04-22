@@ -7,23 +7,23 @@ import java.util.List;
 public class Scene implements IScene {
 
     private String title;
-    private String imageSource;
-    private String soundSource;
+    private String img;
+    private String snd;
 
-    public String getImageSource() {
-        return imageSource;
+    public String getImg() {
+        return img;
     }
 
-    public void setImageSource(String imageSource) {
-        this.imageSource = imageSource;
+    public void setImg(String img) {
+        this.img = img;
     }
 
-    public String getSoundSource() {
-        return soundSource;
+    public String getSnd() {
+        return snd;
     }
 
-    public void setSoundSource(String soundSource) {
-        this.soundSource = soundSource;
+    public void setSnd(String snd) {
+        this.snd = snd;
     }
 
     public String getTitle() {
