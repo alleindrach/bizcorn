@@ -183,14 +183,17 @@ public class StoryServiceMongoImpl implements IStoryService{
 
     @Override
     @PreAuthorize("hasRole('USER')")
-    public Result getAllStory(HttpServletRequest request, HttpServletResponse response, String un) {
-        String username= SecurityUtil.getUserName();
+    public Result getAllStory(HttpServletRequest request, HttpServletResponse response, String username) {
+        if(username==null)
+        {
+            username= SecurityUtil.getUserName();
+        }
 
         User user=userDAO.selectByName(username);
         if (user == null) {
             throw new CommonException(ExceptionEnum.USER_ACCOUNT_NOT_EXIST);
         }
-        List<Story> bundles=storyDAO.find(Query.query(Criteria.where("author.username").is(un)));
+        List<Story> bundles=storyDAO.find(Query.query(Criteria.where("author.username").is(username)));
         return Result.successWithData(bundles);
     }
 

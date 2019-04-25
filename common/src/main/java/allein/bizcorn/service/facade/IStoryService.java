@@ -20,9 +20,9 @@ public interface IStoryService {
     @ResponseBody
     public Result getOneStory(@RequestParam HttpServletRequest request,@RequestParam HttpServletResponse response,
                               @PathParam("id") String id);
-    @PostMapping("/story/{username}/all")
+    @PostMapping("/story/of/{username}")
     @ResponseBody
-    public Result getAllStory(@RequestParam HttpServletRequest request,@RequestParam HttpServletResponse response ,@PathParam("username") String uid);
+    public Result getAllStory(@RequestParam HttpServletRequest request,@RequestParam HttpServletResponse response ,@PathParam("username") String username);
 
     @DeleteMapping("/story/{id}")
     @ResponseBody
