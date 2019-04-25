@@ -196,8 +196,7 @@ public class StoryServiceMongoImpl implements IStoryService{
         }
 
         User user=userDAO.selectByName(username);
-        if (user == n mn
-        kull) {
+        if (user == null) {
             throw new CommonException(ExceptionEnum.USER_ACCOUNT_NOT_EXIST);
         }
         List<Story> bundles=storyDAO.find(Query.query(Criteria.where("author.$id").is(new ObjectId(user.getId()))));
