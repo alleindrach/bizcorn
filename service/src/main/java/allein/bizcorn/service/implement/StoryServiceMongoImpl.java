@@ -10,6 +10,7 @@ import allein.bizcorn.service.db.mongo.dao.UserDAO;
 import allein.bizcorn.service.facade.IFileService;
 import allein.bizcorn.service.facade.IStoryService;
 import com.alibaba.fastjson.JSONObject;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -195,7 +196,7 @@ public class StoryServiceMongoImpl implements IStoryService{
         if (user == null) {
             throw new CommonException(ExceptionEnum.USER_ACCOUNT_NOT_EXIST);
         }
-        List<Story> bundles=storyDAO.find(Query.query(Criteria.where("author.$id").is(user.getId())));
+        List<Story> bundles=storyDAO.find(Query.query(Criteria.where("author.$id").is(new ObjectId(user.getId()))));
         return Result.successWithData(bundles);
     }
 
