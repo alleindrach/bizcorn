@@ -17,6 +17,8 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -174,7 +176,7 @@ public class StoryServiceMongoImpl implements IStoryService{
 
     @Override
     @PreAuthorize("hasRole('USER')")
-    public Result getOneStory(@PathParam("id")  String id) {
+    public Result getOneStory(String id) {
         String username= SecurityUtil.getUserName();
 
         User user=userDAO.selectByName(username);
