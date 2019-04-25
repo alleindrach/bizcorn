@@ -14,15 +14,13 @@ import java.util.HashMap;
 public interface IFileService {
 
     @RequestMapping(value = "/files",method = RequestMethod.POST)
-    public Result upload(HttpServletRequest request) ;
+    public Result upload() ;
 
     @RequestMapping(value = "/file/{id}",method = RequestMethod.GET)
-    public void downloadById(@PathVariable("id") String fileId,
-                             @RequestParam HttpServletResponse response,
-                             @RequestParam HttpServletRequest request)
+    public void downloadById(@PathVariable("id") String fileId)
             throws IOException;
 
     @RequestMapping(value = "/file/{id}",method = RequestMethod.DELETE)
-    public void deleteById(@PathVariable("id") String fileId)
+    public Result deleteById(@PathVariable("id") String fileId)
             throws IOException;
 }

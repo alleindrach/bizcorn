@@ -35,6 +35,8 @@ import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.MultipartResolver;
@@ -66,7 +68,8 @@ public class FileServiceImpl implements IFileService {
 
     @Override
     @PreAuthorize("hasRole('USER')")
-    public Result upload(HttpServletRequest request) {
+    public Result upload() {
+        HttpServletRequest request=((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         String username= SecurityUtil.getUserName();
         logger.debug("upload by {}",username);
 //        MultipartResolver resolver = new CommonsMultipartResolver(request.getSession().getServletContext());
@@ -134,7 +137,9 @@ public class FileServiceImpl implements IFileService {
         return Result.successWithData(result);
     }
     @Override
-    public void downloadById(@RequestParam String fileId,@RequestParam HttpServletResponse response,@RequestParam HttpServletRequest request) throws IOException {
+    public void downloadById(@RequestParam String fileId) throws IOException {
+        HttpServletRequest request=((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        HttpServletResponse response=((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
 
         Query query = Query.query(Criteria.where("_id").is(fileId));
 // 查询单个文件
@@ -171,8 +176,9 @@ public class FileServiceImpl implements IFileService {
     }
 
     @Override
-    public void deleteById(String fileId) throws IOException {
+    public Result deleteById(String fileId) throws IOException {
         gridFsTemplate.delete(Query.query(Criteria.where("_id").is(fileId)));
+        return Result.successWithData(fileId);
     }
 
 

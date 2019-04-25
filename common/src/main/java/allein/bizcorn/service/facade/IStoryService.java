@@ -12,21 +12,18 @@ public interface IStoryService {
 
     @PostMapping("/story/sync")
     @ResponseBody
-    public Result syncStory(@RequestParam HttpServletRequest request,@RequestParam HttpServletResponse response ,
-                            @RequestParam("id") String id,@RequestParam("work") String work);
+    public Result syncStory(@RequestParam("id") String id,@RequestParam("work") String work);
 
 
     @PostMapping("/story/{id}")
     @ResponseBody
-    public Result getOneStory(@RequestParam HttpServletRequest request,@RequestParam HttpServletResponse response,
-                              @PathParam("id") String id);
+    public Result getOneStory(@PathParam("id") String id);
     @PostMapping("/story/of/{username}")
     @ResponseBody
-    public Result getAllStory(@RequestParam HttpServletRequest request,@RequestParam HttpServletResponse response ,@PathParam("username") String username);
+    public Result getAllStory(@PathParam("username") String username);
 
     @DeleteMapping("/story/{id}")
     @ResponseBody
-    public Result deleteOneStory(@RequestParam HttpServletRequest request,@RequestParam HttpServletResponse response ,
-                              @PathParam("id") String id);
+    public Result deleteOneStory( @PathParam("id") String id);
 
 }

@@ -26,6 +26,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
 import org.apache.commons.io.FilenameUtils;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
 @RestController
 @RefreshScope
 public class StoryServiceMongoImpl implements IStoryService{
@@ -130,21 +133,20 @@ public class StoryServiceMongoImpl implements IStoryService{
 
     @Override
     @PreAuthorize("hasRole('USER')")
-    public Result syncStory(HttpServletRequest request, HttpServletResponse response ,
-                            String id,String work){
+    public Result syncStory(String id,String work){
         String username= SecurityUtil.getUserName();
 
         User user=userDAO.selectByName(username);
         if (user == null) {
             throw new CommonException(ExceptionEnum.USER_ACCOUNT_NOT_EXIST);
         }
-
+        HttpServletRequest request=((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();
         Story story= null;
         if(id!=null && !id.isEmpty())
             story=storyDAO.get(id);
         if(story==null)
         {
-            Result uploadResult=fileService.upload(request);
+            Result uploadResult=fileService.upload();
             if(!uploadResult.isSuccess())
                 return Result.failWithException(new CommonException(ExceptionEnum.FILE_UPLOAD_FAIL));
             story=process(uploadResult,work);
@@ -157,7 +159,7 @@ public class StoryServiceMongoImpl implements IStoryService{
             {
                 throw new CommonException(ExceptionEnum.USER_NOT_AUHTORIZED);
             }
-            Result uploadResult=fileService.upload(request);
+            Result uploadResult=fileService.upload();
             if(!uploadResult.isSuccess())
                 return Result.failWithException(new CommonException(ExceptionEnum.FILE_UPLOAD_FAIL));
             Story bundle2=process(uploadResult,work);
@@ -170,7 +172,7 @@ public class StoryServiceMongoImpl implements IStoryService{
 
     @Override
     @PreAuthorize("hasRole('USER')")
-    public Result getOneStory(HttpServletRequest request, HttpServletResponse response, String id) {
+    public Result getOneStory( String id) {
         String username= SecurityUtil.getUserName();
 
         User user=userDAO.selectByName(username);
@@ -183,7 +185,7 @@ public class StoryServiceMongoImpl implements IStoryService{
 
     @Override
     @PreAuthorize("hasRole('USER')")
-    public Result getAllStory(HttpServletRequest request, HttpServletResponse response, String username) {
+    public Result getAllStory(String username) {
         if(username==null)
         {
             username= SecurityUtil.getUserName();
@@ -193,13 +195,13 @@ public class StoryServiceMongoImpl implements IStoryService{
         if (user == null) {
             throw new CommonException(ExceptionEnum.USER_ACCOUNT_NOT_EXIST);
         }
-        List<Story> bundles=storyDAO.find(Query.query(Criteria.where("author.username").is(username)));
+        List<Story> bundles=storyDAO.find(Query.query(Criteria.where("author.id").is(user.getId())));
         return Result.successWithData(bundles);
     }
 
     @Override
     @PreAuthorize("hasRole('USER')")
-    public Result deleteOneStory(HttpServletRequest request, HttpServletResponse response,  String id) {
+    public Result deleteOneStory(String id) {
         String username= SecurityUtil.getUserName();
 
         User user=userDAO.selectByName(username);
