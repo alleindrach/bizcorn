@@ -225,7 +225,7 @@ public class StoryServiceMongoImpl implements IStoryService{
             return Result.successWithData(id);
         }else
         {
-            storyDAO.deleteById(new Story());
+            storyDAO.deleteByQuery(new Query());
             return Result.successWithData(id);
         }
     }

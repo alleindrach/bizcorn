@@ -17,6 +17,7 @@ public interface BaseDAO<T > {
     // 根据对象的属性删除
     public void deleteByCondition(T t);
 
+    public void deleteByQuery(Query q);
     // 通过条件查询更新数据
     public void update(Query query, Update update);
 

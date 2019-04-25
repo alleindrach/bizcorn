@@ -40,6 +40,10 @@ public class BaseDAOImpl<T extends Serializable> implements  BaseDAO<T>{
     }
 
     @Override
+    public void deleteByQuery(Query query) {
+        mongoTemplate.remove(query, getEntityClass());
+    }
+    @Override
     public void update(Query query, Update update) {
         mongoTemplate.updateMulti(query, update, this.getEntityClass());
     }
