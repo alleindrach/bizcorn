@@ -176,7 +176,7 @@ public class StoryServiceMongoImpl implements IStoryService{
 
     @Override
     @PreAuthorize("hasRole('USER')")
-    public Result getOneStory(String id) {
+    public Result getOneStory(@PathVariable("id") String id) {
         String username= SecurityUtil.getUserName();
 
         User user=userDAO.selectByName(username);
@@ -189,14 +189,15 @@ public class StoryServiceMongoImpl implements IStoryService{
 
     @Override
     @PreAuthorize("hasRole('USER')")
-    public Result getAllStory(String username) {
+    public Result getAllStory(@PathVariable("username") String username) {
         if(username==null)
         {
             username= SecurityUtil.getUserName();
         }
 
         User user=userDAO.selectByName(username);
-        if (user == null) {
+        if (user == n mn
+        kull) {
             throw new CommonException(ExceptionEnum.USER_ACCOUNT_NOT_EXIST);
         }
         List<Story> bundles=storyDAO.find(Query.query(Criteria.where("author.$id").is(new ObjectId(user.getId()))));
@@ -205,7 +206,7 @@ public class StoryServiceMongoImpl implements IStoryService{
 
     @Override
     @PreAuthorize("hasRole('USER')")
-    public Result deleteOneStory(String id) {
+    public Result deleteOneStory(@PathVariable("id") String id) {
         String username= SecurityUtil.getUserName();
 
         User user=userDAO.selectByName(username);

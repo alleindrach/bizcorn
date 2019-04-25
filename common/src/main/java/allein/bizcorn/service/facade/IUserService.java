@@ -37,28 +37,28 @@ public interface IUserService {
     @ResponseBody
     public Result<Long> getUserLoginErrorTimes(@PathVariable("username") String userName);
 
-    @PostMapping("/user/login/errortimes/inc/{username}")
+    @RequestMapping("/user/login/errortimes/inc/{username}")
     @ResponseBody
     public Result<Long> incUserLoginErrorTimes(@PathVariable("username")  String userName);
 
-    @PostMapping("/user/login/errortimes/rst/{username}")
+    @RequestMapping("/user/login/errortimes/rst/{username}")
     @ResponseBody
     public Result<Boolean> rstUserLoginErrorTimes(@PathVariable("username")String userName);
 
-    @PostMapping("/user/update")
+    @RequestMapping("/user/update")
     @ResponseBody
     public Result<Integer> updateUser(@RequestParam  IUser user);
 
-    @PostMapping("/user/bymobile/{mobile}")
+    @RequestMapping("/user/bymobile/{mobile}")
     @ResponseBody
     public Result<IUser> getUserByMobile(@PathVariable("mobile") String mobile);
 
-    @PostMapping("/user/authorities/id")
+    @RequestMapping("/user/authorities/id")
     @ResponseBody
     public Result<List<String>> getUserAuthorities(@PathVariable("id")  String userId);
 
 
-    @PostMapping("/user/homepage")
+    @RequestMapping("/user/homepage")
     @ResponseBody
     public Result<IUser> fetchHomepage();
 

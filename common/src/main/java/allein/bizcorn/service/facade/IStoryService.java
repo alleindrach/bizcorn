@@ -9,16 +9,16 @@ import java.io.IOException;
 
 public interface IStoryService {
 
-    @PostMapping("/story/sync")
+    @RequestMapping("/story/sync")
     @ResponseBody
     public Result syncStory(@RequestParam("id") String id,@RequestParam("work") String work);
 
 
-    @PostMapping("/story/{id}")
+    @RequestMapping("/story/{id}")
     @ResponseBody
     public Result getOneStory(@PathVariable("id") String id);
 
-    @PostMapping("/story/of/{username}")
+    @RequestMapping("/story/of/{username}")
     @ResponseBody
     public Result getAllStory(@PathVariable("username") String username);
 
