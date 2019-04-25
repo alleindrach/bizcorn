@@ -112,7 +112,7 @@ public class UserServiceMongoImpl implements IUserService {
     }
 
     @Override
-    public Result<IUser> getUserByUsername(String userName) {
+    public Result<IUser> getUserByUsername(@PathVariable("username") String userName) {
 
         User user=userDAO.selectByName(userName);
         return Result.successWithData(user);
@@ -141,13 +141,13 @@ public class UserServiceMongoImpl implements IUserService {
         return Result.successWithData(user);
     }
     @Override
-    public Result<IUser> getUserByMobile(String mobile)
+    public Result<IUser> getUserByMobile(@PathVariable("mobile") String mobile)
     {
         return Result.successWithData(mobile);
     }
 
     @Override
-    public Result<List<String>> getUserAuthorities(String userId) {
+    public Result<List<String>> getUserAuthorities(@PathVariable("id") String userId) {
         User user=userDAO.get(userId);
         List<String> auths=new ArrayList<>();
         for (Authority auth:user.getAuthoritys()

@@ -205,23 +205,28 @@ public class StoryServiceMongoImpl implements IStoryService{
 
     @Override
     @PreAuthorize("hasRole('USER')")
-    public Result deleteOneStory(@PathVariable("id") String id) {
+    public Result deleteStory(@PathVariable("id") String id) {
         String username= SecurityUtil.getUserName();
 
         User user=userDAO.selectByName(username);
         if (user == null) {
             throw new CommonException(ExceptionEnum.USER_ACCOUNT_NOT_EXIST);
         }
-        Story bundle=storyDAO.get(id);
-        if(bundle==null)
-            return  Result.failWithException(new CommonException(ExceptionEnum.BUNDLE_NOT_EXISTS));
+        if(id.compareToIgnoreCase("*")!=0) {
+            Story bundle = storyDAO.get(id);
+            if (bundle == null)
+                return Result.failWithException(new CommonException(ExceptionEnum.BUNDLE_NOT_EXISTS));
 
-        if(bundle.getAuthor().getUsername().compareToIgnoreCase(username)!=0)
+            if (bundle.getAuthor().getUsername().compareToIgnoreCase(username) != 0) {
+                throw new CommonException(ExceptionEnum.USER_NOT_AUHTORIZED);
+            }
+
+            storyDAO.deleteById(bundle);
+            return Result.successWithData(id);
+        }else
         {
-            throw new CommonException(ExceptionEnum.USER_NOT_AUHTORIZED);
+            storyDAO.deleteById(new Story());
+            return Result.successWithData(id);
         }
-
-        storyDAO.deleteById(bundle);
-        return Result.successWithData(id);
     }
 }

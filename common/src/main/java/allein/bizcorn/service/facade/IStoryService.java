@@ -24,6 +24,6 @@ public interface IStoryService {
 
     @DeleteMapping("/story/{id}")
     @ResponseBody
-    public Result deleteOneStory( @PathVariable("id") String id);
+    public Result deleteStory( @PathVariable("id") String id);
 
 }
