@@ -100,8 +100,8 @@ public class FileServiceImpl implements IFileService {
                     String uploadFileSuffix = uploadFilePath.substring(
                             uploadFilePath.indexOf('.') + 1, uploadFilePath.length());
                     logger.debug("uploadFileSuffix:{}" , uploadFileSuffix);
-                    stream = new BufferedOutputStream(new FileOutputStream(new File(
-                            FileRoot + uploadFileName + "." + uploadFileSuffix)));
+//                    stream = new BufferedOutputStream(new FileOutputStream(new File(
+//                            FileRoot + uploadFileName + "." + uploadFileSuffix)));
 
 
                     String md5Name= DigestUtils.md5DigestAsHex(file.getBytes());
@@ -123,13 +123,13 @@ public class FileServiceImpl implements IFileService {
                     logger.debug("上传文件错误:",e);
                     result.put(file.getOriginalFilename(),Result.failWithException(e));
                 } finally {
-                    try {
-                        if (stream != null) {
-                            stream.close();
-                        }
-                    } catch (IOException e) {
-                        logger.debug("上传文件错误:",e);
-                    }
+//                    try {
+////                        if (stream != null) {
+////                            stream.close();
+////                        }
+//                    } catch (IOException e) {
+//                        logger.debug("上传文件错误:",e);
+//                    }
                 }
             } else {
                 logger.debug("上传文件为空");
