@@ -10,6 +10,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -59,6 +60,12 @@ public class ExceptionHandler {
         logger.error("Request: " + req.getRequestURL(), ex);
 
         return new Result<Object>(new CommonException(ExceptionEnum.USER_ACCOUNT_ID_INVALID));
+    }
+    @org.springframework.web.bind.annotation.ExceptionHandler(AuthenticationCredentialsNotFoundException.class)
+    public @ResponseBody
+    Result<Object> handleError(HttpServletRequest req, AuthenticationCredentialsNotFoundException ex) {
+        logger.error("Request: " + req.getRequestURL(), ex);
+        return new Result<Object>(new CommonException(ExceptionEnum.USER_NOT_LOGIN));
     }
     // Total control - setup a model and return the view name yourself. Or
     // consider subclassing ExceptionHandlerExceptionResolver (see below).
