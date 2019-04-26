@@ -11,7 +11,7 @@ public interface IStoryService {
 
     @RequestMapping("/story/sync")
     @ResponseBody
-    public Result syncStory(@RequestParam("id") String id,@RequestParam("work") String work);
+    public Result syncStory(HttpServletRequest request,@RequestParam("id") String id,@RequestParam("work") String work);
 
 
     @RequestMapping("/story/{id}")

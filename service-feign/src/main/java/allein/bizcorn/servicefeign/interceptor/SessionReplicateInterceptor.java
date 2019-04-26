@@ -30,12 +30,12 @@ public class SessionReplicateInterceptor implements RequestInterceptor {
                 return;
             }
 
-            HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
-            Enumeration<String> headerNames = request.getHeaderNames();
+            HttpServletRequest requestHolder = ((ServletRequestAttributes) requestAttributes).getRequest();
+            Enumeration<String> headerNames = requestHolder.getHeaderNames();
             if (headerNames != null) {
                 while (headerNames.hasMoreElements()) {
                     String name = headerNames.nextElement();
-                    Enumeration<String> values = request.getHeaders(name);
+                    Enumeration<String> values = requestHolder.getHeaders(name);
                     while (values.hasMoreElements()) {
                         String value = values.nextElement();
                         requestTemplate.header(name, value);

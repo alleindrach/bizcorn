@@ -137,20 +137,20 @@ public class StoryServiceMongoImpl implements IStoryService{
 
     @Override
     @PreAuthorize("hasRole('USER')")
-    public Result syncStory(String id,String work){
+    public Result syncStory(HttpServletRequest request,String id,String work){
         String username= SecurityUtil.getUserName();
 
         User user=userDAO.selectByName(username);
         if (user == null) {
             throw new CommonException(ExceptionEnum.USER_ACCOUNT_NOT_EXIST);
         }
-        HttpServletRequest request=((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();
+//        HttpServletRequest request=((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();
         Story story= null;
         if(id!=null && !id.isEmpty())
             story=storyDAO.get(id);
         if(story==null)
         {
-            Result uploadResult=fileService.upload();
+            Result uploadResult=fileService.upload(request);
             if(!uploadResult.isSuccess())
                 return Result.failWithException(new CommonException(ExceptionEnum.FILE_UPLOAD_FAIL));
             story=process(uploadResult,work);
@@ -163,7 +163,7 @@ public class StoryServiceMongoImpl implements IStoryService{
             {
                 throw new CommonException(ExceptionEnum.USER_NOT_AUHTORIZED);
             }
-            Result uploadResult=fileService.upload();
+            Result uploadResult=fileService.upload(request);
             if(!uploadResult.isSuccess())
                 return Result.failWithException(new CommonException(ExceptionEnum.FILE_UPLOAD_FAIL));
             Story bundle2=process(uploadResult,work);
