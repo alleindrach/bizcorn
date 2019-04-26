@@ -4,6 +4,7 @@ import allein.bizcorn.common.exception.CommonException;
 import allein.bizcorn.common.exception.ExceptionEnum;
 import allein.bizcorn.model.facade.IUser;
 import allein.bizcorn.model.output.Result;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -25,9 +26,10 @@ public class FileServiceHystric implements  FileServiceProxy{
     }
 
     @Override
-    public void downloadById(String fileId) throws IOException {
+    public ResponseEntity<byte[]> downloadById(String fileId) throws IOException {
         HttpServletResponse response=((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
         response.sendError(500);
+        return null;
     }
 
     @Override
