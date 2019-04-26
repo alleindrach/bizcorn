@@ -87,4 +87,4 @@ logging:
         root: WARN
         org.springframework.web: INFO
         com.memorynotfound: DEBUG
-        allein.servicefeign: DEBUG
+        allein.bizcorn.servicefeign: DEBUG
