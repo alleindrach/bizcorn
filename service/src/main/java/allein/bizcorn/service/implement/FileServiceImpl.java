@@ -19,6 +19,7 @@ import com.mongodb.client.gridfs.model.GridFSFile;
 import com.mongodb.gridfs.GridFSDBFile;
 import org.apache.commons.lang.StringUtils;
 import org.bson.BsonObjectId;
+import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,7 +120,11 @@ public class FileServiceImpl implements IFileService {
                     else{
                         InputStream ins = file.getInputStream();
                         String contentType = file.getContentType();
-                        ObjectId gridFSFileId = gridFsTemplate.store(ins, md5Name, contentType);
+                        Document metaData=new Document();
+                        metaData.append("_contentType",contentType);
+                        metaData.append("_fileSuffix",uploadFileSuffix);
+                        metaData.append("_originFileName",uploadFilePath);
+                        ObjectId gridFSFileId = gridFsTemplate.store(ins, md5Name, metaData);
                         result.put(file.getOriginalFilename(),Result.successWithData(gridFSFileId.toString()));
                     }
 //
