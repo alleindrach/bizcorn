@@ -170,7 +170,16 @@ public class FileServiceImpl implements IFileService {
         }
         // 通知浏览器进行文件下载
         try {
-            headers.setContentType(new MediaType((String) gfsfile.getMetadata().get("_contentType")));
+            String mimeType=(String) gfsfile.getMetadata().get("_contentType");
+            String[] mimeTypes=mimeType.split("/");
+            if(mimeTypes!=null&&mimeTypes.length>0 )
+            {
+                headers.setContentType(new MediaType(mimeTypes[0],mimeTypes[1]));
+            }else
+            {
+                headers.setContentType(new MediaType(mimeType));
+            }
+
 //            if(gfsfile.getContentType()!=null)
 //                headers.setContentType(new MediaType(gfsfile.getContentType()));
         }catch(Exception ex)
