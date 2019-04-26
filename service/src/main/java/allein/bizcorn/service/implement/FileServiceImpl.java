@@ -169,7 +169,15 @@ public class FileServiceImpl implements IFileService {
             fileName = new String(fileName.getBytes("UTF-8"), "ISO-8859-1");
         }
         // 通知浏览器进行文件下载
-        headers.setContentType(new MediaType(gfsfile.getContentType()));
+        try {
+            
+            if(gfsfile.getContentType()!=null)
+                headers.setContentType(new MediaType(gfsfile.getContentType()));
+        }catch(Exception ex)
+        {
+            logger.debug("gfsfile:{} has no content type",gfsfile.getId());
+        }
+
         headers.setContentDispositionFormData("attachment",fileName);
         HttpStatus status = HttpStatus.OK;
 
