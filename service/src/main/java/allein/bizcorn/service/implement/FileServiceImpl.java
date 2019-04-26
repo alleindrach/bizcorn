@@ -72,10 +72,10 @@ public class FileServiceImpl implements IFileService {
         HttpServletRequest request=((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         String username= SecurityUtil.getUserName();
         logger.debug("upload by {}",username);
-//        MultipartResolver resolver = new CommonsMultipartResolver(request.getSession().getServletContext());
-//        resolver.resolveMultipart(request);
+        MultipartResolver resolver = new CommonsMultipartResolver(request.getSession().getServletContext());
+        MultipartHttpServletRequest multipartRequest = resolver.resolveMultipart(request);
         //
-        MultipartHttpServletRequest multipartRequest =  ((MultipartHttpServletRequest) request);
+//        MultipartHttpServletRequest multipartRequest =  ((MultipartHttpServletRequest) request);
 
 
         Map<String, MultipartFile> fileMap =((StandardMultipartHttpServletRequest) multipartRequest).getFileMap();
