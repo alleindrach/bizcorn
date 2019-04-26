@@ -170,9 +170,9 @@ public class FileServiceImpl implements IFileService {
         }
         // 通知浏览器进行文件下载
         try {
-            
-            if(gfsfile.getContentType()!=null)
-                headers.setContentType(new MediaType(gfsfile.getContentType()));
+            headers.setContentType(new MediaType((String) gfsfile.getMetadata().get("_contentType")));
+//            if(gfsfile.getContentType()!=null)
+//                headers.setContentType(new MediaType(gfsfile.getContentType()));
         }catch(Exception ex)
         {
             logger.debug("gfsfile:{} has no content type",gfsfile.getId());
