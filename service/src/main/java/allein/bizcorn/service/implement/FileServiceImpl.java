@@ -4,6 +4,7 @@ import allein.bizcorn.common.cache.ICacheAccessor;
 import allein.bizcorn.common.util.SecurityUtil;
 import allein.bizcorn.model.entity.User;
 import allein.bizcorn.model.output.Result;
+import allein.bizcorn.service.captcha.CaptchaGenerator;
 import allein.bizcorn.service.captcha.CaptchaImageHelper;
 import allein.bizcorn.service.captcha.CaptchaMessageHelper;
 import allein.bizcorn.service.captcha.CaptchaResult;
@@ -16,6 +17,7 @@ import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import com.mongodb.gridfs.GridFSDBFile;
+import org.apache.commons.lang.StringUtils;
 import org.bson.BsonObjectId;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -29,9 +31,10 @@ import org.springframework.data.mongodb.gridfs.GridFsCriteria;
 import org.springframework.data.mongodb.gridfs.GridFsOperations;
 import org.springframework.data.mongodb.gridfs.GridFsResource;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.DigestUtils;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,8 +48,11 @@ import org.springframework.web.multipart.support.AbstractMultipartHttpServletReq
 import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest;
 import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest;
 
+import javax.imageio.ImageIO;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.HashMap;
 import java.util.List;
@@ -139,15 +145,18 @@ public class FileServiceImpl implements IFileService {
         return Result.successWithData(result);
     }
     @Override
-    public void downloadById(@RequestParam String fileId) throws IOException {
+    public ResponseEntity<byte[]> downloadById(@PathVariable("id") String fileId) throws IOException {
         HttpServletRequest request=((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         HttpServletResponse response=((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
+
+        ResponseEntity<byte[]> entity = null;
+        HttpHeaders headers = new HttpHeaders();
 
         Query query = Query.query(Criteria.where("_id").is(fileId));
 // 查询单个文件
         GridFSFile gfsfile = gridFsTemplate.findOne(query);
         if (gfsfile == null) {
-            return;
+            return entity;
         }
         String fileName = gfsfile.getFilename().replace(",", "");
         //处理中文文件名乱码
@@ -160,25 +169,22 @@ public class FileServiceImpl implements IFileService {
             fileName = new String(fileName.getBytes("UTF-8"), "ISO-8859-1");
         }
         // 通知浏览器进行文件下载
-        response.setContentType(gfsfile.getContentType());
-        response.setHeader("Content-Disposition", "attachment;filename=\"" + fileName + "\"");
-//        GridFSDownloadStream in = gridFSBucket.openDownloadStream(gfsfile.getObjectId());
+        headers.setContentType(new MediaType(gfsfile.getContentType()));
+        headers.setContentDispositionFormData("attachment",fileName);
+        HttpStatus status = HttpStatus.OK;
 
-//        GridFsResource gridFsResource=new GridFsResource(gfsfile,in);
+        byte[] fileBuffer = new byte[(int) gfsfile.getLength()];
 
-        gridFSBucket.downloadToStream(gfsfile.getObjectId(), response.getOutputStream());
-//        byte[] b = new byte[1024];
-//        int  i = 0;
-//        while (-1!=(i=in.read(b))){
-//            response.getOutputStream().write(b,0,i);
-//        }
+        GridFSDownloadStream in = gridFSBucket.openDownloadStream(gfsfile.getObjectId());
+        in.read(fileBuffer);
+        in.close();
+        entity = new ResponseEntity<byte[]>(fileBuffer, headers, status);
 
-
-        logger.debug("success");
+        return entity;
     }
 
     @Override
-    public Result deleteById(String fileId) throws IOException {
+    public Result deleteById(@PathVariable("id") String fileId) throws IOException {
         gridFsTemplate.delete(Query.query(Criteria.where("_id").is(fileId)));
         return Result.successWithData(fileId);
     }

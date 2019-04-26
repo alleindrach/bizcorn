@@ -17,7 +17,7 @@ public interface IFileService {
     public Result upload(HttpServletRequest request) ;
 
     @RequestMapping(value = "/file/{id}",method = RequestMethod.GET)
-    public void downloadById(@PathVariable("id") String fileId)
+    public ResponseEntity<byte[]> downloadById(@PathVariable("id") String fileId)
             throws IOException;
 
     @RequestMapping(value = "/file/{id}",method = RequestMethod.DELETE)
