@@ -41,6 +41,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
+import org.springframework.web.multipart.support.AbstractMultipartHttpServletRequest;
+import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest;
 import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
@@ -78,7 +80,7 @@ public class FileServiceImpl implements IFileService {
 //        MultipartHttpServletRequest multipartRequest =  ((MultipartHttpServletRequest) request);
 
 
-        Map<String, MultipartFile> fileMap =((StandardMultipartHttpServletRequest) multipartRequest).getFileMap();
+        Map<String, MultipartFile> fileMap =((AbstractMultipartHttpServletRequest) multipartRequest).getFileMap();
 //        MultipartFile file = null;
         BufferedOutputStream stream = null;
         Result r= Result.successWithMessage("Success!");
