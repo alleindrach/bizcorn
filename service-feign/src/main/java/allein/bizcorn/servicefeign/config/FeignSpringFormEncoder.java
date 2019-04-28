@@ -13,6 +13,7 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 
 import static feign.form.ContentType.MULTIPART;
+import static java.util.Collections.singletonMap;
 
 public class FeignSpringFormEncoder extends FormEncoder {
 
@@ -40,6 +41,8 @@ public class FeignSpringFormEncoder extends FormEncoder {
 
     @Override
     public void encode(Object object, Type bodyType, RequestTemplate template) throws EncodeException {
+
+
         if (bodyType.equals(MultipartFile.class)) {
             MultipartFile file = (MultipartFile) object;
             HashMap data = new HashMap();
