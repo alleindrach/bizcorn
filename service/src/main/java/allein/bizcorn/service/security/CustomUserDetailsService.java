@@ -7,6 +7,7 @@ import allein.bizcorn.service.db.mysql.dao.UserDAO;
 import allein.bizcorn.service.facade.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -39,7 +40,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         }
         else
             authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-        allein.bizcorn.service.security.UserDetails userDetails = new allein.bizcorn.service.security.UserDetails(user,authorities);
+        User userDetails = new User(user.getUsername(),user.getPassword(),authorities);
         return userDetails;
 
     }

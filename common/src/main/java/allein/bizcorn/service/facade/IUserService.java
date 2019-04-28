@@ -33,6 +33,11 @@ public interface IUserService {
     @ResponseBody
     public Result<IUser> getUserByUsername(@PathVariable("username") String userName);
 
+    @RequestMapping(value = "/user/masked/{username}",method = RequestMethod.GET)
+    @ResponseBody
+    public Result<IUser> getMaskedUserByUsername(@PathVariable("username") String userName);
+
+
     @RequestMapping(value = "/user/login/errortimes/{username}",method = RequestMethod.GET)
     @ResponseBody
     public Result<Long> getUserLoginErrorTimes(@PathVariable("username") String userName);

@@ -1,23 +1,11 @@
 package allein.bizcorn.service.implement;
 
-import allein.bizcorn.common.cache.ICacheAccessor;
 import allein.bizcorn.common.util.SecurityUtil;
-import allein.bizcorn.model.entity.User;
 import allein.bizcorn.model.output.Result;
-import allein.bizcorn.service.captcha.CaptchaGenerator;
-import allein.bizcorn.service.captcha.CaptchaImageHelper;
-import allein.bizcorn.service.captcha.CaptchaMessageHelper;
-import allein.bizcorn.service.captcha.CaptchaResult;
-import allein.bizcorn.service.db.mysql.dao.UserDAO;
-import allein.bizcorn.service.facade.ICommonService;
 import allein.bizcorn.service.facade.IFileService;
-import allein.bizcorn.service.security.config.SecurityConstants;
-import com.alibaba.fastjson.JSONObject;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
 import com.mongodb.client.gridfs.model.GridFSFile;
-import com.mongodb.gridfs.GridFSDBFile;
-import org.apache.commons.lang.StringUtils;
 import org.bson.BsonObjectId;
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -35,29 +23,14 @@ import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.DigestUtils;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
-import org.springframework.web.multipart.MultipartResolver;
-import org.springframework.web.multipart.commons.CommonsMultipartResolver;
-import org.springframework.web.multipart.support.AbstractMultipartHttpServletRequest;
-import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest;
-import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest;
-
-import javax.imageio.ImageIO;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @RefreshScope
@@ -77,23 +50,23 @@ public class FileServiceImpl implements IFileService {
 
     @Override
     @PreAuthorize("hasRole('USER')")
-    public Result upload(HttpServletRequest request) {
+    public Result upload(@RequestPart MultipartFile[] files) {
 //        HttpServletRequest request=((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         String username= SecurityUtil.getUserName();
         logger.debug("upload by {}",username);
 //        MultipartResolver resolver = new CommonsMultipartResolver(request.getSession().getServletContext());
 //        MultipartHttpServletRequest multipartRequest = resolver.resolveMultipart(request);
 
-        MultipartHttpServletRequest multipartRequest =  ((MultipartHttpServletRequest) request);
-
-
-        Map<String, MultipartFile> fileMap =((AbstractMultipartHttpServletRequest) multipartRequest).getFileMap();
-//        MultipartFile file = null;
-        BufferedOutputStream stream = null;
+//        MultipartHttpServletRequest multipartRequest =  ((MultipartHttpServletRequest) request);
+//
+//
+//        Map<String, MultipartFile> fileMap =((AbstractMultipartHttpServletRequest) multipartRequest).getFileMap();
+////        MultipartFile file = null;
+//        BufferedOutputStream stream = null;
         Result r= Result.successWithMessage("Success!");
         HashMap<String,Result > result=new HashMap<>();
 
-        for (MultipartFile file:fileMap.values()) {
+        for (MultipartFile file:files) {
             if (!file.isEmpty()) {
                 try {
                     String uploadFilePath = file.getOriginalFilename();

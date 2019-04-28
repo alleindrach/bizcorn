@@ -14,7 +14,7 @@ import java.util.HashMap;
 public interface IFileService {
 
     @RequestMapping(value = "/files",method = RequestMethod.POST)
-    public Result upload(HttpServletRequest request) ;
+    public Result upload(@RequestPart MultipartFile[] files) ;
 
     @RequestMapping(value = "/file/{id}",method = RequestMethod.GET)
     public ResponseEntity<byte[]> downloadById(@PathVariable("id") String fileId)

@@ -10,7 +10,7 @@ public class UrlUtil {
         return matcher.matches();
     }
     public static boolean isUrl(String url){
-        String regex = "http(s)?://([\\w-]+\\.)+[\\w-]+(/[\\w- ./?%&=]*)?";
+        String regex = "http(s)?://([\\w-]+\\.)+[\\w-]+(\\:[\\d]+)*(/[\\w- ./?%&=]*)?";
         return match(regex, url);
     }
 }

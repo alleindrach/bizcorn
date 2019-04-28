@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -27,9 +28,9 @@ public class StoryServiceControl {
     StoryServiceProxy storyService;
     @RequestMapping("/story/sync")
     @ResponseBody
-    public Result syncStory(HttpServletRequest request,@RequestParam("id") String id,@RequestParam("work") String work)
+    public Result syncStory(@RequestPart MultipartFile [] files, @RequestParam("id") String id, @RequestParam("work") String work)
     {
-        return    storyService.syncStory(request,id,work);
+        return    storyService.syncStory(files,id,work);
     }
 
 

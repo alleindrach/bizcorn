@@ -5,7 +5,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 
 //动态注入proxy
 @FeignClient(value = "service"
-        , fallback = UserServiceHystric.class
+//        , fallback = UserServiceHystric.class
 )
 public interface UserServiceProxy extends IUserService{
 }

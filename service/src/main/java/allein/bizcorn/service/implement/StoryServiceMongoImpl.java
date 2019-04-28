@@ -3,7 +3,9 @@ package allein.bizcorn.service.implement;
 import allein.bizcorn.common.exception.CommonException;
 import allein.bizcorn.common.exception.ExceptionEnum;
 import allein.bizcorn.common.util.SecurityUtil;
-import allein.bizcorn.model.mongo.*;
+import allein.bizcorn.model.mongo.Scene;
+import allein.bizcorn.model.mongo.Story;
+import allein.bizcorn.model.mongo.User;
 import allein.bizcorn.model.output.Result;
 import allein.bizcorn.service.db.mongo.dao.StoryDAO;
 import allein.bizcorn.service.db.mongo.dao.UserDAO;
@@ -17,21 +19,13 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.websocket.server.PathParam;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.function.Consumer;
 import org.apache.commons.io.FilenameUtils;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RefreshScope
@@ -89,7 +83,7 @@ public class StoryServiceMongoImpl implements IStoryService{
         }
         return fileSource;
     }
-    private Story process(Result uploadResult ,String detail)
+    private Story process(Result uploadResult , String detail)
     {
         Story story=new Story();
         JSONObject jsonDetail=JSONObject.parseObject(detail);
@@ -137,7 +131,7 @@ public class StoryServiceMongoImpl implements IStoryService{
 
     @Override
     @PreAuthorize("hasRole('USER')")
-    public Result syncStory(HttpServletRequest request,String id,String work){
+    public Result syncStory(@RequestPart MultipartFile[] files, String id, String work){
         String username= SecurityUtil.getUserName();
 
         User user=userDAO.selectByName(username);
@@ -150,7 +144,7 @@ public class StoryServiceMongoImpl implements IStoryService{
             story=storyDAO.get(id);
         if(story==null)
         {
-            Result uploadResult=fileService.upload(request);
+            Result uploadResult=fileService.upload(files);
             if(!uploadResult.isSuccess())
                 return Result.failWithException(new CommonException(ExceptionEnum.FILE_UPLOAD_FAIL));
             story=process(uploadResult,work);
@@ -163,7 +157,7 @@ public class StoryServiceMongoImpl implements IStoryService{
             {
                 throw new CommonException(ExceptionEnum.USER_NOT_AUHTORIZED);
             }
-            Result uploadResult=fileService.upload(request);
+            Result uploadResult=fileService.upload(files);
             if(!uploadResult.isSuccess())
                 return Result.failWithException(new CommonException(ExceptionEnum.FILE_UPLOAD_FAIL));
             Story bundle2=process(uploadResult,work);

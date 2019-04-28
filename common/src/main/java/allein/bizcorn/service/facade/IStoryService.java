@@ -2,6 +2,7 @@ package allein.bizcorn.service.facade;
 
 import allein.bizcorn.model.output.Result;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -11,7 +12,7 @@ public interface IStoryService {
 
     @RequestMapping("/story/sync")
     @ResponseBody
-    public Result syncStory(HttpServletRequest request,@RequestParam("id") String id,@RequestParam("work") String work);
+    public Result syncStory(@RequestPart MultipartFile[] files, @RequestParam("id") String id, @RequestParam("work") String work);
 
 
     @RequestMapping("/story/{id}")

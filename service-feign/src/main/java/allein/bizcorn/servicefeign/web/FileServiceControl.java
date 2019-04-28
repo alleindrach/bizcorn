@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -30,9 +31,9 @@ public class FileServiceControl {
     String sessionAttrUser;
 
     @RequestMapping(value = "/files",method = RequestMethod.POST)
-    public Result upload(HttpServletRequest request)
+    public Result upload(MultipartFile[] files)
     {
-        Result result=fileService.upload(request);
+        Result result=fileService.upload(files);
         return result;
     }
     @RequestMapping(value = "/file/{id}",method = RequestMethod.GET)

@@ -12,7 +12,6 @@ import allein.bizcorn.service.facade.IUserService;
 import allein.bizcorn.service.captcha.CaptchaImageHelper;
 import allein.bizcorn.service.captcha.CaptchaMessageHelper;
 import allein.bizcorn.service.db.mysql.dao.UserDAO;
-import allein.bizcorn.service.security.UserDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

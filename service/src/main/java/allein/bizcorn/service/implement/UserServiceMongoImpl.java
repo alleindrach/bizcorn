@@ -3,9 +3,8 @@ package allein.bizcorn.service.implement;
 import allein.bizcorn.common.cache.ICacheAccessor;
 import allein.bizcorn.common.exception.CommonException;
 import allein.bizcorn.common.exception.ExceptionEnum;
-import allein.bizcorn.common.util.SecurityUtil;
 
-import allein.bizcorn.model.facade.IAuthority;
+import allein.bizcorn.common.util.Masker;
 import allein.bizcorn.model.facade.IUser;
 import allein.bizcorn.model.mongo.Authority;
 import allein.bizcorn.model.mongo.User;
@@ -15,9 +14,7 @@ import allein.bizcorn.service.captcha.CaptchaMessageHelper;
 import allein.bizcorn.service.captcha.CaptchaResult;
 import allein.bizcorn.service.db.mongo.dao.UserDAO;
 import allein.bizcorn.service.facade.IUserService;
-import allein.bizcorn.service.security.UserDetails;
 import allein.bizcorn.service.security.config.SecurityConstants;
-import com.netflix.ribbon.proxy.annotation.Http;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +27,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
@@ -98,7 +95,7 @@ public class UserServiceMongoImpl implements IUserService {
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken= (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         if(usernamePasswordAuthenticationToken !=null &&
                 usernamePasswordAuthenticationToken.isAuthenticated() &&
-                usernamePasswordAuthenticationToken.getPrincipal() instanceof  UserDetails &&
+                usernamePasswordAuthenticationToken.getPrincipal() instanceof UserDetails &&
                 ((UserDetails) usernamePasswordAuthenticationToken.getPrincipal()).getUsername()!=null)
         {
             String username=((UserDetails) usernamePasswordAuthenticationToken.getPrincipal()).getUsername();
@@ -115,6 +112,15 @@ public class UserServiceMongoImpl implements IUserService {
     public Result<IUser> getUserByUsername(@PathVariable("username") String userName) {
 
         User user=userDAO.selectByName(userName);
+        return Result.successWithData(user);
+
+    }
+    @Override
+    public Result<IUser> getMaskedUserByUsername(@PathVariable("username") String userName) {
+
+        User user=userDAO.selectByName(userName);
+        user.setMobile(Masker.getMaskCharWay(user.getMobile(),3,9));
+        user.setPassword("");
         return Result.successWithData(user);
 
     }
@@ -150,7 +156,7 @@ public class UserServiceMongoImpl implements IUserService {
     public Result<List<String>> getUserAuthorities(@PathVariable("id") String userId) {
         User user=userDAO.get(userId);
         List<String> auths=new ArrayList<>();
-        for (Authority auth:user.getAuthoritys()
+        for (Authority auth:user.getAuthorities()
              ) {
             auths.add(auth.getAuthority());
         }
@@ -186,7 +192,7 @@ public class UserServiceMongoImpl implements IUserService {
 
         HashSet<Authority> auths=new HashSet<Authority>();
         auths.add(new Authority().setAuthority("ROLE_USER"));
-        newuser.setAuthoritys(auths);
+        newuser.setAuthorities(auths);
         userDAO.save(newuser);
         return  Result.successWithData(newuser);
     }
@@ -196,16 +202,16 @@ public class UserServiceMongoImpl implements IUserService {
     public Result<IUser> fetchHomepage()
     {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if(auth.getPrincipal() instanceof UserDetails )
-        {
-            try {
-                UserDetails userDetails = (UserDetails) auth.getPrincipal();
-                User user = userDAO.selectByName(userDetails.getUsername());
-                return Result.successWithData(user);
-            }catch(Exception ex) {
-                return Result.failWithException(ex);
-            }
-        }
+//        if(auth.getPrincipal() instanceof UserDetails )
+//        {
+//            try {
+//                UserDetails userDetails = (UserDetails) auth.getPrincipal();
+//                User user = userDAO.selectByName(userDetails.getUsername());
+//                return Result.successWithData(user);
+//            }catch(Exception ex) {
+//                return Result.failWithException(ex);
+//            }
+//        }
         return  Result.failWithException(new CommonException(ExceptionEnum.USER_NOT_LOGIN));
     }
 

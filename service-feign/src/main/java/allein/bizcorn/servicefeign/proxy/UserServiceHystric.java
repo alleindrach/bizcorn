@@ -39,6 +39,11 @@ public class UserServiceHystric implements  UserServiceProxy{
     }
 
     @Override
+    public Result<IUser> getMaskedUserByUsername(String userName) {
+        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
+    }
+
+    @Override
     public Result<Long> getUserLoginErrorTimes(String userName) {
         return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
     }

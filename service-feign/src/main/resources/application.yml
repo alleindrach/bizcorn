@@ -67,14 +67,30 @@ bizcorn:
         attribute:
             user: user
             timeout: timeout
-
+hystrix:
+   command:
+       default:
+           execution:
+               isolation:
+                   thread:
+                       timeoutInMilliseconds: 5000
+#               timeout:
+#                   enabled: false
 feign:
     hystrix:
         enabled: true
+
+
         #使用apache的httpclient，连接池，替换feign原生的httpclient
     httpclient:
-        enabled=true
-
+        enabled: true
+        connection-timeout: 5000
+        read_timeout: 5000
+ribbon:
+    ReadTimeout: 60000
+    ConnectTimeout: 60000
+    MaxAutoRetries: 0
+    MaxAutoRetriesNextServer: 1
 #hystrix:
 #  command:
 #    default:

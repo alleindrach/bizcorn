@@ -6,6 +6,7 @@ import allein.bizcorn.model.output.Result;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,7 +17,7 @@ public class StoryServiceHystric implements  StoryServiceProxy{
 
 
     @Override
-    public Result syncStory(HttpServletRequest request, String id, String work) {
+    public Result syncStory(MultipartFile[] files, String id, String work) {
         return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
 
     }
