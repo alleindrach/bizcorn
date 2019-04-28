@@ -1,6 +1,7 @@
 package allein.bizcorn.service.facade;
 
 import allein.bizcorn.model.output.Result;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -10,7 +11,7 @@ import java.io.IOException;
 
 public interface IStoryService {
 
-    @RequestMapping("/story/sync")
+    @RequestMapping(value="/story/sync",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseBody
     public Result syncStory(@RequestPart MultipartFile[] files, @RequestParam("id") String id, @RequestParam("work") String work);
 
