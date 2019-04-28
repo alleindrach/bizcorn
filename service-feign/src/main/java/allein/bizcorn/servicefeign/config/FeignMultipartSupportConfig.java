@@ -11,8 +11,8 @@ import feign.codec.Encoder;
 public class FeignMultipartSupportConfig {
     @Bean
     public Encoder feignFormEncoder() {
-//        return new FeignSpringFormEncoder();
-        return new SpringFormEncoder();
+        return new FeignSpringFormEncoder();
+//        return new SpringFormEncoder();
     }
 //
 //    @Bean
