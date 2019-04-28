@@ -85,7 +85,7 @@ public class UserServiceMongoImpl implements IUserService {
 
     public
     @PreAuthorize("hasRole('USER')")
-    @Transactional
+//    @Transactional
 //    @AuthLogin(injectUidFiled = "userId")
     Result<IUser> update(
             @RequestParam(value = "mobile") String mobile,
