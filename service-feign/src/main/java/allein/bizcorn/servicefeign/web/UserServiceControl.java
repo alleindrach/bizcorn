@@ -20,7 +20,6 @@ import java.util.Enumeration;
 
 @RestController
 @RefreshScope
-@RequestMapping("/user")
 public class UserServiceControl {
 
     private static final Logger logger = LoggerFactory.getLogger(UserServiceControl.class);
@@ -32,7 +31,7 @@ public class UserServiceControl {
     @Value("${bizcorn.session.attribute.user}")
     String sessionAttrUser;
 
-    @RequestMapping(value = "/login")
+    @RequestMapping(value = "/user/login")
     @ResponseBody
     public Result login(
             RequestTemplate requestTemplate,
@@ -58,13 +57,13 @@ public class UserServiceControl {
         return x;
     }
 
-    @PutMapping(value = "/")
+    @PutMapping(value = "/user")
     @ResponseBody
     public Result update(@RequestParam String mobile,HttpServletRequest request,HttpServletResponse response,HttpSession session) {
         Object uo=session.getAttribute(sessionAttrUser);
         return userService.update(mobile,session,request);
     }
-    @RequestMapping(value = "/logout")
+    @RequestMapping(value = "/user/logout")
     @ResponseBody
     public Result logout(HttpServletRequest request,HttpServletResponse response)
     {

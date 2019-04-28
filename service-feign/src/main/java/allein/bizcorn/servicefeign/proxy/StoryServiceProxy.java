@@ -6,8 +6,8 @@ import org.springframework.cloud.openfeign.FeignClient;
 
 //动态注入proxy
 @FeignClient(value = "service",
-        configuration = FeignMultipartSupportConfig.class //,
-//        fallback = StoryServiceHystric.class
+        configuration = FeignMultipartSupportConfig.class ,
+        fallback = StoryServiceHystric.class
 )
 public interface StoryServiceProxy extends IStoryService{
 }
