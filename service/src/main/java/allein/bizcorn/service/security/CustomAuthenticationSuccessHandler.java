@@ -3,7 +3,10 @@ package allein.bizcorn.service.security;
 import allein.bizcorn.model.facade.IUser;
 import allein.bizcorn.model.output.Result;
 import allein.bizcorn.service.facade.IUserService;
+import allein.bizcorn.service.implement.UserServiceMongoImpl;
 import com.alibaba.fastjson.JSON;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,6 +22,7 @@ import java.io.IOException;
 
 @Component
 public class CustomAuthenticationSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
+    private static final Logger logger = LoggerFactory.getLogger(CustomAuthenticationSuccessHandler.class);
 
     @Autowired
     private IUserService userService;
@@ -32,6 +36,7 @@ public class CustomAuthenticationSuccessHandler extends SavedRequestAwareAuthent
         if (session != null) {
             session.setAttribute("username", username);
         }
+        logger.info("Auth session>>>>{}",session.getId());
         this.clearAuthenticationAttributes(request);
 
         String ajaxHeader = ((HttpServletRequest) request).getHeader("X-Requested-With");

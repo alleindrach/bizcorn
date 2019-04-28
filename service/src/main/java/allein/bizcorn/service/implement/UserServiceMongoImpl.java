@@ -31,6 +31,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -84,14 +85,13 @@ public class UserServiceMongoImpl implements IUserService {
     }
 
     public
-    @PreAuthorize("hasRole('USER')")
+//    @PreAuthorize("hasRole('USER')")
 //    @Transactional
 //    @AuthLogin(injectUidFiled = "userId")
     Result<IUser> update(
-            @RequestParam(value = "mobile") String mobile,
-            HttpSession session,
-            HttpServletRequest request
+            @RequestParam(value = "mobile") String mobile
     ) {
+        logger.info("session_id>>>>>{}",RequestContextHolder.getRequestAttributes().getSessionId());
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken= (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         if(usernamePasswordAuthenticationToken !=null &&
                 usernamePasswordAuthenticationToken.isAuthenticated() &&

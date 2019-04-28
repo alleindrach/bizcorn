@@ -24,9 +24,7 @@ public interface IUserService {
     @RequestMapping(value = "/user",method = RequestMethod.PUT)
     @ResponseBody
     Result<IUser> update(
-            @RequestParam(value = "mobile") String mobile,
-            @RequestParam HttpSession session,
-            @RequestParam HttpServletRequest request
+            @RequestParam(value = "mobile") String mobile
     );
 
     @RequestMapping(value = "/user/byname/{username}",method = RequestMethod.GET)
