@@ -28,7 +28,7 @@ public class UserServiceHystric implements  UserServiceProxy{
     }
 
 
-    public Result<IUser> update(String mobile, HttpSession session, HttpServletRequest request) {
+    public Result<IUser> update(String mobile) {
         return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
     }
 

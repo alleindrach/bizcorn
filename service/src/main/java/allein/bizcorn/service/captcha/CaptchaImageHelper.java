@@ -4,6 +4,7 @@ import allein.bizcorn.common.cache.CacheAccessor;
 import allein.bizcorn.common.cache.ICacheAccessor;
 import allein.bizcorn.common.exception.CommonException;
 import allein.bizcorn.common.exception.ExceptionEnum;
+import allein.bizcorn.model.security.CaptchaResult;
 import allein.bizcorn.service.captcha.config.CaptchaProperties;
 import allein.bizcorn.service.captcha.message.CaptchaMessageSource;
 import com.google.code.kaptcha.impl.DefaultKaptcha;

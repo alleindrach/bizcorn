@@ -2,6 +2,7 @@ package allein.bizcorn.service.captcha;
 
 
 import allein.bizcorn.common.cache.ICacheAccessor;
+import allein.bizcorn.model.security.CaptchaResult;
 import allein.bizcorn.service.captcha.config.CaptchaProperties;
 import allein.bizcorn.service.captcha.message.CaptchaMessageSource;
 import org.apache.commons.lang.StringUtils;

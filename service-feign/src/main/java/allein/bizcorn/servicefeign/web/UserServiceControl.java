@@ -9,8 +9,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.session.web.http.CookieSerializer;
+import org.springframework.session.web.http.DefaultCookieSerializer;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -32,10 +37,24 @@ public class UserServiceControl {
     String sessionAttrUser;
 
     @RequestMapping(value = "/user/login")
-    @ResponseBody
     public Result login(
-            RequestTemplate requestTemplate,
-            @RequestParam String username, @RequestParam String password, @RequestParam String captcha, HttpServletRequest request, HttpSession session) {
+            @RequestParam String username, @RequestParam String password, @RequestParam(required = false) String captcha) {
+//说明： 发起时       从终端 -- cookie1--> Feign -- cookie2-->Service 中，cookie2的复制通过interceptor完成
+//      返回时       从Serivice--cookie3-->Feign--cookie4-->终端 的过程中，cookie4的session传播，如果不通过ResponseEntity ，则只能手工添加？存疑
+        Result x=userService.login(username,password,captcha);
+        if(x.isSuccess())
+        {
+            String sessionCookieId=(String)x.getData();
+            DefaultCookieSerializer cookieSerializer=new DefaultCookieSerializer();
+            HttpServletRequest request=((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();
+            HttpServletResponse response=((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getResponse();
+            cookieSerializer.writeCookieValue(new CookieSerializer.CookieValue(request, response, sessionCookieId));
+        }
+        return x;
+    }
+
+    @PutMapping(value = "/user")
+    public Result update(@RequestParam String mobile,HttpServletRequest request,HttpServletResponse response,HttpSession session) {
         String sessionId =  RequestContextHolder.getRequestAttributes().getSessionId();
 
         logger.info(" {} >>> {}",  request.getRequestURL().toString(),sessionId);
@@ -51,20 +70,9 @@ public class UserServiceControl {
 //                requestTemplate.header("Cookie", cookies[i].getName()+"=" + cookies[i].getValue());
             }
         }
-
-
-        Result x=userService.login(username,password,captcha);
-        return x;
-    }
-
-    @PutMapping(value = "/user")
-    @ResponseBody
-    public Result update(@RequestParam String mobile,HttpServletRequest request,HttpServletResponse response,HttpSession session) {
-        Object uo=session.getAttribute(sessionAttrUser);
-        return userService.update(mobile,session,request);
+        return userService.update(mobile);
     }
     @RequestMapping(value = "/user/logout")
-    @ResponseBody
     public Result logout(HttpServletRequest request,HttpServletResponse response)
     {
         return  userService.logout(request,response);

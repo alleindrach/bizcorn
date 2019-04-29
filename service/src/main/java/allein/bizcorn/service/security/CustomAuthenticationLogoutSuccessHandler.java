@@ -15,7 +15,7 @@ public class CustomAuthenticationLogoutSuccessHandler extends SimpleUrlLogoutSuc
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
 
         String ajaxHeader = ((HttpServletRequest) request).getHeader("X-Requested-With");
-        boolean isAjax = "XMLHttpRequest".equals(ajaxHeader);
+        boolean isAjax = true;//"XMLHttpRequest".equals(ajaxHeader);
         if (isAjax) {
             try {
                 response.setCharacterEncoding("UTF-8");

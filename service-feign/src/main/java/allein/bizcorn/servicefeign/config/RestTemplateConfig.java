@@ -1,6 +1,5 @@
 package allein.bizcorn.servicefeign.config;
 
-import allein.bizcorn.model.facade.IUser;
 import allein.bizcorn.model.output.Result;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -22,7 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Component
+//@Component
 public class RestTemplateConfig {
     private static final Logger logger = LoggerFactory.getLogger(RestTemplateConfig.class);
 

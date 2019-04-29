@@ -2,7 +2,7 @@ package allein.bizcorn.common.exception;
 
 public enum ExceptionEnum {
 
-    USER_NOT_LOGIN("0001", "登录验证失败,请重新登录"),
+    USER_NOT_LOGIN("0001", "用户名或密码不符"),
     USER_NOT_AUHTORIZED("0002", "权限受限"),
     USER_ACCOUNT_ID_INVALID("0003", "用户id获取失败"),
     USER_ACCOUNT_NOT_EXIST("0004","用户名或者密码错误"),

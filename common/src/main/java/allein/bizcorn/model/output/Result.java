@@ -40,6 +40,11 @@ public class Result<T> implements Serializable{
 
     }
 
+    public Result() {
+
+
+    }
+
     public boolean isSuccess(){return this.state==1;};
     public String getReason() {
         return reason;

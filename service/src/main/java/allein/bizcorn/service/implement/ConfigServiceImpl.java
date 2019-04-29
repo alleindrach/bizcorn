@@ -8,7 +8,10 @@ public class ConfigServiceImpl implements IConfigSerivce {
 
     public boolean isEnableCaptcha(Long errorTime)
     {
-        return true;
+        if(errorTime>3)
+            return true;
+        else
+            return false;
     }
 
 }

@@ -1,6 +1,7 @@
 package allein.bizcorn.service.security;
 
 
+import allein.bizcorn.model.security.CustomWebAuthenticationDetails;
 import allein.bizcorn.service.captcha.CaptchaImageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationDetailsSource;

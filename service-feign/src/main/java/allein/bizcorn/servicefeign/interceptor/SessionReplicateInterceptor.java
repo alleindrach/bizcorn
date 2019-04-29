@@ -47,22 +47,22 @@ public class SessionReplicateInterceptor implements RequestInterceptor {
         } catch (Exception e) {
             logger.error("SessionInterceptor exception: ", e);
         }
-
-        logger.info("{} SessionInterceptor apply begin.",Thread.currentThread().getId());
-        try {
-            String sessionId =  RequestContextHolder.currentRequestAttributes().getSessionId();
-            if (null != sessionId) {
-//                requestTemplate.header("Cookie", "SESSION=" + sessionId);
-            }
-            Cookie[] cookies =request.getCookies();
-            if(cookies!=null) {
-                for (int i = 0; i < cookies.length; i++) {
-                    logger.info("Cookie >>>>> {} => {}", cookies[i].getName(), cookies[i].getValue());
-                    requestTemplate.header("Cookie", cookies[i].getName()+"=" + cookies[i].getValue());
-                }
-            }
-        } catch (Exception e) {
-            logger.error("SessionInterceptor exception: ", e);
-        }
+//
+//        logger.info("{} SessionInterceptor apply begin.",Thread.currentThread().getId());
+//        try {
+//            String sessionId =  RequestContextHolder.currentRequestAttributes().getSessionId();
+//            if (null != sessionId) {
+////                requestTemplate.header("Cookie", "SESSION=" + sessionId);
+//            }
+//            Cookie[] cookies =request.getCookies();
+//            if(cookies!=null) {
+//                for (int i = 0; i < cookies.length; i++) {
+//                    logger.info("Cookie >>>>> {} => {}", cookies[i].getName(), cookies[i].getValue());
+//                    requestTemplate.header("Cookie", cookies[i].getName()+"=" + cookies[i].getValue());
+//                }
+//            }
+//        } catch (Exception e) {
+//            logger.error("SessionInterceptor exception: ", e);
+//        }
     }
 }

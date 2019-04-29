@@ -9,9 +9,9 @@ import allein.bizcorn.model.facade.IUser;
 import allein.bizcorn.model.mongo.Authority;
 import allein.bizcorn.model.mongo.User;
 import allein.bizcorn.model.output.Result;
+import allein.bizcorn.model.security.CaptchaResult;
 import allein.bizcorn.service.captcha.CaptchaImageHelper;
 import allein.bizcorn.service.captcha.CaptchaMessageHelper;
-import allein.bizcorn.service.captcha.CaptchaResult;
 import allein.bizcorn.service.db.mongo.dao.UserDAO;
 import allein.bizcorn.service.facade.IUserService;
 import allein.bizcorn.service.security.config.SecurityConstants;
@@ -71,7 +71,7 @@ public class UserServiceMongoImpl implements IUserService {
     private CaptchaMessageHelper captchaMessageHelper;
 
     @Override
-    public Result<IUser> login(String username, String password, String captcha) {
+    public Result login(String username, String password, String captcha) {
         return null;
     }
 

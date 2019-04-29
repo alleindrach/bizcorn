@@ -14,59 +14,48 @@ import java.util.List;
 
 public interface IUserService {
     @RequestMapping(value = "/user/login", method = RequestMethod.POST)
-    Result<IUser> login(
+    Result login(
             @RequestParam(value = "username") String username,
             @RequestParam(value = "password") String password,
-            @RequestParam(value = "captcha") String captcha);
+            @RequestParam(value = "captcha",required = false) String captcha);
     @RequestMapping(value = "/user/logout", method = RequestMethod.GET)
     Result logout(@RequestParam HttpServletRequest request,@RequestParam HttpServletResponse response);
 
     @RequestMapping(value = "/user",method = RequestMethod.PUT)
-    @ResponseBody
     Result<IUser> update(
             @RequestParam(value = "mobile") String mobile
     );
 
     @RequestMapping(value = "/user/byname/{username}",method = RequestMethod.GET)
-    @ResponseBody
     public Result<IUser> getUserByUsername(@PathVariable("username") String userName);
 
     @RequestMapping(value = "/user/masked/{username}",method = RequestMethod.GET)
-    @ResponseBody
     public Result<IUser> getMaskedUserByUsername(@PathVariable("username") String userName);
 
 
     @RequestMapping(value = "/user/login/errortimes/{username}",method = RequestMethod.GET)
-    @ResponseBody
     public Result<Long> getUserLoginErrorTimes(@PathVariable("username") String userName);
 
     @RequestMapping("/user/login/errortimes/inc/{username}")
-    @ResponseBody
     public Result<Long> incUserLoginErrorTimes(@PathVariable("username")  String userName);
 
     @RequestMapping("/user/login/errortimes/rst/{username}")
-    @ResponseBody
     public Result<Boolean> rstUserLoginErrorTimes(@PathVariable("username")String userName);
 
     @RequestMapping("/user/update")
-    @ResponseBody
     public Result<Integer> updateUser(@RequestParam  IUser user);
 
     @RequestMapping("/user/bymobile/{mobile}")
-    @ResponseBody
     public Result<IUser> getUserByMobile(@PathVariable("mobile") String mobile);
 
     @RequestMapping("/user/authorities/id")
-    @ResponseBody
     public Result<List<String>> getUserAuthorities(@PathVariable("id")  String userId);
 
 
     @RequestMapping("/user/homepage")
-    @ResponseBody
     public Result<IUser> fetchHomepage();
 
     @RequestMapping(value = "/user/register",method = RequestMethod.PUT)
-    @ResponseBody
     Result<IUser> register(
             @RequestParam HttpServletRequest request,
             @RequestParam(value = "username") String username,

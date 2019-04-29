@@ -3,6 +3,7 @@ package allein.bizcorn.service.security;
 
 import allein.bizcorn.model.entity.User;
 import allein.bizcorn.model.facade.IUser;
+import allein.bizcorn.model.security.CustomWebAuthenticationDetails;
 import allein.bizcorn.service.facade.IConfigSerivce;
 import allein.bizcorn.service.facade.IUserService;
 import org.apache.commons.lang.StringUtils;

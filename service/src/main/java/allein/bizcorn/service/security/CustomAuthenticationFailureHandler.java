@@ -47,11 +47,18 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
             userService.incUserLoginErrorTimes(username);
         }
         String ajaxHeader = ((HttpServletRequest) request).getHeader("X-Requested-With");
-        boolean isAjax = "XMLHttpRequest".equals(ajaxHeader);
+        boolean isAjax =true;// "XMLHttpRequest".equals(ajaxHeader);
         if (isAjax) {
             response.setCharacterEncoding("UTF-8");
             response.setContentType("application/json; charset=utf-8");
-            Result error=Result.failWithException(new CommonException(ExceptionEnum.USER_NOT_LOGIN));
+            Result error;
+            if("login.captcha.error".compareToIgnoreCase(exception.getMessage())==0)
+            {
+                error=Result.failWithException(new CommonException(ExceptionEnum.CAPTCH_INVALID));
+            }else // if("login.username-or-password.error".compareToIgnoreCase(exception.getMessage())==0)
+            {
+                error=Result.failWithException(new CommonException(ExceptionEnum.USER_NOT_LOGIN));
+            }
             response.getWriter().print(JSON.toJSONString(error));
             response.getWriter().flush();
         } else {
