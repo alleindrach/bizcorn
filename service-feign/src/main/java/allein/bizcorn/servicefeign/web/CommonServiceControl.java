@@ -35,6 +35,6 @@ public class CommonServiceControl {
     @ResponseBody
     public Result mobileCaptcha(@RequestParam String mobile,@RequestParam String captcha)
     {
-        return commonService.mobileCaptcha(null, null,mobile,captcha);
+        return commonService.mobileCaptcha(mobile,captcha);
     }
 }

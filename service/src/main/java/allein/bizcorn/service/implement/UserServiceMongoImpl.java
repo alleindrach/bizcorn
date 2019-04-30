@@ -1,13 +1,16 @@
 package allein.bizcorn.service.implement;
 
 import allein.bizcorn.common.cache.ICacheAccessor;
+import allein.bizcorn.common.config.SecurityConstants;
 import allein.bizcorn.common.exception.CommonException;
 import allein.bizcorn.common.exception.ExceptionEnum;
 
 import allein.bizcorn.common.util.Masker;
+import allein.bizcorn.common.util.SecurityUtil;
 import allein.bizcorn.model.facade.IUser;
 import allein.bizcorn.model.mongo.Authority;
 import allein.bizcorn.model.mongo.Kid;
+import allein.bizcorn.model.mongo.Role;
 import allein.bizcorn.model.mongo.User;
 import allein.bizcorn.model.output.Result;
 import allein.bizcorn.model.security.CaptchaResult;
@@ -15,7 +18,6 @@ import allein.bizcorn.service.captcha.CaptchaImageHelper;
 import allein.bizcorn.service.captcha.CaptchaMessageHelper;
 import allein.bizcorn.service.db.mongo.dao.UserDAO;
 import allein.bizcorn.service.facade.IUserService;
-import allein.bizcorn.service.security.config.SecurityConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,10 +37,6 @@ import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -72,6 +70,17 @@ public class UserServiceMongoImpl implements IUserService {
     @Autowired
     private CaptchaMessageHelper captchaMessageHelper;
 
+    private User getUserFromSession(){
+        String username= SecurityUtil.getUserName();
+        if(username!=null)
+        {
+            return userDAO.selectByName(username);
+
+        }else
+        {
+            return null;
+        }
+    }
     @Override
     public Result login(String username, String password, String captcha) {
         return null;
@@ -94,19 +103,12 @@ public class UserServiceMongoImpl implements IUserService {
             @RequestParam(value = "mobile") String mobile
     ) {
         logger.info("session_id>>>>>{}",RequestContextHolder.getRequestAttributes().getSessionId());
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken= (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        if(usernamePasswordAuthenticationToken !=null &&
-                usernamePasswordAuthenticationToken.isAuthenticated() &&
-                usernamePasswordAuthenticationToken.getPrincipal() instanceof UserDetails &&
-                ((UserDetails) usernamePasswordAuthenticationToken.getPrincipal()).getUsername()!=null)
-        {
-            String username=((UserDetails) usernamePasswordAuthenticationToken.getPrincipal()).getUsername();
-            if(username!=null)
-            {
+        String username=SecurityUtil.getUserName();
+        if(username!=null){
                 userDAO.update(new Query(Criteria.where("username").is(username)),new Update().set("mobile",mobile));
                 return Result.successWithData(this.getMaskedUserByUsername(username).getData());
-            }
         }
+
         return  Result.failWithException(new CommonException(ExceptionEnum.USER_ACCOUNT_ID_INVALID));
     }
 
@@ -151,9 +153,10 @@ public class UserServiceMongoImpl implements IUserService {
         return Result.successWithData(cacheAccessor.del(this.ErrorTimesKey+userName));
     }
     @Override
-    public Result<Integer> updateUser(IUser user)
+    public Result<Integer> update(User user)
     {
-        return Result.successWithData(user);
+        userDAO.save(user);
+        return Result.successWithData(user.getId());
     }
     @Override
     public Result<IUser> getUserByMobile(@PathVariable("mobile") String mobile)
@@ -175,23 +178,17 @@ public class UserServiceMongoImpl implements IUserService {
 
     @Override
     public Result register(
-           HttpServletRequest request,
-           String username,
-           String password,
-           String captcha,
-           String mobile)
+            @RequestParam(value = "username") String username,
+            @RequestParam(value = "password") String password,
+            @RequestParam(value = "mobileCaptcha") String captcha,
+            @RequestParam(value = "mobile") String mobile,
+            @CookieValue(value= SecurityConstants.MOBILE_CAPTCHA_KEY_COOKIE_NAME) String mobileCaptchaKey
+    )
     {
     
         User newuser=new User();
         newuser.setUsername(username);
-        String mobileCaptchaKey=null;
-        for ( Cookie cookie:request.getCookies()
-             ) {
-            if(cookie.getName().compareToIgnoreCase(SecurityConstants.MOBILE_CAPTCHA_KEY_COOKIE_NAME)==0)
-            {
-                mobileCaptchaKey=cookie.getValue();
-            }
-        }
+
         CaptchaResult captchaResult=captchaMessageHelper.checkCaptcha(mobileCaptchaKey,captcha,mobile,SecurityConstants.SECURITY_KEY,true);
         if(!captchaResult.isSuccess())
             Result.failWithException(new CommonException(ExceptionEnum.CAPTCH_INVALID));
@@ -231,8 +228,74 @@ public class UserServiceMongoImpl implements IUserService {
         return  Result.successWithData(getMaskedUser(kid));
     }
 
+    @Override
     @PreAuthorize("hasRole('USER')")
-    @PostMapping("/user/homepage")
+    public Result  bind(
+            @PathVariable(value = "mac") String mac
+    ){
+        Kid kid= (Kid) userDAO.selectByName(mac);
+        if(kid==null){
+            return Result.failWithException(new CommonException(ExceptionEnum.USER_KID_ACCOUNT_NOT_EXIST));
+        }
+        if(kid.getRole()!= Role.KID)
+        {
+            return Result.failWithException(new CommonException(ExceptionEnum.BIND_KID_INVALID));
+        }
+        User userBinding=getUserFromSession();
+        if(userBinding==null) {
+            return Result.failWithException(new CommonException(ExceptionEnum.USER_ACCOUNT_NOT_EXIST));
+        }
+        boolean isDirt=false;
+        switch (userBinding.getRole())
+        {
+            case KID:
+                if(kid.isCanBind()){
+                    userBinding.setCurPartner(kid);
+                    kid.setCurPartner(userBinding);
+                    isDirt=true;
+                }else
+                {
+                    return Result.failWithException(new CommonException(ExceptionEnum.BIND_KID_STATUS_INVALID));
+                }
+                break;
+            default:
+                if(kid.getParent()==null)
+                {
+                    kid.setParent(userBinding);
+                    kid.setCurPartner(userBinding);
+                    userBinding.setCurPartner(kid);
+                    isDirt=true;
+                }else
+                {
+                    if(kid.isValidElder(userBinding.getMobile()))
+                    {
+                        kid.setCurPartner(userBinding);
+                        userBinding.setCurPartner(kid);
+                        isDirt=true;
+                    }
+                    else
+                    {
+                        return Result.failWithException(new CommonException(ExceptionEnum.BIND_USER_INVALID));
+                    }
+                }
+                break;
+        }
+
+        if(isDirt)
+        {
+            try {
+                userDAO.save(userBinding);
+                userDAO.save(kid);
+            }
+            catch(Exception ex){
+                logger.error("绑定错误",ex);
+                return  Result.failWithException(new CommonException(ExceptionEnum.BIND_SAVE_ERROR));
+            }
+        }
+        return Result.successWithMessage("绑定成功");
+    }
+
+    @PreAuthorize("hasRole('USER')")
     @ResponseBody
     public Result<IUser> fetchHomepage()
     {

@@ -37,13 +37,13 @@ public class User  implements  IUser {
     @DBRef
     private User curPartner;
 
-    protected  Integer role=0;
+    protected  Role role=Role.ADULT;
 
-    public Integer getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(Integer role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 

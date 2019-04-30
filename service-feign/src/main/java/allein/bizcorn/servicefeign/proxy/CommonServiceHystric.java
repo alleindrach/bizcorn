@@ -17,7 +17,7 @@ public class CommonServiceHystric implements  CommonServiceProxy{
     }
 
     @Override
-    public Result mobileCaptcha(HttpServletRequest request, HttpServletResponse response, String mobile, String captcha) {
+    public Result mobileCaptcha( String mobile, String captcha) {
         return null;
     }
 

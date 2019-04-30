@@ -1,6 +1,7 @@
 package allein.bizcorn.service.implement;
 
 import allein.bizcorn.common.cache.ICacheAccessor;
+import allein.bizcorn.common.config.SecurityConstants;
 import allein.bizcorn.common.exception.CommonException;
 import allein.bizcorn.common.exception.ExceptionEnum;
 import allein.bizcorn.model.entity.User;
@@ -10,7 +11,6 @@ import allein.bizcorn.service.captcha.CaptchaImageHelper;
 import allein.bizcorn.service.captcha.CaptchaMessageHelper;
 import allein.bizcorn.service.db.mysql.dao.UserDAO;
 import allein.bizcorn.service.facade.ICommonService;
-import allein.bizcorn.service.security.config.SecurityConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +19,8 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -59,7 +61,10 @@ public class CommonServiceImpl implements ICommonService {
     public ResponseEntity<byte[]> captcha() {
         return captchaImageHelper.captchaImage(SecurityConstants.SECURITY_KEY);
     }
-    public Result mobileCaptcha( HttpServletRequest request,  HttpServletResponse response,  String mobile,  String captcha) {
+
+    public Result mobileCaptcha(String mobile,  String captcha) {
+        HttpServletRequest request=((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();
+        HttpServletResponse response=((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getResponse();
 
         String cacheCaptcha = captchaImageHelper.getCaptcha(request, SecurityConstants.SECURITY_KEY);
         if(cacheCaptcha==null || cacheCaptcha.isEmpty()||cacheCaptcha.compareToIgnoreCase(captcha)!=0)

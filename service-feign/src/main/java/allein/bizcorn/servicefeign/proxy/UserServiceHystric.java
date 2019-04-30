@@ -5,6 +5,7 @@ import allein.bizcorn.common.exception.ExceptionEnum;
 
 
 import allein.bizcorn.model.facade.IUser;
+import allein.bizcorn.model.mongo.User;
 import allein.bizcorn.model.output.Result;
 import org.springframework.stereotype.Component;
 
@@ -61,7 +62,7 @@ public class UserServiceHystric implements  UserServiceProxy{
 
 
     @Override
-    public Result<Integer> updateUser(IUser user) {
+    public Result<Integer> update(User user) {
         return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
     }
 
@@ -81,12 +82,17 @@ public class UserServiceHystric implements  UserServiceProxy{
     }
 
     @Override
-    public Result<IUser> register(HttpServletRequest request, String username, String password, String captcha, String mobile) {
+    public Result<IUser> register( String username, String password, String captcha, String mobile,String mobileCaptchaKey) {
         return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
     }
 
     @Override
     public Result register(String mac) {
+        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
+    }
+
+    @Override
+    public Result bind(String mac) {
         return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
     }
 

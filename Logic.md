@@ -1,7 +1,7 @@
 ##业务逻辑
 * 用户
     角色：role:=0 成人/家长,:=1 小童,
-    * 注册 /user/register
+    * 注册 /register
        - 参数：
          - mobile 电话
          - mobilecaptcha 验证码
@@ -17,7 +17,7 @@
     权限：管理员 HasRole('ADMIN')
     
     * 凭mac地址自动登录,不需要验证码
-    /user/login/username=mac&password=mac
+    /login/username=mac&password=mac
     * 小童的owner 在初次绑定时设定，不允许再次修改。
     * 小童有8个可绑定的所有用户电话号码，由owner设定，和owner构成ownerGroup，只有在ownerGroup中的**用户**，才能进行绑定。
     * 小童和小童间的绑定，不受ownerGroup的限制。

@@ -15,10 +15,26 @@ public interface ICommonService {
 //    public void captcha(@RequestParam HttpServletRequest request, @RequestParam HttpServletResponse response) ;
 
     @RequestMapping(value = "/common/captcha.jpg",method = RequestMethod.GET)
+    /*
+    @Description:发送图形验证码
+    @Param:[]
+    @Return:org.springframework.http.ResponseEntity<byte[]>
+    @Author:Alleindrach@gmail.com
+    @Date:2019/4/30
+    @Time:2:47 PM
+    */
     public ResponseEntity<byte[]> captcha() ;
 
     @RequestMapping(value = "/common/mobile/captcha")
-    public Result mobileCaptcha(@RequestParam HttpServletRequest request,@RequestParam HttpServletResponse response , @RequestParam String mobile, @RequestParam String captcha) ;
+    /*
+    @Description:发送手机验证码
+    @Param:[mobile 手机号, captcha：图形验证码]
+    @Return:allein.bizcorn.model.output.Result
+    @Author:Alleindrach@gmail.com
+    @Date:2019/4/30
+    @Time:2:33 PM
+    */
+    public Result mobileCaptcha( @RequestParam String mobile, @RequestParam String captcha) ;
 
 
 }

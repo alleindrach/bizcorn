@@ -1,4 +1,9 @@
-package allein.bizcorn.service.security.config;
+/*
+ * Copyright (c) 2019.
+ * Alleindrach@gmail.com
+ */
+
+package allein.bizcorn.common.config;
 
 public class SecurityConstants {
 

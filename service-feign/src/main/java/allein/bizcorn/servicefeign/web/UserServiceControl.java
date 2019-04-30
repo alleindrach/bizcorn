@@ -1,6 +1,7 @@
 package allein.bizcorn.servicefeign.web;
 
 
+import allein.bizcorn.common.config.SecurityConstants;
 import allein.bizcorn.servicefeign.proxy.UserServiceProxy;
 import allein.bizcorn.model.output.Result;
 import feign.RequestTemplate;
@@ -36,7 +37,7 @@ public class UserServiceControl {
     @Value("${bizcorn.session.attribute.user}")
     String sessionAttrUser;
 
-    @RequestMapping(value = "/user/login")
+    @RequestMapping(value = "/login")
     public Result login(
             @RequestParam String username, @RequestParam String password, @RequestParam(required = false) String captcha) {
 //说明： 发起时       从终端 -- cookie1--> Feign -- cookie2-->Service 中，cookie2的复制通过interceptor完成
@@ -53,19 +54,34 @@ public class UserServiceControl {
         return x;
     }
 
-    @PutMapping(value = "/user")
+    @RequestMapping(value = "/user")
     public Result update(@RequestParam String mobile) {
 
         Result result= userService.update(mobile);
         return result;
     }
-    @RequestMapping(value = "/user/logout")
+    @RequestMapping(value = "/logout")
     public Result logout()
     {
         return  userService.logout();
     }
-    @RequestMapping(value = "/kid/register/{mac}",method = RequestMethod.PUT)
+    @RequestMapping(value = "/kid/register/{mac}")
     public Result register(@PathVariable("mac") String mac) {
         return userService.register(mac);
+    }
+
+    @RequestMapping(value = "/register")
+    public Result register(
+            @RequestParam(value = "username") String username,
+            @RequestParam(value = "password") String password,
+            @RequestParam(value = "mobileCaptcha") String captcha,
+            @RequestParam(value = "mobile") String mobile,
+            @CookieValue(value= SecurityConstants.MOBILE_CAPTCHA_KEY_COOKIE_NAME) String mobileCaptchaKey
+    ){
+        return userService.register(username,password,captcha,mobile,mobileCaptchaKey);
+    }
+    @RequestMapping(value = "/user/bind/{mac}")
+    public Result bind(@PathVariable("mac") String mac) {
+        return userService.bind(mac);
     }
 }
