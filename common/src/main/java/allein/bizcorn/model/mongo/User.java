@@ -16,38 +16,36 @@ public class User  implements  IUser {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     *
-     */
     @Id
     private String id;
-
 
     @Indexed(unique = true)
     private String username;
 
-    /**
-     *
-     */
     private String password;
     @Indexed
     private String mobile;
-    /**
-     *
-     */
+
     private Integer enabled;
 
     private IProfile profile;
 
     Set<Authority> Authorities;
 
-    private int type=0;//0=mobile,1=device
-
     private Date createDate;
 
     @DBRef
-    List<IUser> friends;
+    private User curPartner;
 
+    protected  Integer role=0;
+
+    public Integer getRole() {
+        return role;
+    }
+
+    public void setRole(Integer role) {
+        this.role = role;
+    }
 
     public String getId() {
         return id;
@@ -89,22 +87,6 @@ public class User  implements  IUser {
         this.mobile = mobile;
     }
 
-    public int getType() {
-        return type;
-    }
-
-    public void setType(int type) {
-        this.type = type;
-    }
-
-    public List<IUser> getFriends() {
-        return friends;
-    }
-
-    public void setFriends(List<IUser> friends) {
-        this.friends = friends;
-    }
-
     public IProfile getProfile() {
         return profile;
     }
@@ -128,4 +110,13 @@ public class User  implements  IUser {
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
     }
+
+    public User getCurPartner() {
+        return curPartner;
+    }
+
+    public void setCurPartner(User curPartner) {
+        this.curPartner = curPartner;
+    }
+
 }

@@ -82,7 +82,13 @@ public class CacheAccessor implements ICacheAccessor {
             if(result==null)
                 return null;
             else
-                return (String) result;
+            {
+                if(String.class.isAssignableFrom(result.getClass()) ){
+                    return (String) result;
+                }else
+                    return result.toString();
+            }
+
         } catch (Exception e) {
             logger.error("Cache Error",e);
             return null;
@@ -92,10 +98,22 @@ public class CacheAccessor implements ICacheAccessor {
     public
     Long getLong(String key)
     {
-        String result=this.get(key);
-        if(result!=null)
-            return Long.parseLong(result);
-        return 0L;
+        Object result ;
+        try {
+            ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
+            result=operations.get(key);
+            if(result==null)
+                return 0L;
+            else if(result instanceof Number)
+                    return ((Number)result).longValue();
+            else
+                    return Long.parseLong(result.toString());
+
+        } catch (Exception e) {
+            logger.error("Cache Error",e);
+            return 0L;
+        }
+
     }
     public
     Boolean exists(final String key)

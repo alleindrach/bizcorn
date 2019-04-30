@@ -1,4 +1,4 @@
-package allein.servicefeign;
+package allein.bizcorn.servicefeign;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

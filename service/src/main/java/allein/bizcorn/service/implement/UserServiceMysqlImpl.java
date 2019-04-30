@@ -34,110 +34,111 @@ import java.util.List;
 //@RestController
 @RefreshScope
 //@RequestMapping("/mysql")
-public abstract  class UserServiceMysqlImpl implements IUserService {
+public abstract  class UserServiceMysqlImpl //implements IUserService
+{
     private static final Logger logger = LoggerFactory.getLogger(UserServiceMysqlImpl.class);
-
-    @Value("${bizcorn.session.prefix}")
-    String sessionPrefix;
-
-    @Value("${bizcorn.session.attribute.user}")
-    String sessionAttrUser;
-
-    @Value("${bizcorn.session.attribute.timeout}")
-    String sessionAttrTimeout;
-
-    @Value("${bizcorn.session.timeout}")
-    Long sessionTimeout;
-
-    @Autowired
-    ICacheAccessor cacheAccessor;
-
-    @Autowired
-    UserDAO userDAO;
-
-    @Autowired
-    private CaptchaImageHelper captchaImageHelper;
-
-    @Autowired
-    private CaptchaMessageHelper captchaMessageHelper;
-
-    @Override
-    public Result<IUser> login(String username, String password, String captcha) {
-        return null;
-    }
-
-    @Override
-    public Result<IUser> logout(HttpServletRequest request , HttpServletResponse response) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null){
-            new SecurityContextLogoutHandler().logout(request, response, auth);
-        }
-        return null;
-    }
-
-    public
-    @PreAuthorize("hasRole('USER')")
-    @Transactional
-//    @AuthLogin(injectUidFiled = "userId")
-    Result<IUser> update(
-            @RequestParam(value = "mobile") String mobile,
-            HttpSession session,
-            HttpServletRequest request
-    ) {
-        logger.info(" {} >>> {}",  request.getRequestURL().toString(),session.getId());
-        String username= SecurityUtil.getUserName();
-        String test=(String)session.getAttribute("username");
-        User user=userDAO.selectByName(username);
-        if (user == null) {
-            throw new CommonException(ExceptionEnum.USER_ACCOUNT_NOT_EXIST);
-        } else {
-            user.setMobile(mobile);
-            int updated=userDAO.update(user);
-            if(updated>0)
-            {
-                return new Result<IUser>(1, "", null, user);
-            }else
-            {
-                return new Result<IUser>(0, "", null, user);
-            }
-        }
-    }
-
-    @Override
-    public Result<IUser> getUserByUsername(String userName) {
-        return Result.successWithData( userDAO.selectByName(userName));
-    }
-    @Value("${bizcorn.user.login.errortimes.cache.key.prefix}")
-    String ErrorTimesKey="user_login_error_times_cache_";
-    @Override
-    public Result<Long> getUserLoginErrorTimes(String userName)
-    {
-        return Result.successWithData(cacheAccessor.getLong(this.ErrorTimesKey+userName));
-    }
-    @Override
-    public Result<Long> incUserLoginErrorTimes(String userName)
-    {
-        return Result.successWithData(cacheAccessor.inc(this.ErrorTimesKey+userName));
-    }
-    @Override
-    public Result<Boolean> rstUserLoginErrorTimes(String userName)
-    {
-        return Result.successWithData(cacheAccessor.del(this.ErrorTimesKey+userName));
-    }
-    @Override
-    public Result<Integer> updateUser(IUser user)
-    {
-        return Result.successWithData(userDAO.update((User) user));
-    }
-    @Override
-    public Result<IUser> getUserByMobile(String mobile)
-    {
-        return Result.successWithData(userDAO.selectByMobile(mobile));
-    }
-
-    @Override
-    public Result<List<String>> getUserAuthorities(String userId) {
-        return Result.successWithData(userDAO.selectAuthorities(userId));
-    }
+//
+//    @Value("${bizcorn.session.prefix}")
+//    String sessionPrefix;
+//
+//    @Value("${bizcorn.session.attribute.user}")
+//    String sessionAttrUser;
+//
+//    @Value("${bizcorn.session.attribute.timeout}")
+//    String sessionAttrTimeout;
+//
+//    @Value("${bizcorn.session.timeout}")
+//    Long sessionTimeout;
+//
+//    @Autowired
+//    ICacheAccessor cacheAccessor;
+//
+//    @Autowired
+//    UserDAO userDAO;
+//
+//    @Autowired
+//    private CaptchaImageHelper captchaImageHelper;
+//
+//    @Autowired
+//    private CaptchaMessageHelper captchaMessageHelper;
+//
+//    @Override
+//    public Result<IUser> login(String username, String password, String captcha) {
+//        return null;
+//    }
+//
+//    @Override
+//    public Result<IUser> logout() {
+////        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+////        if (auth != null){
+////            new SecurityContextLogoutHandler().logout(request, response, auth);
+////        }
+//        return null;
+//    }
+//
+//    public
+//    @PreAuthorize("hasRole('USER')")
+//    @Transactional
+////    @AuthLogin(injectUidFiled = "userId")
+//    Result update(
+//            @RequestParam(value = "mobile") String mobile,
+//            HttpSession session,
+//            HttpServletRequest request
+//    ) {
+//        logger.info(" {} >>> {}",  request.getRequestURL().toString(),session.getId());
+//        String username= SecurityUtil.getUserName();
+//        String test=(String)session.getAttribute("username");
+//        User user=userDAO.selectByName(username);
+//        if (user == null) {
+//            throw new CommonException(ExceptionEnum.USER_ACCOUNT_NOT_EXIST);
+//        } else {
+//            user.setMobile(mobile);
+//            int updated=userDAO.update(user);
+//            if(updated>0)
+//            {
+//                return new Result<IUser>(1, "", null, user);
+//            }else
+//            {
+//                return new Result<IUser>(0, "", null, user);
+//            }
+//        }
+//    }
+//
+//    @Override
+//    public Result<IUser> getUserByUsername(String userName) {
+//        return Result.successWithData( userDAO.selectByName(userName));
+//    }
+//    @Value("${bizcorn.user.login.errortimes.cache.key.prefix}")
+//    String ErrorTimesKey="user_login_error_times_cache_";
+//    @Override
+//    public Result<Long> getUserLoginErrorTimes(String userName)
+//    {
+//        return Result.successWithData(cacheAccessor.getLong(this.ErrorTimesKey+userName));
+//    }
+//    @Override
+//    public Result<Long> incUserLoginErrorTimes(String userName)
+//    {
+//        return Result.successWithData(cacheAccessor.inc(this.ErrorTimesKey+userName));
+//    }
+//    @Override
+//    public Result<Boolean> rstUserLoginErrorTimes(String userName)
+//    {
+//        return Result.successWithData(cacheAccessor.del(this.ErrorTimesKey+userName));
+//    }
+//    @Override
+//    public Result<Integer> updateUser(IUser user)
+//    {
+//        return Result.successWithData(userDAO.update((User) user));
+//    }
+//    @Override
+//    public Result<IUser> getUserByMobile(String mobile)
+//    {
+//        return Result.successWithData(userDAO.selectByMobile(mobile));
+//    }
+//
+//    @Override
+//    public Result<List<String>> getUserAuthorities(String userId) {
+//        return Result.successWithData(userDAO.selectAuthorities(userId));
+//    }
 
 }

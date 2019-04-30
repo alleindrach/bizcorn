@@ -13,6 +13,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.servlet.configuration.EnableWebMvcSecurity;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 
 @Configuration
 @EnableWebMvcSecurity
@@ -48,7 +50,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //        WebSecurity主要是配置跟web资源相关的，比如css、js、images等等，但是这个还不是本质的区别，关键的区别如下：
 //        ingore是完全绕过了spring security的所有filter，相当于不走spring security
 //        https://www.baeldung.com/security-none-filters-none-access-permitAll
-        web.ignoring().antMatchers("/common/captcha.jpg","/user/mobile/captcha","/user/new","/user");
+        web.ignoring().antMatchers("/common/captcha.jpg","/user/mobile/captcha","/user/new");
     }
 
     @Override
@@ -58,7 +60,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //        AnonymousAuthenticationFilter 的 主要功能就是给没有登陆的用户，填充AnonymousAuthenticationToken到SecurityContextHolder的Authentication，后续依赖Authentication的代码可以统一处理。
 //        参见 SecurityFilters.class,FilterComparator
         http.authorizeRequests()
-                .antMatchers(HttpMethod.PUT,"/user/x").authenticated()
+                .antMatchers(HttpMethod.PUT,"/user").authenticated()
+                .antMatchers(HttpMethod.PUT,"/kid/register/*").authenticated()
                 .and()
                 .formLogin().loginPage("/user/login")
                 .authenticationDetailsSource(authenticationDetailsSource)
@@ -67,8 +70,19 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .logout().logoutUrl("/user/logout").addLogoutHandler(authenticationLogoutHandler).logoutSuccessHandler(authenticationLogoutSuccessHandler)
                 .and()
+                .exceptionHandling()
+                .authenticationEntryPoint(new UnauthenticatedEntryPoint()) //重新授权入口，比如用户未登录
+                .accessDeniedHandler(new AuthorizationFailure())//禁止访问入口，比如用户无权
+                .and()
                 .csrf().disable()
                 .anonymous().disable()
+                .sessionManagement()
+                .invalidSessionStrategy(new CustomInvalidSessionStrategy())//session过期
+                //最大登录数，不限制
+                .maximumSessions(-1)
+                //达到最大用户数时，前面被挤掉的用户处理
+                .expiredSessionStrategy(new CustomExpiredSessionStrategy())//配置并发登录，-1表示不限制
+                .sessionRegistry(sessionRegistry())
                 ;
 
 //                .antMatchers("/", "/home").permitAll()
@@ -112,7 +126,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return new MD5PasswordEncoder();
 
     }
-
+    @Bean
+    public SessionRegistry sessionRegistry() {
+        return new SessionRegistryImpl();
+    }
     /**
      * 自定义UserDetailsService，从数据库中读取用户信息
      * @return

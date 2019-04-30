@@ -54,28 +54,18 @@ public class UserServiceControl {
     }
 
     @PutMapping(value = "/user")
-    public Result update(@RequestParam String mobile,HttpServletRequest request,HttpServletResponse response,HttpSession session) {
-        String sessionId =  RequestContextHolder.getRequestAttributes().getSessionId();
+    public Result update(@RequestParam String mobile) {
 
-        logger.info(" {} >>> {}",  request.getRequestURL().toString(),sessionId);
-        Enumeration e = request.getSession().getAttributeNames();
-        while (e.hasMoreElements()) {
-            String ename = (String) e.nextElement();
-            logger.info("Session >>>>> {} => {}",ename,request.getSession().getAttribute(ename));
-        }
-        Cookie[] cookies =request.getCookies();
-        if(cookies!=null) {
-            for (int i = 0; i < cookies.length; i++) {
-                logger.info("Cookie >>>>> {} => {}", cookies[i].getName(), cookies[i].getValue());
-//                requestTemplate.header("Cookie", cookies[i].getName()+"=" + cookies[i].getValue());
-            }
-        }
-        return userService.update(mobile);
+        Result result= userService.update(mobile);
+        return result;
     }
     @RequestMapping(value = "/user/logout")
-    public Result logout(HttpServletRequest request,HttpServletResponse response)
+    public Result logout()
     {
-        return  userService.logout(request,response);
+        return  userService.logout();
     }
-
+    @RequestMapping(value = "/kid/register/{mac}",method = RequestMethod.PUT)
+    public Result register(@PathVariable("mac") String mac) {
+        return userService.register(mac);
+    }
 }

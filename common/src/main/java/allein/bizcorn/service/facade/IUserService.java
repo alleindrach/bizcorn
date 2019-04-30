@@ -19,10 +19,10 @@ public interface IUserService {
             @RequestParam(value = "password") String password,
             @RequestParam(value = "captcha",required = false) String captcha);
     @RequestMapping(value = "/user/logout", method = RequestMethod.GET)
-    Result logout(@RequestParam HttpServletRequest request,@RequestParam HttpServletResponse response);
+    Result logout();
 
     @RequestMapping(value = "/user",method = RequestMethod.PUT)
-    Result<IUser> update(
+    Result update(
             @RequestParam(value = "mobile") String mobile
     );
 
@@ -56,12 +56,16 @@ public interface IUserService {
     public Result<IUser> fetchHomepage();
 
     @RequestMapping(value = "/user/register",method = RequestMethod.PUT)
-    Result<IUser> register(
+    Result register(
             @RequestParam HttpServletRequest request,
             @RequestParam(value = "username") String username,
             @RequestParam(value = "password") String password,
             @RequestParam(value = "mobileCaptcha") String captcha,
             @RequestParam(value = "mobile") String mobile
+    );
+    @RequestMapping(value = "/kid/register/{mac}",method = RequestMethod.PUT)
+    Result register(
+            @PathVariable(value = "mac") String mac
     );
 
 }

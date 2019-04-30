@@ -12,37 +12,29 @@ import java.util.List;
 @Document(collection="Users")
 public class Kid extends User implements IKid {
 
-    @Indexed(unique = true)
-    String key;
+
+    List<String> elderNumbers;//可绑定的长辈的电话号码
 
     @DBRef
-    List<IParent> parents;
+    private User parent;
 
-    @DBRef
-    private IUser owner;
-
-    public List<IParent> getParents() {
-        return parents;
+    public Kid(){
+        this.role=1;//kid
     }
 
-    public void setParents(List<IParent> parents) {
-        this.parents = parents;
+    public User getParent() {
+        return parent;
     }
 
-    public IUser getOwner() {
-        return owner;
+    public void setParent(User parent) {
+        this.parent = parent;
     }
 
-    public void setOwner(IUser owner) {
-        this.owner = owner;
+    public List<String> getElderNumbers() {
+        return elderNumbers;
     }
 
-    public String getKey() {
-        return key;
+    public void setElderNumbers(List<String> elderNumbers) {
+        this.elderNumbers = elderNumbers;
     }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
 }

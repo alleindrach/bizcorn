@@ -21,7 +21,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RefreshScope
 @EnableScheduling
 @EnableCaching
-@EnableRedisHttpSession(redisFlushMode = RedisFlushMode.IMMEDIATE)
+@EnableRedisHttpSession(
+        redisFlushMode = RedisFlushMode.IMMEDIATE,
+        maxInactiveIntervalInSeconds = 86400*30 /*过期时间=30天*/)
 @ComponentScan(basePackages = "allein.bizcorn" )
 @EnableTransactionManagement
 public class ServiceApplication {

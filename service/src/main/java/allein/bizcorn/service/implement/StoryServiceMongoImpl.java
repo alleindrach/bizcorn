@@ -209,7 +209,7 @@ public class StoryServiceMongoImpl implements IStoryService{
         if(id.compareToIgnoreCase("*")!=0) {
             Story bundle = storyDAO.get(id);
             if (bundle == null)
-                return Result.failWithException(new CommonException(ExceptionEnum.BUNDLE_NOT_EXISTS));
+                return Result.failWithException(new CommonException(ExceptionEnum.FILE_NOT_EXISTS));
 
             if (bundle.getAuthor().getUsername().compareToIgnoreCase(username) != 0) {
                 throw new CommonException(ExceptionEnum.USER_NOT_AUHTORIZED);

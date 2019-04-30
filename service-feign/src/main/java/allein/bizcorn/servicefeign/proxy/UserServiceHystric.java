@@ -23,12 +23,12 @@ public class UserServiceHystric implements  UserServiceProxy{
     }
 
     @Override
-    public Result logout(HttpServletRequest request, HttpServletResponse response) {
+    public Result logout() {
         return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
     }
 
 
-    public Result<IUser> update(String mobile) {
+    public Result update(String mobile) {
         return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
     }
 
@@ -82,7 +82,12 @@ public class UserServiceHystric implements  UserServiceProxy{
 
     @Override
     public Result<IUser> register(HttpServletRequest request, String username, String password, String captcha, String mobile) {
-        return null;
+        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
+    }
+
+    @Override
+    public Result register(String mac) {
+        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
     }
 
 

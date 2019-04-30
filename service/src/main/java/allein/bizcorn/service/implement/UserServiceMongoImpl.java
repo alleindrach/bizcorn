@@ -7,6 +7,7 @@ import allein.bizcorn.common.exception.ExceptionEnum;
 import allein.bizcorn.common.util.Masker;
 import allein.bizcorn.model.facade.IUser;
 import allein.bizcorn.model.mongo.Authority;
+import allein.bizcorn.model.mongo.Kid;
 import allein.bizcorn.model.mongo.User;
 import allein.bizcorn.model.output.Result;
 import allein.bizcorn.model.security.CaptchaResult;
@@ -20,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -76,7 +78,7 @@ public class UserServiceMongoImpl implements IUserService {
     }
 
     @Override
-    public Result logout(HttpServletRequest request, HttpServletResponse response) {
+    public Result logout() {
 //        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 //        if (auth != null){
 //            new SecurityContextLogoutHandler().logout(request, response, auth);
@@ -85,10 +87,10 @@ public class UserServiceMongoImpl implements IUserService {
     }
 
     public
-//    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER')")
 //    @Transactional
 //    @AuthLogin(injectUidFiled = "userId")
-    Result<IUser> update(
+    Result update(
             @RequestParam(value = "mobile") String mobile
     ) {
         logger.info("session_id>>>>>{}",RequestContextHolder.getRequestAttributes().getSessionId());
@@ -102,7 +104,7 @@ public class UserServiceMongoImpl implements IUserService {
             if(username!=null)
             {
                 userDAO.update(new Query(Criteria.where("username").is(username)),new Update().set("mobile",mobile));
-                return Result.successWithData(userDAO.selectByName(username));
+                return Result.successWithData(this.getMaskedUserByUsername(username).getData());
             }
         }
         return  Result.failWithException(new CommonException(ExceptionEnum.USER_ACCOUNT_ID_INVALID));
@@ -123,6 +125,13 @@ public class UserServiceMongoImpl implements IUserService {
         user.setPassword("");
         return Result.successWithData(user);
 
+    }
+    private User getMaskedUser(User userOri)
+    {
+        User user=userOri;
+        user.setMobile(Masker.getMaskCharWay(user.getMobile(),3,9));
+        user.setPassword("");
+        return user;
     }
     @Value("${bizcorn.user.login.errortimes.cache.key.prefix}")
     String ErrorTimesKey="user_login_error_times_cache_";
@@ -164,8 +173,8 @@ public class UserServiceMongoImpl implements IUserService {
     }
 
 
-
-    public Result<IUser> register(
+    @Override
+    public Result register(
            HttpServletRequest request,
            String username,
            String password,
@@ -196,6 +205,32 @@ public class UserServiceMongoImpl implements IUserService {
         userDAO.save(newuser);
         return  Result.successWithData(newuser);
     }
+
+    @Override
+    @PreAuthorize("hasRole('ADMIN')")
+    public Result register(@PathVariable("mac")  String mac) {
+
+        if(userDAO.selectByName(mac)!=null){
+            return Result.failWithException(new CommonException(ExceptionEnum.USER_EXISTS));
+        }
+
+        Kid kid=new Kid();
+        kid.setUsername(mac);
+        String mobileCaptchaKey=null;
+
+        kid.setPassword( DigestUtils.md5DigestAsHex(mac.toString().getBytes()));
+        HashSet<Authority> auths=new HashSet<Authority>();
+        auths.add(new Authority().setAuthority("ROLE_USER"));
+        kid.setAuthorities(auths);
+        try {
+            userDAO.save(kid);
+        }catch(DuplicateKeyException exception)
+        {
+            return Result.failWithException(new CommonException(ExceptionEnum.USER_REGISTER_FAIL));
+        }
+        return  Result.successWithData(getMaskedUser(kid));
+    }
+
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/user/homepage")
     @ResponseBody
