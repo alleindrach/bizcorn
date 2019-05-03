@@ -1,6 +1,6 @@
 package allein.bizcorn.servicefeign.proxy;
 
-import allein.bizcorn.service.facade.IStoryService;
+import allein.bizcorn.service.facade.gate.IStoryServiceGate;
 import allein.bizcorn.servicefeign.config.FeignMultipartSupportConfig;
 import org.springframework.cloud.openfeign.FeignClient;
 
@@ -9,5 +9,5 @@ import org.springframework.cloud.openfeign.FeignClient;
         configuration = FeignMultipartSupportConfig.class ,
         fallback = StoryServiceHystric.class
 )
-public interface StoryServiceProxy extends IStoryService{
+public interface StoryServiceProxy extends IStoryServiceGate {
 }

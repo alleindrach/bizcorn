@@ -1,7 +1,26 @@
 package allein.bizcorn.service.task;
 
+import allein.bizcorn.model.mongo.Story;
+import allein.bizcorn.service.db.mongo.dao.StoryDAO;
+import com.mongodb.Block;
+import com.mongodb.client.gridfs.GridFSBucket;
+import com.mongodb.client.gridfs.GridFSFindIterable;
+import com.mongodb.client.gridfs.model.GridFSFile;
+import org.bson.BsonObjectId;
+import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.gridfs.GridFsCriteria;
+import org.springframework.data.mongodb.gridfs.GridFsOperations;
+import org.springframework.data.mongodb.gridfs.GridFsTemplate;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -9,7 +28,20 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Component
+@Configurable
+@EnableScheduling
+@EnableAsync
 public class ScheduledTask {
+    @Autowired
+    private GridFsTemplate gridFsTemplate;
+    @Autowired
+    private GridFsOperations operations;
+    @Autowired
+    private GridFSBucket gridFSBucket;
+
+
+    @Autowired
+    private StoryDAO storyDAO;
 
     private static final Logger logger = LoggerFactory.getLogger(ScheduledTask.class);
     private static final SimpleDateFormat formate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -32,9 +64,22 @@ public class ScheduledTask {
      * "0 0-5 14 * * ?"    每天14:00至14:05每分钟一次触发
      * "0 10,44 14 ? 3 WED"    三月的每周三的14：10和14：44触发
      * "0 15 10 ? * MON-FRI"    每个周一、周二、周三、周四、周五的10：15触发
+     * http://cron.qqe2.com/
      */
-//    @Scheduled(cron = "0/10 * *  * * ?")
-    public void scheduledCronDemo() {
+    @Scheduled(cron = "0 0 0/4 * * ? ")
+    @Async("ScheduleTaskAsyncExecutor")
+    public void scheduledImageFileRecycleTask() {
         logger.info("scheduled - cron - print time every 10 seconds:{}", formate.format(new Date()));
+        GridFSFindIterable filesIterable= gridFsTemplate.find(Query.query(Criteria.where("uploadDate").lt(new Date(System.currentTimeMillis()-1*86400000))).with(Sort.by(new Sort.Order(Sort.Direction.ASC,"uploadDate"))));
+        filesIterable.forEach((Block)(gridFSFile -> {
+            String md5name = ((GridFSFile) gridFSFile).getFilename();
+            if (!md5name.contains(".small") ) {
+                Boolean  isFileOccupied = storyDAO.isSotryIncludeFileExists(((BsonObjectId) ((GridFSFile) gridFSFile).getId()).getValue().toString());
+                if (!isFileOccupied) {
+                    gridFsTemplate.delete(Query.query(GridFsCriteria.whereFilename().regex("^"+md5name+"")));
+                }
+            }
+        }
+        ));
     }
 }

@@ -1,7 +1,9 @@
 package allein.bizcorn.service.security;
 
+import allein.bizcorn.common.mq.Topic;
 import allein.bizcorn.model.facade.IUser;
 import allein.bizcorn.model.output.Result;
+import allein.bizcorn.service.facade.IMessageQueueService;
 import allein.bizcorn.service.facade.IUserService;
 import allein.bizcorn.service.implement.UserServiceMongoImpl;
 import com.alibaba.fastjson.JSON;
@@ -29,6 +31,8 @@ public class CustomAuthenticationSuccessHandler extends SavedRequestAwareAuthent
 
     @Autowired
     private IUserService userService;
+    @Autowired
+    private IMessageQueueService messageQueueService;
     private String base64Encode(String value) {
         byte[] encodedCookieBytes = Base64.getEncoder().encode(value.getBytes());
         return new String(encodedCookieBytes);
@@ -57,6 +61,7 @@ public class CustomAuthenticationSuccessHandler extends SavedRequestAwareAuthent
             Result<String> sessionIdCookie=Result.successWithData(session.getId());
             response.getWriter().print(JSON.toJSONString(sessionIdCookie));
             response.getWriter().flush();
+            messageQueueService.send(Topic.USER_LOGIN,"user login success!");
         } else {
             super.onAuthenticationSuccess(request, response, authentication);
         }

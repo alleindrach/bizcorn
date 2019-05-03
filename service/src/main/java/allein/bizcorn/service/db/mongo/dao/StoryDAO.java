@@ -10,6 +10,6 @@ import java.util.List;
 
 public interface StoryDAO extends  BaseDAO<Story> {
 
-    List<IStory> selectByUid(String uid);
-
+    List<Story> selectByUid(String uid);
+    Boolean isSotryIncludeFileExists(String fid);
 }

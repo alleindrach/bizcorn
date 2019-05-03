@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
+import org.springframework.http.server.ServerHttpRequest;
+import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.converter.*;
@@ -20,14 +22,20 @@ import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptorAdapter;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.config.annotation.*;
+import org.springframework.web.socket.server.HandshakeFailureException;
 import org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean;
+import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
 
+import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Configuration
 @EnableWebSocket
@@ -88,7 +96,8 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 // 即用户发送请求 ：url=’/127.0.0.1:8080/gs-guide-websocket 与 STOMP server 进行连接，之后再转发到订阅url
 // withSockJS作用是添加SockJS支持
 
-        registry.addEndpoint("/websocket").setHandshakeHandler(new WebSocketHandshakeHandler()).setAllowedOrigins("*").withSockJS();
+        registry.addEndpoint("/websocket")
+        .addInterceptors(new WebSocketHandshakeInterceptor()).setHandshakeHandler(new WebSocketHandshakeHandler()).setAllowedOrigins("*").withSockJS();
     }
 
     //
@@ -117,7 +126,7 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
             public Message<?> preSend(Message<?> message, MessageChannel channel) {
                 System.out.println("recv : "+message);
                 StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
-
+//                Principal user = (User)accessor.getSessionAttributes().get("user");
                 return super.preSend(message, channel);
             }
 

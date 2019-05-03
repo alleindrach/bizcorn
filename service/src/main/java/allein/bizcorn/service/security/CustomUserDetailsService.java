@@ -27,6 +27,9 @@ public class CustomUserDetailsService implements UserDetailsService {
         //本例使用SUser中的email作为用户名:
         IUser user = userService.getUserByUsername(userName).getData();
         if (user == null) {
+            user = userService.getUserByMobile(userName);
+        }
+        if (user == null) {
             throw new UsernameNotFoundException("用户名密码错误！");
         }
         // SecurityUser实现UserDetails并将SUser的Email映射为username

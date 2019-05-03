@@ -24,7 +24,9 @@ spring:
     kafka:
         bootstrap-servers: 192.168.2.233:9092
         template:
-            default-topic: bizcorn-user
+            default-topic: bizcorn.mq.default
+            topic-pattern: bizcorn.mq.*
+            topic-pattern-prefix: bizcorn.mq.
         listener:
             concurrency: 3
         producer:
@@ -145,7 +147,10 @@ bizcorn:
             user: user
             timeout: timeout
     filebase: http://192.168.2.233:8762/file/
-
+    thumbnail:
+        small:
+            width: 200
+            height: 200
 
 #
 #endpoints:

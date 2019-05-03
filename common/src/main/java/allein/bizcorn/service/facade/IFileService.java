@@ -1,26 +1,16 @@
 package allein.bizcorn.service.facade;
 
-import allein.bizcorn.model.output.Result;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+import allein.bizcorn.service.facade.gate.IFileServiceGate;
+import com.mongodb.client.gridfs.model.GridFSFile;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
 
-public interface IFileService {
+public interface IFileService extends IFileServiceGate {
 
-    @RequestMapping(value = "/files",method = RequestMethod.POST)
-    public Result upload(@RequestPart MultipartFile[] files) ;
 
-    @RequestMapping(value = "/file/{id}",method = RequestMethod.GET)
-    public ResponseEntity<byte[]> downloadById(@PathVariable("id") String fileId)
+    public GridFSFile getFileByName( String fileName)
             throws IOException;
 
-    @RequestMapping(value = "/file/{id}",method = RequestMethod.DELETE)
-    public Result deleteById(@PathVariable("id") String fileId)
-            throws IOException;
+    public GridFSFile getFile(String id) throws IOException;
+
 }

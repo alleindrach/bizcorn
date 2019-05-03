@@ -1,5 +1,6 @@
 package allein.bizcorn.model.mongo;
 
+import allein.bizcorn.common.websocket.Status;
 import allein.bizcorn.model.facade.IProfile;
 import allein.bizcorn.model.facade.IUser;
 import org.springframework.data.annotation.Id;
@@ -33,6 +34,8 @@ public class User  implements  IUser {
     Set<Authority> Authorities;
 
     private Date createDate;
+    private Date lastVisit;
+    private Status status;
 
     @DBRef
     private User curPartner;
@@ -119,4 +122,19 @@ public class User  implements  IUser {
         this.curPartner = curPartner;
     }
 
+    public Date getLastVisit() {
+        return lastVisit;
+    }
+
+    public void setLastVisit(Date lastVisit) {
+        this.lastVisit = lastVisit;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
 }

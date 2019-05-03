@@ -34,6 +34,27 @@ public class FileServiceHystric implements  FileServiceProxy{
     }
 
     @Override
+    public ResponseEntity<byte[]> thumbById(String fileId) throws IOException {
+        HttpServletResponse response=((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
+        response.sendError(500);
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<byte[]> downloadByName(String fileName) throws IOException {
+        HttpServletResponse response=((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
+        response.sendError(500);
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<byte[]> thumbByName(String fileName) throws IOException {
+        HttpServletResponse response=((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
+        response.sendError(500);
+        return null;
+    }
+
+    @Override
     public Result deleteById(String fileId) throws IOException {
         return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
     }

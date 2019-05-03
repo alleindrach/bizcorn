@@ -1,6 +1,6 @@
 package allein.bizcorn.servicefeign.proxy;
 
-import allein.bizcorn.service.facade.ICacheService;
+import allein.bizcorn.service.facade.gate.ICacheServiceGate;
 import org.springframework.cloud.openfeign.FeignClient;
 
 //动态注入proxy
@@ -8,6 +8,6 @@ import org.springframework.cloud.openfeign.FeignClient;
         , fallback = CacheServiceHystric.class
 )
 //@RequestMapping(value = "/cache")
-public interface CacheServiceProxy extends ICacheService{
+public interface CacheServiceProxy extends ICacheServiceGate{
 
 }

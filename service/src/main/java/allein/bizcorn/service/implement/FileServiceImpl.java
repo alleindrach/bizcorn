@@ -1,8 +1,12 @@
 package allein.bizcorn.service.implement;
 
+import allein.bizcorn.common.exception.CommonException;
+import allein.bizcorn.common.exception.ExceptionEnum;
+import allein.bizcorn.common.mq.Topic;
 import allein.bizcorn.common.util.SecurityUtil;
 import allein.bizcorn.model.output.Result;
 import allein.bizcorn.service.facade.IFileService;
+import allein.bizcorn.service.facade.IMessageQueueService;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
 import com.mongodb.client.gridfs.model.GridFSFile;
@@ -23,6 +27,8 @@ import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.DigestUtils;
+import org.springframework.util.MimeType;
+import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -43,6 +49,8 @@ public class FileServiceImpl implements IFileService {
     private GridFsOperations operations;
     @Autowired
     private GridFSBucket gridFSBucket;
+    @Autowired
+    private IMessageQueueService messageQueueService;
 
     @Value("${file.uploadRoot}")
     private String FileRoot;
@@ -54,15 +62,7 @@ public class FileServiceImpl implements IFileService {
 //        HttpServletRequest request=((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         String username= SecurityUtil.getUserName();
         logger.debug("upload by {}",username);
-//        MultipartResolver resolver = new CommonsMultipartResolver(request.getSession().getServletContext());
-//        MultipartHttpServletRequest multipartRequest = resolver.resolveMultipart(request);
 
-//        MultipartHttpServletRequest multipartRequest =  ((MultipartHttpServletRequest) request);
-//
-//
-//        Map<String, MultipartFile> fileMap =((AbstractMultipartHttpServletRequest) multipartRequest).getFileMap();
-////        MultipartFile file = null;
-//        BufferedOutputStream stream = null;
         Result r= Result.successWithMessage("Success!");
         HashMap<String,Result > result=new HashMap<>();
 
@@ -99,6 +99,10 @@ public class FileServiceImpl implements IFileService {
                         metaData.append("_originFileName",uploadFilePath);
                         ObjectId gridFSFileId = gridFsTemplate.store(ins, md5Name, metaData);
                         result.put(file.getOriginalFilename(),Result.successWithData(gridFSFileId.toString()));
+                        MimeType mimeType=MimeTypeUtils.parseMimeType(contentType);
+                        if(mimeType.isCompatibleWith(MimeType.valueOf("image/*"))){
+                            messageQueueService.send(Topic.IMAGE_THUMB,gridFSFileId.toString());
+                        }
                     }
 //
 //                    byte[] bytes = file.getBytes();
@@ -148,16 +152,17 @@ public class FileServiceImpl implements IFileService {
         }
         // 通知浏览器进行文件下载
         try {
-            String mimeType=(String) gfsfile.getMetadata().get("_contentType");
-            String[] mimeTypes=mimeType.split("/");
-            if(mimeTypes!=null&&mimeTypes.length>0 )
-            {
-                headers.setContentType(new MediaType(mimeTypes[0],mimeTypes[1]));
-            }else
-            {
-                headers.setContentType(new MediaType(mimeType));
-            }
-
+//            String mimeType=(String) gfsfile.getMetadata().get("_contentType");
+//            String[] mimeTypes=mimeType.split("/");
+//            if(mimeTypes!=null&&mimeTypes.length>0 )
+//            {
+//                headers.setContentType(new MediaType(mimeTypes[0],mimeTypes[1]));
+//            }else
+//            {
+//                headers.setContentType(new MediaType(mimeType));
+//            }
+            MimeType type= MimeTypeUtils.parseMimeType((String) gfsfile.getMetadata().get("_contentType"));
+            headers.setContentType(new MediaType(type.getType(),type.getSubtype()));
 //            if(gfsfile.getContentType()!=null)
 //                headers.setContentType(new MediaType(gfsfile.getContentType()));
         }catch(Exception ex)
@@ -176,6 +181,51 @@ public class FileServiceImpl implements IFileService {
         entity = new ResponseEntity<byte[]>(fileBuffer, headers, status);
 
         return entity;
+    }
+
+    @Override
+    public ResponseEntity<byte[]> thumbById(String fileId) throws IOException {
+        GridFSFile file=getFile(fileId);
+        if(file==null)
+        {
+            return  null ;//Result.failWithException(new CommonException(ExceptionEnum.FILE_NOT_EXISTS));
+        }
+        GridFSFile thumbFile=getFileByName(file.getFilename()+".small");
+        if(thumbFile==null)
+        {
+            return null;
+        }
+        return downloadById(((BsonObjectId) file.getId()).getValue().toString());
+    }
+
+    @Override
+    public ResponseEntity<byte[]> downloadByName(String fileName) throws IOException {
+        GridFSFile file=getFileByName(fileName);
+        if(file==null)
+        {
+            return  null ;//Result.failWithException(new CommonException(ExceptionEnum.FILE_NOT_EXISTS));
+        }
+        return this.downloadById(((BsonObjectId) file.getId()).getValue().toString());
+    }
+
+    @Override
+    public ResponseEntity<byte[]> thumbByName(String oriFileName) throws IOException {
+
+        return downloadByName(oriFileName+".small");
+    }
+
+    @Override
+    public GridFSFile getFileByName(String fileName) throws IOException {
+        GridFSFile gridFSFile=gridFsTemplate.findOne(Query.query(GridFsCriteria.whereFilename().is(fileName)));
+        return gridFSFile;
+    }
+
+    @Override
+    public GridFSFile getFile(String id) throws IOException {
+        Query query = Query.query(Criteria.where("_id").is(id));
+// 查询单个文件
+        GridFSFile gfsfile = gridFsTemplate.findOne(query);
+        return gfsfile;
     }
 
     @Override

@@ -34,47 +34,12 @@ public class UserServiceHystric implements  UserServiceProxy{
     }
 
 
-    @Override
-    public Result<IUser> getUserByUsername(String userName) {
-        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
-    }
-
-    @Override
-    public Result<IUser> getMaskedUserByUsername(String userName) {
-        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
-    }
-
-    @Override
-    public Result<Long> getUserLoginErrorTimes(String userName) {
-        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
-    }
-
-    @Override
-    public Result<Long> incUserLoginErrorTimes(String userName) {
-        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
-    }
-
-    @Override
-    public Result<Boolean> rstUserLoginErrorTimes(String userName) {
-        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
-    }
-
-
 
     @Override
     public Result<Integer> update(User user) {
         return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
     }
 
-    @Override
-    public Result<IUser> getUserByMobile(String mobile) {
-        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
-    }
-
-    @Override
-    public Result<List<String>> getUserAuthorities(String userId) {
-        return null;
-    }
 
     @Override
     public Result<IUser> fetchHomepage() {
@@ -93,6 +58,11 @@ public class UserServiceHystric implements  UserServiceProxy{
 
     @Override
     public Result bind(String mac) {
+        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
+    }
+
+    @Override
+    public Result resetPassowrd(String password, String captcha, String mobile, String mobileCaptchaKey) {
         return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
     }
 

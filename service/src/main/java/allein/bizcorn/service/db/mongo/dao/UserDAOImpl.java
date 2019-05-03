@@ -10,9 +10,23 @@ public class UserDAOImpl extends   BaseDAOImpl<User> implements UserDAO  {
 
     @Override
     public User selectByName(String name) {
-
-
         return this.mongoTemplate.findOne(new Query(where("username").is(name)),User.class);
+    }
+
+    @Override
+    public User selectByMobile(String mobile) {
+        return this.mongoTemplate.findOne(new Query(where("mobile").is(mobile)),User.class);
+    }
+
+    @Override
+    public User select(String idNameMobile) {
+        User user=null;
+        user=this.selectByName(idNameMobile);
+        if(user!=null) return user;
+        user=this.selectByMobile(idNameMobile);
+        user=this.get(idNameMobile);
+        if(user!=null) return user;
+        return user;
     }
 
 }

@@ -7,6 +7,7 @@ import allein.bizcorn.common.exception.ExceptionEnum;
 
 import allein.bizcorn.common.util.Masker;
 import allein.bizcorn.common.util.SecurityUtil;
+import allein.bizcorn.common.websocket.Status;
 import allein.bizcorn.model.facade.IUser;
 import allein.bizcorn.model.mongo.Authority;
 import allein.bizcorn.model.mongo.Kid;
@@ -38,6 +39,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
@@ -74,8 +76,7 @@ public class UserServiceMongoImpl implements IUserService {
         String username= SecurityUtil.getUserName();
         if(username!=null)
         {
-            return userDAO.selectByName(username);
-
+            return userDAO.select(username);
         }else
         {
             return null;
@@ -159,9 +160,15 @@ public class UserServiceMongoImpl implements IUserService {
         return Result.successWithData(user.getId());
     }
     @Override
-    public Result<IUser> getUserByMobile(@PathVariable("mobile") String mobile)
+    public User  getUserByMobile(@PathVariable("mobile") String mobile)
     {
-        return Result.successWithData(mobile);
+        User user=userDAO.findOne(Query.query(Criteria.where("mobile").is(mobile)));
+        return user;
+    }
+
+    @Override
+    public User getUser(String principal) {
+        return userDAO.select(principal);
     }
 
     @Override
@@ -185,7 +192,20 @@ public class UserServiceMongoImpl implements IUserService {
             @CookieValue(value= SecurityConstants.MOBILE_CAPTCHA_KEY_COOKIE_NAME) String mobileCaptchaKey
     )
     {
-    
+
+        if(userDAO.select(username)!=null||userDAO.select(mobile)!=null)
+        {
+            return Result.failWithException(new CommonException(ExceptionEnum.USER_EXISTS));
+        }
+        if(username.matches("^[0-9]*$"))
+        {
+            return Result.failWithException(new CommonException(ExceptionEnum.USER_NAME_INVALID));
+        }
+        if(!mobile.matches("^[0-9]*$"))
+        {
+            return Result.failWithException(new CommonException(ExceptionEnum.USER_MOBILE_INVALID));
+        }
+
         User newuser=new User();
         newuser.setUsername(username);
 
@@ -293,6 +313,49 @@ public class UserServiceMongoImpl implements IUserService {
             }
         }
         return Result.successWithMessage("绑定成功");
+    }
+
+    @Override
+    public void checkIn(String username) {
+        User user=userDAO.selectByName(username);
+        if(user!=null)
+        {
+            user.setStatus(Status.ON_LINE);
+            user.setLastVisit(new Date());
+            userDAO.save(user);
+        }
+    }
+
+    @Override
+    public void checkOut(String username) {
+        User user=userDAO.selectByName(username);
+        if(user!=null)
+        {
+            user.setStatus(Status.OFF_LINE);
+            userDAO.save(user);
+        }
+    }
+
+    @Override
+    public Result resetPassowrd(String password, String captcha, String mobile, String mobileCaptchaKey) {
+        User user=userDAO.select(mobile);
+        if(user==null){
+            return Result.failWithException(new CommonException(ExceptionEnum.USER_ACCOUNT_NOT_EXIST));
+        }
+
+        CaptchaResult captchaResult=captchaMessageHelper.checkCaptcha(mobileCaptchaKey,captcha,mobile,SecurityConstants.SECURITY_KEY,true);
+        if(!captchaResult.isSuccess())
+            Result.failWithException(new CommonException(ExceptionEnum.CAPTCH_INVALID));
+
+
+        try {
+            user.setPassword( DigestUtils.md5DigestAsHex(password.toString().getBytes()));
+            userDAO.save(user);
+        }catch(DuplicateKeyException exception)
+        {
+            return Result.failWithException(new CommonException(ExceptionEnum.USER_PASSWORD_RESET_FAIL));
+        }
+        return  Result.successWithData(getMaskedUser(user));
     }
 
     @PreAuthorize("hasRole('USER')")

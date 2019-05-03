@@ -1,5 +1,6 @@
 package allein.bizcorn.model.mongo;
 
+import allein.bizcorn.common.websocket.Action;
 import allein.bizcorn.model.facade.IMessage;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
@@ -9,17 +10,17 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.Date;
 
 @Document(collection="Messages")
-@CompoundIndexes({
-        @CompoundIndex(name = "session_index", def = "{'sessionId', 1, 'createDate': -1}")
-
-})
+//@CompoundIndexes({
+//        @CompoundIndex(name = "session_index", def = "{'sessionId', 1, 'createDate': -1}")
+//
+//})
 public class Message implements IMessage {
     @Id
     private String id;
 
-    private String sessionId;//null 离线消息，
+//    private String sessionId;//null 离线消息，
 
-    private String groupId;//null 非群消息
+//    private String groupId;//null 非群消息
 
     private String srcId;//发送方id
 
@@ -27,9 +28,11 @@ public class Message implements IMessage {
 
     private String content;
 
+    private Action action;
+
     private Date createDate;
 
-    private Integer status;//0=未送达， 1=已送达， 2=已阅读
+    private Integer status;//0=已收到， 1=已送达， 2=已阅读
 
     private Date deliverDate;//送达时间
 
@@ -109,19 +112,31 @@ public class Message implements IMessage {
         this.msgType = msgType;
     }
 
-    public String getSessionId() {
-        return sessionId;
+    public Action getAction() {
+        return action;
     }
 
-    public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
+    public void setAction(Action action) {
+        this.action = action;
     }
 
-    public String getGroupId() {
-        return groupId;
-    }
-
-    public void setGroupId(String groupId) {
-        this.groupId = groupId;
-    }
+    //    public String getSessionId() {
+//        return sessionId;
+//    }
+//
+//    public void setSessionId(String sessionId) {
+//        this.sessionId = sessionId;
+//    }
+//
+//    public String getGroupId() {
+//        return groupId;
+//    }
+//
+//    public void setGroupId(String groupId) {
+//        this.groupId = groupId;
+//    }
+//    public String toString(){
+//        return null;
+//    }
+//
 }
