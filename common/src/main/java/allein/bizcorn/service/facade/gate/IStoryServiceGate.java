@@ -29,4 +29,12 @@ public interface IStoryServiceGate {
     @ResponseBody
     public Result deleteStory(@PathVariable("id") String id);
 
+    @RequestMapping("/story/sound/channels")
+    @ResponseBody
+    public Result getSoundChannelBGs();
+
+    @RequestMapping("/story/sound/channel/{index}")
+    @ResponseBody
+    public Result setSoundChannelBG(@PathVariable("index") Integer index,@RequestPart MultipartFile file);
+
 }

@@ -130,36 +130,48 @@ public class Story implements IStory {
 
     public String toString(String filebase){
 
-            Story story=this;
-            JSONObject jsonObject= (JSONObject) JSON.toJSON(story);
-            jsonObject.put("author",story.getAuthor().getId());
-////            story.getAuthor().setPassword("*");
-////            story.getAuthor().setMobile("*");
-            JSONArray scenes=jsonObject.getJSONArray("scenes");
-            scenes.forEach(
-                    scene-> {
-                        String imageSource=((JSONObject) scene).getString("img");
-                        String soundSource=((JSONObject) scene).getString("snd");
-                        if(!UrlUtil.isUrl(imageSource))
-                        {
-                            imageSource=filebase+imageSource;
-                        }
-                        if(!UrlUtil.isUrl(soundSource))
-                        {
-                            soundSource=filebase+soundSource;
-                        }
-                        ((JSONObject) scene).put("img",imageSource);
-                        ((JSONObject) scene).put("snd",soundSource);
+        Story story=this;
+        JSONObject jsonObject=new JSONObject ();//JSONObject) JSON.toJSON(story);
+        jsonObject.put("id",this.getId());
+        jsonObject.put("author",this.getAuthor().getId());
+        jsonObject.put("channel",this.getChannel());
+        jsonObject.put("createTime",this.getCreateTime());
+        jsonObject.put("downloads",this.getDownloads());
+        jsonObject.put("likes",this.getLikes());
+        jsonObject.put("published",this.getPublished());
+        jsonObject.put("description",this.getDescription());
+        jsonObject.put("title",this.getTitle());
+        JSONArray scenes;
+        scenes = new JSONArray();
+        this.getScenes().forEach(
+                scene-> {
+                    JSONObject jsonScene = new JSONObject();
+
+                    String imageSource = scene.getImg();
+                    String soundSource = scene.getSnd();
+                    if (!UrlUtil.isUrl(imageSource)) {
+                        imageSource = filebase + imageSource;
                     }
-            );
+                    if (!UrlUtil.isUrl(soundSource)) {
+                        soundSource = filebase + soundSource;
+                    }
+                    jsonScene.put("img", imageSource);
+                    jsonScene.put("snd", soundSource);
+                    scenes.add(jsonScene);
+                }
+        );
+        jsonObject.put("scenes",scenes);
+
+
 //            if(story.getSceneList()!=null&& story.getSceneList().size()>0){
 //                story.getSceneList().forEach(scene->{
 //                    scene.setSoundSource(this.filebase+scene.getSoundSource());
 //                    scene.setImageSource(this.filebase+scene.getImageSource());
 //                });
 //            }
-            String result=jsonObject.toJSONString();// JSON.toJSONString(story);
-            return result;
+        String result=jsonObject.toJSONString();// JSON.toJSONString(story);
+
+        return result;
 
     }
 }

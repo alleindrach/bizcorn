@@ -36,6 +36,19 @@ public class StoryServiceHystric implements  StoryServiceProxy{
 
     @Override
     public Result deleteStory(String id) {
-        return null;
+        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
+
+    }
+
+    @Override
+    public Result getSoundChannelBGs() {
+        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
+
+    }
+
+    @Override
+    public Result setSoundChannelBG(Integer index, MultipartFile file) {
+        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
+
     }
 }

@@ -31,7 +31,7 @@ public class FileServiceControl {
     String sessionAttrUser;
 
     @RequestMapping(value = "/files",method = RequestMethod.POST)
-    public Result upload(MultipartFile[] files)
+    public Result upload(@RequestPart MultipartFile[] files)
     {
         Result result=fileService.upload(files);
         return result;
@@ -50,4 +50,27 @@ public class FileServiceControl {
     {
         return fileService.deleteById(fileId);
     }
+
+    @RequestMapping(value = "/file/small/{id}",method = RequestMethod.GET)
+    public ResponseEntity<byte[]> thumbById(@PathVariable("id") String fileId)
+            throws IOException
+    {
+        return fileService.thumbById(fileId);
+    }
+
+
+    @RequestMapping(value = "/file/byname/{name}",method = RequestMethod.GET)
+    public ResponseEntity<byte[]> downloadByName(@PathVariable("name") String fileName)
+            throws IOException
+    {
+        return fileService.downloadByName(fileName);
+    }
+
+    @RequestMapping(value = "/file/small/byname/{name}",method = RequestMethod.GET)
+    public ResponseEntity<byte[]> thumbByName(@PathVariable("name") String fileName)
+            throws IOException
+    {
+        return fileService.thumbByName(fileName);
+    }
+
 }

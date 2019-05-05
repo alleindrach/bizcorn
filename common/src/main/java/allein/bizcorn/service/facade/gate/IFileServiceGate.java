@@ -25,7 +25,7 @@ public interface IFileServiceGate {
     public ResponseEntity<byte[]> downloadById(@PathVariable("id") String fileId)
             throws IOException;
     @RequestMapping(value = "/file/small/{id}",method = RequestMethod.GET)
-    public ResponseEntity<byte[]> thumbById(@PathVariable("name") String fileId)
+    public ResponseEntity<byte[]> thumbById(@PathVariable("id") String fileId)
             throws IOException;
 
     @RequestMapping(value = "/file/byname/{name}",method = RequestMethod.GET)

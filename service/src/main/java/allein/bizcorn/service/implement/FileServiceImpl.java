@@ -184,7 +184,7 @@ public class FileServiceImpl implements IFileService {
     }
 
     @Override
-    public ResponseEntity<byte[]> thumbById(String fileId) throws IOException {
+    public ResponseEntity<byte[]> thumbById(@PathVariable("id") String fileId) throws IOException {
         GridFSFile file=getFile(fileId);
         if(file==null)
         {
@@ -195,11 +195,11 @@ public class FileServiceImpl implements IFileService {
         {
             return null;
         }
-        return downloadById(((BsonObjectId) file.getId()).getValue().toString());
+        return downloadById(((BsonObjectId) thumbFile.getId()).getValue().toString());
     }
 
     @Override
-    public ResponseEntity<byte[]> downloadByName(String fileName) throws IOException {
+    public ResponseEntity<byte[]> downloadByName(@PathVariable("name") String fileName) throws IOException {
         GridFSFile file=getFileByName(fileName);
         if(file==null)
         {
@@ -209,7 +209,7 @@ public class FileServiceImpl implements IFileService {
     }
 
     @Override
-    public ResponseEntity<byte[]> thumbByName(String oriFileName) throws IOException {
+    public ResponseEntity<byte[]> thumbByName(@PathVariable("name") String oriFileName) throws IOException {
 
         return downloadByName(oriFileName+".small");
     }

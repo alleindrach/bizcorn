@@ -4,9 +4,11 @@ import allein.bizcorn.common.exception.CommonException;
 import allein.bizcorn.common.exception.ExceptionEnum;
 import allein.bizcorn.common.util.SecurityUtil;
 import allein.bizcorn.model.mongo.Scene;
+import allein.bizcorn.model.mongo.SoundChannel;
 import allein.bizcorn.model.mongo.Story;
 import allein.bizcorn.model.mongo.User;
 import allein.bizcorn.model.output.Result;
+import allein.bizcorn.service.db.mongo.dao.SoundChannelDAO;
 import allein.bizcorn.service.db.mongo.dao.StoryDAO;
 import allein.bizcorn.service.db.mongo.dao.UserDAO;
 import allein.bizcorn.service.facade.IFileService;
@@ -34,6 +36,8 @@ public class StoryServiceMongoImpl implements IStoryService{
     UserDAO userDAO;
     @Autowired
     StoryDAO storyDAO;
+    @Autowired
+    SoundChannelDAO soundChannelDAO;
     @Autowired
     IFileService fileService;
     @Value("${bizcorn.filebase}")
@@ -222,5 +226,37 @@ public class StoryServiceMongoImpl implements IStoryService{
             storyDAO.deleteByQuery(new Query());
             return Result.successWithData(id);
         }
+    }
+
+    @Override
+    @PreAuthorize("hasRole('USER')")
+    public Result getSoundChannelBGs() {
+        List<SoundChannel> soundChannels= soundChannelDAO.find(new Query());
+
+        return Result.successWithData(soundChannels);
+    }
+    @PreAuthorize("hasRole('USER')")
+    @Override
+    public Result setSoundChannelBG(@PathVariable("index") Integer index,@RequestPart MultipartFile file) {
+        Result fileResult=fileService.upload(new MultipartFile[]{file});
+        if(fileResult.isSuccess()){
+            HashMap<String,Result > entrys= (HashMap<String, Result>) fileResult.getData();
+            if(entrys!=null && entrys.size()>0)
+            {
+                Result uploaded=entrys.get(file.getOriginalFilename());
+                if(uploaded.isSuccess()){
+                    SoundChannel soundChannel=soundChannelDAO.selectByIndex(index);
+                    if(soundChannel==null)
+                    {
+                        soundChannel=new SoundChannel();
+                        soundChannel.setIndex(index);
+                    }
+                    soundChannel.setBgPictureId((String) uploaded.getData());
+                    soundChannelDAO.save(soundChannel);
+                    return  Result.successWithData(soundChannel.getBgPictureId());
+                }
+            }
+        }
+        return null;
     }
 }
