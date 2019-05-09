@@ -19,10 +19,10 @@ spring:
         stream:
             kafka:
                 binder:
-                    brokers: 192.168.2.233:9092
-                    zk-nodes: 192.168.2.233:2181
+                    brokers: localhost:9092
+                    zk-nodes: localhost:2181
     kafka:
-        bootstrap-servers: 192.168.2.233:9092
+        bootstrap-servers: localhost:9092
         template:
             default-topic: bizcorn.mq.default
             topic-pattern: bizcorn.mq.*
@@ -62,7 +62,7 @@ spring:
 
     data:
         mongodb:
-            uri: mongodb://192.168.2.233:27018/bizcorn
+            uri: mongodb://localhost:27018/bizcorn
 #redis
 
     redis:
@@ -146,12 +146,13 @@ bizcorn:
         attribute:
             user: user
             timeout: timeout
-    filebase: http://192.168.2.233:8762/file/
+    filebase: http://localhost:8762/file/
     thumbnail:
         small:
             width: 200
             height: 200
-
+    bind:
+        timeout: 1800
 #
 #endpoints:
 #  refresh:

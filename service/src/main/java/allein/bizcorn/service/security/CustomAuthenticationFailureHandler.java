@@ -52,7 +52,10 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
             response.setCharacterEncoding("UTF-8");
             response.setContentType("application/json; charset=utf-8");
             Result error;
-            if("login.captcha.error".compareToIgnoreCase(exception.getMessage())==0)
+            if(exception instanceof  BadCredentialsException){
+                error=Result.failWithException(new CommonException(ExceptionEnum.USER_ACCOUNT_LOGIN_FAIL));
+            }
+            else if("login.captcha.error".compareToIgnoreCase(exception.getMessage())==0)
             {
                 error=Result.failWithException(new CommonException(ExceptionEnum.CAPTCH_INVALID));
             }else // if("login.username-or-password.error".compareToIgnoreCase(exception.getMessage())==0)

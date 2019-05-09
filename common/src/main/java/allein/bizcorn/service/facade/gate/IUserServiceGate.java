@@ -91,7 +91,7 @@ public interface IUserServiceGate {
             @PathVariable(value = "mac") String mac
     );
 
-    @RequestMapping(value = "/user/bind/{mac}")
+    @RequestMapping(value = "/user/bind/fire/{mac}")
     /*
     @Description:绑定小童，发起绑定者可以是普通用户，也可以是小童
     @Param:[mac]
@@ -100,8 +100,33 @@ public interface IUserServiceGate {
     @Date:2019/4/30
     @Time:12:02 PM
     */
-    Result bind(
+    Result firebind(
             @PathVariable(value = "mac") String mac
+    );
+    @RequestMapping(value = "/user/bind/confirm/{token}")
+    /*
+    @Description:绑定小童，发起绑定者可以是普通用户，也可以是小童
+    @Param:[mac]
+    @Return:allein.bizcorn.model.output.Result
+    @Author:Alleindrach@gmail.com
+    @Date:2019/4/30
+    @Time:12:02 PM
+    */
+    Result confirmBind(
+            @PathVariable(value = "token") String token
+    );
+
+    @RequestMapping(value = "/user/bind/query/{token}")
+    /*
+    @Description:绑定小童，发起绑定者可以是普通用户，也可以是小童
+    @Param:[mac]
+    @Return:allein.bizcorn.model.output.Result
+    @Author:Alleindrach@gmail.com
+    @Date:2019/4/30
+    @Time:12:02 PM
+    */
+    Result queryBind(
+            @PathVariable(value = "token") String token
     );
 
     @RequestMapping(value = "/password/reset")

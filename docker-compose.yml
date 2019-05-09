@@ -59,7 +59,8 @@ services:
     networks:
       default:
         ipv4_address: 172.23.0.16
-
+    volumes:
+    - /data/docker/mongodb:/data/db
 networks:
   default:
     external:

@@ -6,6 +6,7 @@
 package allein.bizcorn.service.facade;
 
 import allein.bizcorn.model.facade.IUser;
+import allein.bizcorn.model.mongo.Kid;
 import allein.bizcorn.model.mongo.User;
 import allein.bizcorn.model.output.Result;
 import allein.bizcorn.service.facade.gate.IUserServiceGate;
@@ -56,5 +57,6 @@ public interface IUserService extends IUserServiceGate {
     */
     void checkOut(String username);
 
+    boolean rebind(User binder, Kid kid);
 
 }

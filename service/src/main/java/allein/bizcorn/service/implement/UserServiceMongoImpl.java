@@ -7,17 +7,19 @@ import allein.bizcorn.common.exception.ExceptionEnum;
 
 import allein.bizcorn.common.util.Masker;
 import allein.bizcorn.common.util.SecurityUtil;
+import allein.bizcorn.common.websocket.Action;
 import allein.bizcorn.common.websocket.Status;
 import allein.bizcorn.model.facade.IUser;
-import allein.bizcorn.model.mongo.Authority;
-import allein.bizcorn.model.mongo.Kid;
-import allein.bizcorn.model.mongo.Role;
-import allein.bizcorn.model.mongo.User;
+import allein.bizcorn.model.mongo.*;
 import allein.bizcorn.model.output.Result;
 import allein.bizcorn.model.security.CaptchaResult;
 import allein.bizcorn.service.captcha.CaptchaImageHelper;
 import allein.bizcorn.service.captcha.CaptchaMessageHelper;
+import allein.bizcorn.service.config.ServiceConfigProp;
+import allein.bizcorn.service.db.mongo.dao.BindTokenDAO;
 import allein.bizcorn.service.db.mongo.dao.UserDAO;
+import allein.bizcorn.service.facade.IMessageBrokerService;
+import allein.bizcorn.service.facade.IMessageQueueService;
 import allein.bizcorn.service.facade.IUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,29 +50,37 @@ import java.util.List;
 //@RequestMapping("/mongo")
 public class UserServiceMongoImpl implements IUserService {
     private static final Logger logger = LoggerFactory.getLogger(UserServiceMongoImpl.class);
-
-    @Value("${bizcorn.session.prefix}")
-    String sessionPrefix;
-
-    @Value("${bizcorn.session.attribute.user}")
-    String sessionAttrUser;
-
-    @Value("${bizcorn.session.attribute.timeout}")
-    String sessionAttrTimeout;
-
-    @Value("${bizcorn.session.timeout}")
-    Long sessionTimeout;
+//
+//    @Value("${bizcorn.session.prefix}")
+//    String sessionPrefix;
+//
+//    @Value("${bizcorn.session.attribute.user}")
+//    String sessionAttrUser;
+//
+//    @Value("${bizcorn.session.attribute.timeout}")
+//    String sessionAttrTimeout;
+//
+//    @Value("${bizcorn.session.timeout}")
+//    Long sessionTimeout;
+//
 
     @Autowired
     ICacheAccessor cacheAccessor;
-
+    @Autowired
+    ServiceConfigProp serviceProp;
     @Autowired
     UserDAO userDAO;
+    @Autowired
+    BindTokenDAO bindTokenDAO;
     @Autowired
     private CaptchaImageHelper captchaImageHelper;
 
     @Autowired
     private CaptchaMessageHelper captchaMessageHelper;
+    @Autowired
+    private IMessageBrokerService messageBrokerService;
+    @Autowired
+    private IMessageQueueService messageQueueService;
 
     private User getUserFromSession(){
         String username= SecurityUtil.getUserName();
@@ -175,9 +185,9 @@ public class UserServiceMongoImpl implements IUserService {
     public Result<List<String>> getUserAuthorities(@PathVariable("id") String userId) {
         User user=userDAO.get(userId);
         List<String> auths=new ArrayList<>();
-        for (Authority auth:user.getAuthorities()
+        for (String auth:user.getAuthorities()
              ) {
-            auths.add(auth.getAuthority());
+            auths.add(auth);
         }
         return Result.successWithData(auths);
     }
@@ -216,8 +226,8 @@ public class UserServiceMongoImpl implements IUserService {
         newuser.setPassword( DigestUtils.md5DigestAsHex(password.toString().getBytes()));
         newuser.setMobile(mobile);
 
-        HashSet<Authority> auths=new HashSet<Authority>();
-        auths.add(new Authority().setAuthority("ROLE_USER"));
+        HashSet<String> auths=new HashSet<String>();
+        auths.add("ROLE_USER");
         newuser.setAuthorities(auths);
         userDAO.save(newuser);
         return  Result.successWithData(newuser);
@@ -236,8 +246,8 @@ public class UserServiceMongoImpl implements IUserService {
         String mobileCaptchaKey=null;
 
         kid.setPassword( DigestUtils.md5DigestAsHex(mac.toString().getBytes()));
-        HashSet<Authority> auths=new HashSet<Authority>();
-        auths.add(new Authority().setAuthority("ROLE_USER"));
+        HashSet<String> auths=new HashSet<String>();
+        auths.add("ROLE_USER");
         kid.setAuthorities(auths);
         try {
             userDAO.save(kid);
@@ -248,30 +258,42 @@ public class UserServiceMongoImpl implements IUserService {
         return  Result.successWithData(getMaskedUser(kid));
     }
 
+
     @Override
     @PreAuthorize("hasRole('USER')")
-    public Result  bind(
-            @PathVariable(value = "mac") String mac
-    ){
-        Kid kid= (Kid) userDAO.selectByName(mac);
-        if(kid==null){
+    public Result confirmBind(@PathVariable(value = "token") String tokenId) {
+        Kid kid = (Kid) getUserFromSession();
+        if (kid == null) {
             return Result.failWithException(new CommonException(ExceptionEnum.USER_KID_ACCOUNT_NOT_EXIST));
         }
-        if(kid.getRole()!= Role.KID)
+        BindToken token= bindTokenDAO.get(tokenId);
+        if(token.getStatus()!=BindTokenStatus.INIT)
         {
-            return Result.failWithException(new CommonException(ExceptionEnum.BIND_KID_INVALID));
+            return Result.failWithException(new CommonException(ExceptionEnum.BIND_TOKEN_INVALID));
         }
-        User userBinding=getUserFromSession();
-        if(userBinding==null) {
-            return Result.failWithException(new CommonException(ExceptionEnum.USER_ACCOUNT_NOT_EXIST));
+        if(token==null) {
+            return Result.failWithException(new CommonException(ExceptionEnum.BIND_TOKEN_NOT_EXIST));
         }
+        if(token.getBindee().getId().compareToIgnoreCase(kid.getId())!=0) {
+            return Result.failWithException(new CommonException(ExceptionEnum.BIND_TOKEN_INVALID));
+        }
+        if(token.getCreateDate().before(new Date(System.currentTimeMillis()-serviceProp.getBindTokenTimout()*1000))) {
+            token.setStatus(BindTokenStatus.EXPIRED);
+            bindTokenDAO.save(token);
+            return Result.failWithException(new CommonException(ExceptionEnum.BIND_TOKEN_EXPIRED));
+        }
+        User binder=token.getBinder();
+        if(binder==null) {
+            return Result.failWithException(new CommonException(ExceptionEnum.BIND_TOKEN_INVALID));
+        }
+
         boolean isDirt=false;
-        switch (userBinding.getRole())
+        switch (binder.getRole())
         {
             case KID:
                 if(kid.isCanBind()){
-                    userBinding.setCurPartner(kid);
-                    kid.setCurPartner(userBinding);
+                    binder.setCurPartner(kid);
+                    kid.setCurPartner(binder);
                     isDirt=true;
                 }else
                 {
@@ -281,16 +303,16 @@ public class UserServiceMongoImpl implements IUserService {
             default:
                 if(kid.getParent()==null)
                 {
-                    kid.setParent(userBinding);
-                    kid.setCurPartner(userBinding);
-                    userBinding.setCurPartner(kid);
+                    kid.setParent(binder);
+                    kid.setCurPartner(binder);
+                    binder.setCurPartner(kid);
                     isDirt=true;
                 }else
                 {
-                    if(kid.isValidElder(userBinding.getMobile()))
+                    if(kid.isValidElder(binder.getMobile()))
                     {
-                        kid.setCurPartner(userBinding);
-                        userBinding.setCurPartner(kid);
+                        kid.setCurPartner(binder);
+                        binder.setCurPartner(kid);
                         isDirt=true;
                     }
                     else
@@ -304,15 +326,67 @@ public class UserServiceMongoImpl implements IUserService {
         if(isDirt)
         {
             try {
-                userDAO.save(userBinding);
+                token.setStatus(BindTokenStatus.CONFIRMED);
+                bindTokenDAO.save(token);
+//                bindTokenDAO.deleteById(token);
+                userDAO.save(binder);
                 userDAO.save(kid);
+
             }
             catch(Exception ex){
                 logger.error("绑定错误",ex);
                 return  Result.failWithException(new CommonException(ExceptionEnum.BIND_SAVE_ERROR));
             }
         }
+        Message msgAck=Message.BindAckMessage(token,Result.successWithMessage("绑定成功"));
+        messageBrokerService.send(msgAck);
         return Result.successWithMessage("绑定成功");
+    }
+
+    @Override
+    public Result queryBind(@PathVariable(value = "token") String tokenId) {
+        User bindParticipator =  getUserFromSession();
+        if (bindParticipator == null) {
+            return Result.failWithException(new CommonException(ExceptionEnum.USER_NOT_LOGIN));
+        }
+        BindToken token= bindTokenDAO.get(tokenId);
+        if(token.getStatus()!=BindTokenStatus.INIT)
+        {
+            return Result.failWithException(new CommonException(ExceptionEnum.BIND_TOKEN_INVALID));
+        }
+        if(token==null) {
+            return Result.failWithException(new CommonException(ExceptionEnum.BIND_TOKEN_NOT_EXIST));
+        }
+        if(token.getBindee().getId().compareToIgnoreCase(bindParticipator.getId())!=0
+                && token.getBinder().getId().compareToIgnoreCase(bindParticipator.getId())!=0) {
+            return Result.failWithException(new CommonException(ExceptionEnum.BIND_TOKEN_INVALID));
+        }
+        return Result.successWithData(token.toResultJson());
+    }
+
+    @Override
+    @PreAuthorize("hasRole('USER')")
+    public Result firebind(
+            @PathVariable(value = "mac") String mac
+    ) {
+        Kid kid = (Kid) userDAO.selectByName(mac);
+        if (kid == null) {
+            return Result.failWithException(new CommonException(ExceptionEnum.USER_KID_ACCOUNT_NOT_EXIST));
+        }
+        if (kid.getRole() != Role.KID) {
+            return Result.failWithException(new CommonException(ExceptionEnum.BIND_KID_INVALID));
+        }
+        User binder = getUserFromSession();
+        if (binder == null) {
+            return Result.failWithException(new CommonException(ExceptionEnum.USER_ACCOUNT_NOT_EXIST));
+        }
+        BindToken token = new BindToken(binder,kid);
+        token = bindTokenDAO.save(token);
+        Message bindRequireMsg = Message.BindRequireMessage(token);
+        messageBrokerService.send(bindRequireMsg);
+        return Result.successWithData(token.getId());
+
+
     }
 
     @Override
@@ -334,6 +408,36 @@ public class UserServiceMongoImpl implements IUserService {
             user.setStatus(Status.OFF_LINE);
             userDAO.save(user);
         }
+    }
+
+    @Override
+    public boolean rebind(User binder, Kid kid) {
+        if(kid.getRole()!=Role.KID)
+        {
+            throw new CommonException(ExceptionEnum.BIND_KID_INVALID);
+        }
+
+        if(kid.getCurPartner()==null ||kid.getCurPartner().getId().compareToIgnoreCase(binder.getId())!=0 )
+        {
+            if(binder.getRole()==Role.ADULT){
+                //如果当前用户的绑定关系的当前绑定对象不是当前用户，纠正
+                if(kid.isValidElder(binder.getMobile()))
+                {
+                    kid.setCurPartner(binder);
+                    userDAO.save(kid);
+                    return true;
+                }
+                else
+                {
+                    throw new CommonException(ExceptionEnum.BIND_USER_INVALID);
+                }
+            }else
+            {
+                throw new CommonException(ExceptionEnum.BIND_USER_INVALID);
+            }
+
+        }
+        return false;
     }
 
     @Override

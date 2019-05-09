@@ -2,6 +2,8 @@ package allein.bizcorn.servicefeign.proxy;
 
 import allein.bizcorn.common.exception.CommonException;
 import allein.bizcorn.common.exception.ExceptionEnum;
+import allein.bizcorn.model.input.SoundChannelIO;
+import allein.bizcorn.model.input.SoundMessageIO;
 import allein.bizcorn.model.output.Result;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -11,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
 @Component
 public class StoryServiceHystric implements  StoryServiceProxy{
@@ -47,8 +50,28 @@ public class StoryServiceHystric implements  StoryServiceProxy{
     }
 
     @Override
-    public Result setSoundChannelBG(Integer index, MultipartFile file) {
+    public Result setSoundChannelBG(MultipartFile[] files, String channelsJson) {
         return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
 
     }
+
+    @Override
+    public Result msgUp(MultipartFile[] files, String messageJson) {
+        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
+
+    }
+
+
+    @Override
+    public Result msgCopy(String messageId) {
+        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
+
+    }
+
+    @Override
+    public Result msgList(String criteria, Integer pageIndex, Integer pageSize) {
+        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
+
+    }
+
 }

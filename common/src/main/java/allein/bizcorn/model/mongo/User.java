@@ -3,6 +3,9 @@ package allein.bizcorn.model.mongo;
 import allein.bizcorn.common.websocket.Status;
 import allein.bizcorn.model.facade.IProfile;
 import allein.bizcorn.model.facade.IUser;
+import com.alibaba.fastjson.annotation.JSONField;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -18,123 +21,47 @@ public class User  implements  IUser {
     private static final long serialVersionUID = 1L;
 
     @Id
+    @Getter
+    @Setter
     private String id;
 
     @Indexed(unique = true)
+    @Getter
+    @Setter
     private String username;
-
+    @Getter
+    @Setter
+    @JSONField(serialize = false)
     private String password;
     @Indexed
+    @Getter
+    @Setter
     private String mobile;
-
+    @Getter
+    @Setter
     private Integer enabled;
-
+    @Getter
+    @Setter
     private IProfile profile;
-
-    Set<Authority> Authorities;
-
+    @Getter
+    @Setter
+    Set<String> Authorities;
+    @Getter
+    @Setter
     private Date createDate;
+    @Getter
+    @Setter
     private Date lastVisit;
+    @Getter
+    @Setter
     private Status status;
-
+    @JSONField(serialize = false)
     @DBRef
+    @Getter
+    @Setter
     private User curPartner;
-
+    @Getter
+    @Setter
     protected  Role role=Role.ADULT;
 
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public Integer getEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(Integer enabled) {
-        this.enabled = enabled;
-    }
-
-    public String getMobile() {
-        return mobile;
-    }
-
-    public void setMobile(String mobile) {
-        this.mobile = mobile;
-    }
-
-    public IProfile getProfile() {
-        return profile;
-    }
-
-    public void setProfile(IProfile profile) {
-        this.profile = profile;
-    }
-
-    public Set<Authority> getAuthorities() {
-        return Authorities;
-    }
-
-    public void setAuthorities(Set<Authority> authorities) {
-        Authorities = authorities;
-    }
-
-    public Date getCreateDate() {
-        return createDate;
-    }
-
-    public void setCreateDate(Date createDate) {
-        this.createDate = createDate;
-    }
-
-    public User getCurPartner() {
-        return curPartner;
-    }
-
-    public void setCurPartner(User curPartner) {
-        this.curPartner = curPartner;
-    }
-
-    public Date getLastVisit() {
-        return lastVisit;
-    }
-
-    public void setLastVisit(Date lastVisit) {
-        this.lastVisit = lastVisit;
-    }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
-    }
 }

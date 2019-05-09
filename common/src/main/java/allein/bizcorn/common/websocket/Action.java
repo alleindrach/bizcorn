@@ -6,7 +6,8 @@
 package allein.bizcorn.common.websocket;
 
 public enum Action {
-    SOUND_ARRIVED("sound.arrived"),SOUND_COPIED("sound.copied");
+    SOUND_ARRIVED("sound.arrived"),SOUND_COPIED("sound.copied"),
+    BIND_REQURIE("bind.require"),BIND_ACK("bind.ack");
     private String action;
     private Action(String action){
         this.action=action;

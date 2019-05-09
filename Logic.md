@@ -1,36 +1,70 @@
 ##业务
 * 接口
-    * 注册 /register
+    * 注册 POST /register
        - 参数：
          - mobile 电话
          - mobilecaptcha 验证码
          - username 用户名
          - password 密码
+       -返回：
+        result
+            state=1 成功
+            state=0 失败，reason 参见ExceptionEnum code字段
     * 获取图片验证码
-        /common/capthca.jpg?v=timestamp
+        GET /common/capthca.jpg?v=timestamp
         返回的response会带有一个captchaKey的cookie，下次验证图片验证码时需要携带
         一个图形验证码只能使用一次，不管是否通过验证，都将从cache中删除。
     * 获取短信验证码
-       /common/mobile/captcha
+       GET /common/mobile/captcha
        参数：
        mobile:电话号码
        captcha:之前获取的图片验证码。
+       返回：
+        result
+            state=1 成功
+            state=0 失败
     * 登录
-        /login
+        POST /login
         参数: username 用户名，也可以是电话号码
         password:密码
         captcha:非必须，只有超过3次验证错误时才需要，当登录返回CAPTCH_INVALID（000202）时，才需要进行图形验证码验证。
-        返回：Result
-         当state=1时为成功，data字段为sessionid（cookie为其BASE64编码），
-         state=0为失败，具体异常代码见reason字段，
+        返回：
+            Result
+                state=1时为成功，data字段为sessionid（cookie为其BASE64编码），
+                state=0为失败，具体异常代码见reason字段，
     * 重置密码
-        /password/reset
+        POST /password/reset
         参数：
             mobile:注册手机
             mobileCaptcha:手机验证码
             password:新的密码.
     * 绑定
-        /user/bind/{mac}
+        - 发起绑定，POST /user/bind/fire/{mac}
+        
+        参数：mac为设备mac
+        返回：result:
+             data为token
+             token为数据库BindToken.id
+        
+        - 被绑定方接收到消息
+        STOMP{
+            action:"bind.require",
+            content:[token],
+            srcName:[绑定人用户名]
+            ...
+        }
+        - 被绑定方确认绑定
+        POST /user/bind/confirm/{token}
+        
+        参数：token为发起绑定生成的tokenid
+        
+        - 绑定方收到成功消息
+        STOMP {
+            action:"bind.ack",
+            content:[Result],
+            srcName:[被绑定人用户名]
+            ...
+         }
         参数：地址中的mac为需要绑定的设备的mac地址（去掉:间隔符）
           * 用户绑定小童
             * 如果小童是初次绑定kid.owner==null，则设定小童的kid.owner=user，kid.curPartner=user，user.curPartner=kid
@@ -38,24 +72,55 @@
             * 如果kid.owner!=null,且user not in kid.ownerGroup ，绑定失败。
           * 小童绑定小童
             * 设定双方小童的curPartner=对方。
+            
     * 小童设备注册：
-       /kid/register/{mac}
+       POST/GET /kid/register/{mac}
           参数：mac mac地址
           权限：管理员 HasRole('ADMIN')
-    
+    * 文件下载
+        GET /file/{fileid} 下载图片文件，其中fileid为mongodb的文件id
+        GET /file/small/{fileid} 下载缩略图文件
+        GET /file/byname/{name} 按照文件名下载图片，name实际为文件的md5
+        GET /file/byname/small/{name} 按照文件名下载缩略图片，name实际为原始文件的md5
+        图片文件不存在时，返回http 410 错误
+        
+        Response.Header:
+        Content-MD5: afb2ae56b3c88d0bbd03e5c069e878fa
+        Content-Disposition: form-data; name="attachment"; filename="xxx.jpg"
+        Content-Type: image/jpeg
+        Content-Length: 218936
+        
     * 声音变变变频道背景图片设置
-        /story/sound/channel/{index}
+        POST /sound/channels/up
         参数：
-            index:频道号
-            file:频道背景图片，注意，file控件的name字段必须为"file"    
+            files:频道背景图片数组，注意，所有file控件的name字段必须为"files" 
+            channels:频道参数jsonArray，如下：
+            `[
+                {img:"file:///xxxx.jpg"},
+                {img:"file:///yyyy.jpg"},
+                {img:"file:///xxxx.jpg"},
+                {img:"file:///yyyy.jpg"},
+                  
+            ] `
+            其中，img的文件地址是客户端上传的文件名，和file控件的filename一致 
+            另外 Request 的Header要有：'Content-Type': 'multipart/form-data',
+            目前，频道至少4个  
         返回：
             result:state=1表明成功，data为file id
             state =0 表明失败，reason为异常原因。
+            
     * 声音变变变频道背景获取
-        /story/sound/channels
+        GET /sound/channels/down
         参数:无
         返回： 
             result:state=1表明成功，data为频道信息数组
+            `[
+                {img:"http://host/file/downloadid"},
+                {img:"http://host/file/downloadid"},
+                {img:"http://host/file/downloadid"},
+                {img:"http://host/file/downloadid"},
+                  
+            ] `
                    state =0 表明失败，reason为异常原因。
     * 声音变变变消息获取
         /story/sound/{id}

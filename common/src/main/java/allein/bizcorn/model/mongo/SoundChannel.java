@@ -19,7 +19,7 @@ public class SoundChannel implements Serializable {
     private String id;
     @Indexed
     private Integer index ;
-    private String  bgPictureId;
+    private String  img;
 
     public String getId() {
         return id;
@@ -37,11 +37,11 @@ public class SoundChannel implements Serializable {
         this.index = index;
     }
 
-    public String getBgPictureId() {
-        return bgPictureId;
+    public String getImg() {
+        return img;
     }
 
-    public void setBgPictureId(String bgPictureId) {
-        this.bgPictureId = bgPictureId;
+    public void setImg(String img) {
+        this.img = img;
     }
 }

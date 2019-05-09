@@ -1,8 +1,11 @@
 package allein.bizcorn.servicefeign.web;
 
 
+import allein.bizcorn.model.input.SoundChannelIO;
+import allein.bizcorn.model.input.SoundMessageIO;
 import allein.bizcorn.model.mongo.SoundChannel;
 import allein.bizcorn.model.output.Result;
+import allein.bizcorn.service.facade.gate.IStoryServiceGate;
 import allein.bizcorn.servicefeign.proxy.FileServiceProxy;
 import allein.bizcorn.servicefeign.proxy.StoryServiceProxy;
 import org.slf4j.Logger;
@@ -24,7 +27,7 @@ import java.util.List;
 @RestController
 @RefreshScope
 
-public class StoryServiceControl {
+public class StoryServiceControl implements IStoryServiceGate {
 
     private static final Logger logger = LoggerFactory.getLogger(StoryServiceControl.class);
 
@@ -59,12 +62,27 @@ public class StoryServiceControl {
     {
         return storyService.deleteStory(id);
     }
-    @RequestMapping("/story/sound/channels")
+
     public Result getSoundChannelBGs() {
         return storyService.getSoundChannelBGs();
     }
-    @RequestMapping("/story/sound/channel/{index}")
-    public Result setSoundChannelBG(@PathVariable("index") Integer index,@RequestPart MultipartFile file) {
-       return storyService.setSoundChannelBG(index,file);
+
+    @Override
+    public Result msgUp(@RequestPart MultipartFile[] files,@RequestParam("message") String messageJson) {
+        return storyService.msgUp(files,messageJson);
+    }
+
+    @Override
+    public Result msgCopy(String messageId) {
+        return storyService.msgCopy(messageId);
+    }
+
+    @Override
+    public Result msgList(String criteria, Integer pageIndex, Integer pageSize) {
+        return storyService.msgList(criteria,pageIndex,pageSize);
+    }
+    @Override
+    public Result setSoundChannelBG(@RequestPart MultipartFile[] files,@RequestParam("channels")String channelsJson) {
+        return storyService.setSoundChannelBG(files,channelsJson);
     }
 }

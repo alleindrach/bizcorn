@@ -10,5 +10,5 @@ import allein.bizcorn.model.mongo.SoundChannel;
 
 public interface SoundChannelDAO extends  BaseDAO<SoundChannel> {
     SoundChannel selectByIndex(Integer index);
-
+    Boolean isChannelIncludeFileExists(String fid);
 }

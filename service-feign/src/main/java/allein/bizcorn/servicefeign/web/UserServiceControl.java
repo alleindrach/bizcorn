@@ -2,6 +2,9 @@ package allein.bizcorn.servicefeign.web;
 
 
 import allein.bizcorn.common.config.SecurityConstants;
+import allein.bizcorn.model.facade.IUser;
+import allein.bizcorn.model.mongo.User;
+import allein.bizcorn.service.facade.gate.IUserServiceGate;
 import allein.bizcorn.servicefeign.proxy.UserServiceProxy;
 import allein.bizcorn.model.output.Result;
 import com.alibaba.fastjson.JSON;
@@ -34,7 +37,7 @@ import java.util.Enumeration;
 
 @RestController
 @RefreshScope
-public class UserServiceControl {
+public class UserServiceControl implements IUserServiceGate{
 
     private static final Logger logger = LoggerFactory.getLogger(UserServiceControl.class);
 
@@ -48,7 +51,7 @@ public class UserServiceControl {
     @RequestMapping(value = "/login")
     @ResponseBody
     public Result login(
-            @RequestParam String username, @RequestParam String password, @RequestParam(required = false) String captcha) throws IOException {
+            @RequestParam String username, @RequestParam String password, @RequestParam(required = false) String captcha){
 //说明： 发起时       从终端 -- cookie1--> Feign -- cookie2-->Service 中，cookie2的复制通过interceptor完成
 //      返回时       从Serivice--cookie3-->Feign--cookie4-->终端 的过程中，cookie4的session传播，如果不通过ResponseEntity ，则只能手工添加？存疑
         Result result=userService.login(username,password,captcha);
@@ -68,11 +71,24 @@ public class UserServiceControl {
     }
 
     @RequestMapping(value = "/user")
+    @ResponseBody
     public Result update(@RequestParam String mobile) {
 
         Result result= userService.update(mobile);
         return result;
     }
+
+    @Override
+    public Result<Integer> update(User user) {
+        return userService.update(user);
+    }
+
+
+    @Override
+    public Result<IUser> fetchHomepage() {
+        return null;
+    }
+
     @RequestMapping(value = "/logout")
     public Result logout()
     {
@@ -81,6 +97,29 @@ public class UserServiceControl {
     @RequestMapping(value = "/kid/register/{mac}")
     public Result register(@PathVariable("mac") String mac) {
         return userService.register(mac);
+    }
+
+    @Override
+    public Result firebind(@PathVariable(value = "mac") String mac) {
+        return userService.firebind(mac);
+    }
+
+    @Override
+    public Result confirmBind(@PathVariable(value = "token") String token) {
+        return userService.confirmBind(token);
+    }
+
+    @Override
+    public Result queryBind(@PathVariable(value = "token") String token) {
+        return userService.queryBind(token);
+    }
+
+    @Override
+    public Result resetPassowrd( @RequestParam(value = "password") String password,
+                                 @RequestParam(value = "mobileCaptcha") String captcha,
+                                 @RequestParam(value = "mobile") String mobile,
+                                 @CookieValue(value = SecurityConstants.MOBILE_CAPTCHA_KEY_COOKIE_NAME) String mobileCaptchaKey) {
+        return userService.resetPassowrd(password,captcha,mobile,mobileCaptchaKey);
     }
 
     @RequestMapping(value = "/register")
@@ -92,9 +131,5 @@ public class UserServiceControl {
             @CookieValue(value= SecurityConstants.MOBILE_CAPTCHA_KEY_COOKIE_NAME) String mobileCaptchaKey
     ){
         return userService.register(username,password,captcha,mobile,mobileCaptchaKey);
-    }
-    @RequestMapping(value = "/user/bind/{mac}")
-    public Result bind(@PathVariable("mac") String mac) {
-        return userService.bind(mac);
     }
 }

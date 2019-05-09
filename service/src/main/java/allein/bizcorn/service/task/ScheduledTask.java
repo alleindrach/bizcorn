@@ -1,6 +1,7 @@
 package allein.bizcorn.service.task;
 
 import allein.bizcorn.model.mongo.Story;
+import allein.bizcorn.service.db.mongo.dao.SoundChannelDAO;
 import allein.bizcorn.service.db.mongo.dao.StoryDAO;
 import com.mongodb.Block;
 import com.mongodb.client.gridfs.GridFSBucket;
@@ -42,6 +43,8 @@ public class ScheduledTask {
 
     @Autowired
     private StoryDAO storyDAO;
+    @Autowired
+    private SoundChannelDAO soundChannelDAO;
 
     private static final Logger logger = LoggerFactory.getLogger(ScheduledTask.class);
     private static final SimpleDateFormat formate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -66,16 +69,18 @@ public class ScheduledTask {
      * "0 15 10 ? * MON-FRI"    每个周一、周二、周三、周四、周五的10：15触发
      * http://cron.qqe2.com/
      */
-    @Scheduled(cron = "0 0 0/4 * * ? ")
-    @Async("ScheduleTaskAsyncExecutor")
+//    @Scheduled(cron = "0 0 0/4 * * ? ")
+//    @Async("ScheduleTaskAsyncExecutor")
     public void scheduledImageFileRecycleTask() {
         logger.info("scheduled - cron - print time every 10 seconds:{}", formate.format(new Date()));
         GridFSFindIterable filesIterable= gridFsTemplate.find(Query.query(Criteria.where("uploadDate").lt(new Date(System.currentTimeMillis()-1*86400000))).with(Sort.by(new Sort.Order(Sort.Direction.ASC,"uploadDate"))));
         filesIterable.forEach((Block)(gridFSFile -> {
             String md5name = ((GridFSFile) gridFSFile).getFilename();
             if (!md5name.contains(".small") ) {
-                Boolean  isFileOccupied = storyDAO.isSotryIncludeFileExists(((BsonObjectId) ((GridFSFile) gridFSFile).getId()).getValue().toString());
+                Boolean  isFileOccupied = storyDAO.isSotryIncludeFileExists(((BsonObjectId) ((GridFSFile) gridFSFile).getId()).getValue().toString())
+                        || soundChannelDAO.isChannelIncludeFileExists(((BsonObjectId) ((GridFSFile) gridFSFile).getId()).getValue().toString());
                 if (!isFileOccupied) {
+                    logger.info("[FileDelete>>>>>>] {}",((GridFSFile) gridFSFile).getId());
                     gridFsTemplate.delete(Query.query(GridFsCriteria.whereFilename().regex("^"+md5name+"")));
                 }
             }

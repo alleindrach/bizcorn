@@ -2,6 +2,7 @@ package allein.bizcorn.model.output;
 
 import allein.bizcorn.common.exception.ErrorCode;
 import allein.bizcorn.common.exception.ErrorCodeException;
+import com.alibaba.fastjson.annotation.JSONField;
 
 import java.io.Serializable;
 
@@ -9,6 +10,7 @@ public class Result<T> implements Serializable{
     final static public int FAILED = 0;
     final static public int SUCCESS = 1;
     int state = 0;
+//    @JSONField(serialize = false)
     T data;
     String message = null;
     String reason = null;

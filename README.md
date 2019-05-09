@@ -1,6 +1,40 @@
 ## 目标
   **基于 spring cloud 的框架，实验用。**
-  
+## 运行
+   * jdk 1.8
+   * bizcorn目录下mvn install 
+   * 配置修改
+        * docker-compose.yml
+        `     KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka1:9093,OUTSIDE://192.168.2.233:9092
+            这里，修改192.168.2.233为你本机地址
+   
+   * 创建docker内部网段 
+       docker network create --driver bridge --subnet 172.23.0.0/25 --gateway 172.23.0.1  zookeeper_network
+   * 启动docker的 redis/mongodb/zoo/kafka
+        创建宿主机Docker Mongodb 数据目录
+        mkdir -p /data/docker/mongodb
+        也可以修改docker-compose.yml 的volume 数据
+        另外，mac机器需要修改docker preferences share 目录，加入data目录
+        首次启动：
+            docker-compose build
+            docker-compose up -d
+        后续启动:
+            docker-compose restart
+                
+          
+   * 启动eurekaserver 
+            cd eureka-server
+            mvn spring-boot:run
+   * 启动config-server
+        cd config-server
+        mvn spring-boot:run
+   * 启动service
+        cd service
+        mvn spring-boot:run
+   * 启动service-feign 负载均衡代理
+        cd service-feign
+        mvn spring-boot:run
+        
 ## 代码结构
  * bizcorn
    - 根项目

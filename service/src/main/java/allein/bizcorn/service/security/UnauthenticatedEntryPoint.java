@@ -4,6 +4,8 @@ import allein.bizcorn.common.exception.CommonException;
 import allein.bizcorn.common.exception.ExceptionEnum;
 import allein.bizcorn.model.output.Result;
 import com.alibaba.fastjson.JSON;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
@@ -15,6 +17,8 @@ public class UnauthenticatedEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, IOException {
         if (!response.isCommitted()) {
+//            response.sendError(HttpStatus.UNAUTHORIZED.value(),"用户未登录");
+//            throw new AuthenticationCredentialsNotFoundException("");
             response.setCharacterEncoding("UTF-8");
             response.setContentType("application/json; charset=utf-8");
             Result error;

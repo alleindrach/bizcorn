@@ -19,7 +19,7 @@ import org.springframework.security.core.userdetails.User;
 public interface IMessageBrokerService {
 
 
-    void send(User user, Message message);
+    void send(Message message);
 
     void dispatch(JSONObject message,String sender,String sessionId);
 

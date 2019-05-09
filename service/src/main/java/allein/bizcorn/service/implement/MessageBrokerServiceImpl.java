@@ -10,7 +10,8 @@ import allein.bizcorn.common.mq.Topic;
 import allein.bizcorn.common.websocket.Action;
 import allein.bizcorn.common.websocket.Handler;
 import allein.bizcorn.model.mongo.Message;
-import allein.bizcorn.service.db.mysql.dao.UserDAO;
+import allein.bizcorn.model.mongo.MessageStatus;
+import allein.bizcorn.service.db.mongo.dao.UserDAO;
 import allein.bizcorn.service.facade.IMessageBrokerService;
 import allein.bizcorn.service.facade.IMessageQueueService;
 import allein.bizcorn.service.task.MessageQueueReceiverExecutor;
@@ -77,9 +78,10 @@ public class MessageBrokerServiceImpl implements IMessageBrokerService,Initializ
     @Autowired
     private UserDAO userDAO;
     @Override
-    public void send(User dest, Message message)
+    public void send(Message message)
     {
-        simpMessagingTemplate.convertAndSendToUser(dest.getUsername(), "/topic/message",message.toString());
+        String username=message.getDestName();
+        simpMessagingTemplate.convertAndSendToUser(username, "/topic/message",message.toString());
     }
 
     public void dispatch(JSONObject messageJson, String sender, String sessionId) {
@@ -89,8 +91,8 @@ public class MessageBrokerServiceImpl implements IMessageBrokerService,Initializ
         message.setAction(Action.valueOf(messageJson.getString("action")));
         message.setContent(messageJson.getString("content"));
         message.setCreateDate(new Date());
-        message.setSrcId(userDAO.selectByName(sender).getId());
-        message.setStatus(0);
+        message.setSrcName(sender);
+        message.setStatus(MessageStatus.DISPATCHED);
 
         if(this.handlers!=null){
             Handler handler=handlers.get(message.getAction());

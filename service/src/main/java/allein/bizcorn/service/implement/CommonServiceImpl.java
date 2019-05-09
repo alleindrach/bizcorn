@@ -62,7 +62,7 @@ public class CommonServiceImpl implements ICommonService {
         return captchaImageHelper.captchaImage(SecurityConstants.SECURITY_KEY);
     }
 
-    public Result mobileCaptcha(String mobile,  String captcha) {
+    public Result mobileCaptcha(@RequestParam String mobile, @RequestParam String captcha) {
         HttpServletRequest request=((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();
         HttpServletResponse response=((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getResponse();
 

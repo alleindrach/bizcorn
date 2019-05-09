@@ -24,6 +24,13 @@ public class SoundChannelDAOImpl extends   BaseDAOImpl<SoundChannel> implements 
         return this.findOne(new Query(where("index").is(index)));
     }
 
-
+    @Override
+    public  Boolean isChannelIncludeFileExists(String fid) {
+        Query query= Query.query(Criteria.where("bgPictureId").is(fid));
+        SoundChannel soundChannel= this.findOne(query);
+        if(soundChannel==null)
+            return false;
+        return true;
+    }
 
 }

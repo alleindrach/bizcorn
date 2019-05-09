@@ -26,8 +26,15 @@ public enum ExceptionEnum {
     BIND_SAVE_ERROR("010002","绑定错误"),
     BIND_USER_INVALID("010003","当前用户不能绑定此小童"),
     BIND_KID_STATUS_INVALID("010004","当前小童不支持绑定"),
+    BIND_TOKEN_NOT_EXIST("010005","绑定凭据不存在"),
+    BIND_TOKEN_EXPIRED("010006","绑定凭据已过期"),
+    BIND_TOKEN_INVALID("010007","绑定凭据错误"),
+    BIND_NOT_EXIST("010008","绑定关系不存在"),
     FILE_UPLOAD_FAIL("020001", "素材上传错误"),
     FILE_NOT_EXISTS("020002", "素材不存在"),
+    CHANNELS_NOT_INITED("020101", "频道未初始化"),
+    MESSAGE_NOT_EXIST("020102", "文件不存在"),
+
     ;
 
 

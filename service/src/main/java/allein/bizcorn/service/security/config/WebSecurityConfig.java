@@ -15,6 +15,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.annotation.web.servlet.configuration.EnableWebMvcSecurity;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
+import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint;
 
 @Configuration
 @EnableWebMvcSecurity
@@ -60,7 +61,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //        AnonymousAuthenticationFilter 的 主要功能就是给没有登陆的用户，填充AnonymousAuthenticationToken到SecurityContextHolder的Authentication，后续依赖Authentication的代码可以统一处理。
 //        参见 SecurityFilters.class,FilterComparator
         http.authorizeRequests()
-                .antMatchers("/user","/user/*","/kid/register/*","/websocket").authenticated()
+                .antMatchers("/user","/user/*","/kid/register/*","/websocket","/story/*","/sound/*").authenticated()
                 .and()
                 .formLogin().loginPage("/login")
                 .authenticationDetailsSource(authenticationDetailsSource)

@@ -3,16 +3,22 @@ package allein.bizcorn.service.implement;
 import allein.bizcorn.common.exception.CommonException;
 import allein.bizcorn.common.exception.ExceptionEnum;
 import allein.bizcorn.common.util.SecurityUtil;
-import allein.bizcorn.model.mongo.Scene;
-import allein.bizcorn.model.mongo.SoundChannel;
-import allein.bizcorn.model.mongo.Story;
-import allein.bizcorn.model.mongo.User;
+import allein.bizcorn.common.util.UrlUtil;
+import allein.bizcorn.common.websocket.Action;
+import allein.bizcorn.model.input.SoundChannelIO;
+import allein.bizcorn.model.input.SoundMessageIO;
+import allein.bizcorn.model.mongo.*;
 import allein.bizcorn.model.output.Result;
 import allein.bizcorn.service.db.mongo.dao.SoundChannelDAO;
+import allein.bizcorn.service.db.mongo.dao.SoundMessageDAO;
 import allein.bizcorn.service.db.mongo.dao.StoryDAO;
 import allein.bizcorn.service.db.mongo.dao.UserDAO;
 import allein.bizcorn.service.facade.IFileService;
+import allein.bizcorn.service.facade.IMessageBrokerService;
 import allein.bizcorn.service.facade.IStoryService;
+import allein.bizcorn.service.facade.IUserService;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +29,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -39,11 +44,17 @@ public class StoryServiceMongoImpl implements IStoryService{
     @Autowired
     SoundChannelDAO soundChannelDAO;
     @Autowired
+    SoundMessageDAO soundMessageDAO;
+    @Autowired
     IFileService fileService;
+    @Autowired
+    IUserService userService;
+
     @Value("${bizcorn.filebase}")
     private String filebase;
 
-
+    @Autowired
+    private IMessageBrokerService messageBrokerService;
     //    {
 //      titleIcon:{source},
 //      title:'作品',
@@ -71,22 +82,7 @@ public class StoryServiceMongoImpl implements IStoryService{
 //    }
 
 
-    private String getUploadFileSource(Result uploadResult,String filename)
-    {
 
-        String fileSource=null;
-        String fileBaseName = FilenameUtils.getName(filename);
-
-        Object dbFileUploadResult=((HashMap<String, String>) uploadResult.getData()).get(fileBaseName);
-        if(dbFileUploadResult!=null && ((Result)dbFileUploadResult).isSuccess())
-        {
-            fileSource=(String)((Result)dbFileUploadResult).getData();
-        }
-        if(fileSource==null){
-            fileSource=filename;
-        }
-        return fileSource;
-    }
     private Story process(Result uploadResult , String detail)
     {
         Story story=new Story();
@@ -106,8 +102,8 @@ public class StoryServiceMongoImpl implements IStoryService{
             sceneList.add(scene);
             scene.setTitle(jsonScene.getString("title"));
             String fileSource=null;
-            scene.setImg(getUploadFileSource(uploadResult,jsonScene.getString("img")));
-            scene.setSnd(getUploadFileSource(uploadResult,jsonScene.getString("snd")));
+            scene.setImg(fileService.getFileID(uploadResult,jsonScene.getString("img")));
+            scene.setSnd(fileService.getFileID(uploadResult,jsonScene.getString("snd")));
 
         }
         return story;
@@ -230,33 +226,144 @@ public class StoryServiceMongoImpl implements IStoryService{
 
     @Override
     @PreAuthorize("hasRole('USER')")
+
     public Result getSoundChannelBGs() {
         List<SoundChannel> soundChannels= soundChannelDAO.find(new Query());
 
-        return Result.successWithData(soundChannels);
-    }
-    @PreAuthorize("hasRole('USER')")
-    @Override
-    public Result setSoundChannelBG(@PathVariable("index") Integer index,@RequestPart MultipartFile file) {
-        Result fileResult=fileService.upload(new MultipartFile[]{file});
-        if(fileResult.isSuccess()){
-            HashMap<String,Result > entrys= (HashMap<String, Result>) fileResult.getData();
-            if(entrys!=null && entrys.size()>0)
-            {
-                Result uploaded=entrys.get(file.getOriginalFilename());
-                if(uploaded.isSuccess()){
-                    SoundChannel soundChannel=soundChannelDAO.selectByIndex(index);
-                    if(soundChannel==null)
-                    {
-                        soundChannel=new SoundChannel();
-                        soundChannel.setIndex(index);
-                    }
-                    soundChannel.setBgPictureId((String) uploaded.getData());
-                    soundChannelDAO.save(soundChannel);
-                    return  Result.successWithData(soundChannel.getBgPictureId());
-                }
-            }
+        if(soundChannels==null || soundChannels.size()<4)
+        {
+            return Result.failWithException(new CommonException(ExceptionEnum.CHANNELS_NOT_INITED));
         }
-        return null;
+        JSONArray channels=new JSONArray();
+        soundChannels.forEach(channel->{
+            JSONObject channelJson=new JSONObject();
+            channelJson.put("img",fileService.getFileUrl(channel.getImg()));
+            channels.add(channelJson);
+
+        });
+        return Result.successWithData(channels);
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    @Override
+    public Result setSoundChannelBG(@RequestPart MultipartFile[] files,@RequestParam("channels") String  channelsJson) {
+        Result fileResult=fileService.upload(files);
+        HashMap<String, Result> entrys=null;
+        if(fileResult.isSuccess()) {
+            entrys= (HashMap<String, Result>) fileResult.getData();
+        }
+//        JSONArray jsonChannels= JSONArray.parseArray(channelsJson);
+        List<SoundChannelIO> channels=JSONArray.parseArray(channelsJson,SoundChannelIO.class);
+        int i=0;
+        for(Iterator iterator = channels.iterator() ; iterator.hasNext();)
+        {
+            SoundChannelIO item = (SoundChannelIO) iterator.next();
+            String filename=item.getImg();
+            SoundChannel soundChannel = soundChannelDAO.selectByIndex(i);
+            if (soundChannel == null) {
+                soundChannel = new SoundChannel();
+                soundChannel.setIndex(i);
+            }
+            String fileLoc=fileService.getFileID(fileResult,filename);
+            soundChannel.setImg(fileLoc);
+//            if (entrys != null && entrys.size() > 0) {
+//                Result uploaded = entrys.get(filename) == null ? (Result) entrys.get(filename) : null;
+//                if (uploaded != null) {
+            item.setImg(fileService.getFileUrl(fileLoc));
+//                    soundChannel.setBgPictureId((String) uploaded.getData());
+//                }
+//            }
+            soundChannelDAO.save(soundChannel);
+            i++;
+        }
+        return  Result.successWithData(JSON.toJSON(channels));
+
+    }
+
+    @Override
+    @PreAuthorize("hasRole('USER')")
+    public Result msgUp(@RequestPart MultipartFile[] files,@RequestParam("message") String msgJson) {
+        User user=userDAO.select(SecurityUtil.getUserName());
+        if(user==null)
+        {
+            return Result.failWithException(new CommonException(ExceptionEnum.USER_NOT_LOGIN));
+        }
+        if(user.getCurPartner()==null)
+        {
+            return Result.failWithException(new CommonException(ExceptionEnum.BIND_NOT_EXIST));
+        }
+
+        User talkee=user.getCurPartner();
+
+        Result fileResult=fileService.upload(files);
+        SoundMessageIO msg=JSON.parseObject(msgJson,SoundMessageIO.class);
+        String fileID=fileService.getFileID(fileResult,msg.getSnd());
+
+        msg.setSnd(fileID);
+
+        userService.rebind(user,(Kid)talkee);
+
+        SoundMessage soundMessage=new SoundMessage();
+        soundMessage.setChannel(msg.getChannel());
+        soundMessage.setCreateDate(new Date());
+        soundMessage.setTalker(user);
+        soundMessage.setTalkee(user.getCurPartner());
+        soundMessage.setSnd(fileID);
+        soundMessage.setStatus(MessageStatus.INIT);
+        SoundMessage savedSoundMessage= soundMessageDAO.save(soundMessage);
+
+
+        Message wsMsg = Message.SoundMorphyArrivedMessage(soundMessage);
+        messageBrokerService.send(wsMsg);
+
+        return  Result.successWithData(savedSoundMessage.getId());
+
+    }
+
+    @Override
+    @PreAuthorize("hasRole('USER')")
+    public Result msgCopy(@PathVariable("id") String  messageId) {
+        User user=userDAO.select(SecurityUtil.getUserName());
+        if(user==null)
+        {
+            return Result.failWithException(new CommonException(ExceptionEnum.USER_NOT_LOGIN));
+        }
+
+        SoundMessage savedSoundMessage= soundMessageDAO.get(messageId);
+        if(savedSoundMessage!=null){
+            if(user.getId().compareToIgnoreCase(savedSoundMessage.getTalkee().getId())!=0)
+            {
+                return Result.failWithException(new CommonException(ExceptionEnum.USER_NOT_AUHTORIZED));
+            }
+            savedSoundMessage.setStatus(MessageStatus.COPIED);
+            soundMessageDAO.save(savedSoundMessage);
+            return Result.successWithData(messageId);
+        }
+        return Result.failWithException(new CommonException(ExceptionEnum.MESSAGE_NOT_EXIST));
+
+    }
+
+    @Override
+    public Result msgList(@RequestParam("criteria") String criteria, @RequestParam("page") Integer  pageIndex,@RequestParam("size") Integer  pageSize)
+    {
+        if(pageIndex==null)
+            pageIndex=0;
+        if(pageIndex<0)
+            pageIndex=0;
+
+        if(pageSize==null)
+            pageSize=10;
+        if(pageSize<0)
+            pageSize=10;
+        if(pageSize>20)
+            pageSize=20;
+
+        User user=userDAO.select(SecurityUtil.getUserName());
+        if(user==null)
+        {
+            return Result.failWithException(new CommonException(ExceptionEnum.USER_NOT_LOGIN));
+        }
+        List<SoundMessage> soundMessages=soundMessageDAO.find(Query.query(Criteria.where("destId").is(user.getId())).skip(pageIndex*pageSize).limit(pageSize));
+        return Result.successWithData(soundMessages);
+
     }
 }

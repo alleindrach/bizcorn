@@ -5,10 +5,14 @@
 
 package allein.bizcorn.service.facade.gate;
 
+import allein.bizcorn.model.input.SoundChannelIO;
+import allein.bizcorn.model.input.SoundMessageIO;
 import allein.bizcorn.model.output.Result;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 public interface IStoryServiceGate {
 
@@ -29,12 +33,24 @@ public interface IStoryServiceGate {
     @ResponseBody
     public Result deleteStory(@PathVariable("id") String id);
 
-    @RequestMapping("/story/sound/channels")
+    @RequestMapping("/sound/channels/down")
     @ResponseBody
     public Result getSoundChannelBGs();
 
-    @RequestMapping("/story/sound/channel/{index}")
+    @RequestMapping(value="/sound/channels/up",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseBody
-    public Result setSoundChannelBG(@PathVariable("index") Integer index,@RequestPart MultipartFile file);
+    public Result setSoundChannelBG(@RequestPart MultipartFile[] files,@RequestParam("channels")String channelsJson);
+
+    @RequestMapping(value="/sound/msg/up",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseBody
+    public Result msgUp(@RequestPart MultipartFile[] files,@RequestParam("message") String messageJson);
+
+    @RequestMapping(value="/sound/msg/copy/{id}")
+    @ResponseBody
+    public Result msgCopy(@PathVariable("id") String  messageId);
+
+    @RequestMapping(value="/sound/msg/list")
+    @ResponseBody
+    public Result msgList(@RequestParam("criteria") String criteria, @RequestParam("page") Integer  pageIndex,@RequestParam("size") Integer  pageSize);
 
 }

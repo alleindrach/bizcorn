@@ -30,10 +30,10 @@ spring:
         stream:
             kafka:
                 binder:
-                    brokers: 192.168.2.233:9092
-                    zk-nodes: 192.168.2.233:2181
+                    brokers: localhost:9092
+                    zk-nodes: localhost:2181
     kafka:
-        bootstrap-servers: 192.168.2.233:9092
+        bootstrap-servers: localhost:9092
         template:
             default-topic: bizcorn-user
         listener:

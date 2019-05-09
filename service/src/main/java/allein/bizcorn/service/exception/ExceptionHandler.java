@@ -14,8 +14,14 @@ import org.springframework.security.authentication.AuthenticationCredentialsNotF
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.attribute.UserPrincipalNotFoundException;
 import java.sql.SQLException;
 
 @ControllerAdvice
@@ -34,14 +40,33 @@ public class ExceptionHandler {
         return new Result(ex);
     }
 
+    // Convert a predefined exception to an HTTP Status code
+    @ResponseStatus(value = HttpStatus.GONE,
+            reason = "资源不存在")  // 410
+    @org.springframework.web.bind.annotation.ExceptionHandler(FileNotFoundException.class)
+    public Result fileNotFound(HttpServletRequest req, FileNotFoundException ex) {
+        logger.error("Request: " + req.getRequestURL(), ex);
+        return Result.failWithException(ex);
+    }
+//用户未登录
+    @org.springframework.web.bind.annotation.ExceptionHandler(AuthenticationCredentialsNotFoundException.class)
+    public Result fileNotFound(HttpServletRequest req, AuthenticationCredentialsNotFoundException ex) throws IOException {
+        logger.error("Request: " + req.getRequestURL(), ex);
+
+        return Result.failWithException(new CommonException(ExceptionEnum.USER_NOT_LOGIN));
+    }
+
+//    @ResponseStatus(value = HttpStatus.FORBIDDEN,
+//            reason = "无权")  // 403
+    @org.springframework.web.bind.annotation.ExceptionHandler(AccessDeniedException.class)
+    public Result fileNotFound(HttpServletRequest req, AccessDeniedException ex) {
+        logger.error("Request: " + req.getRequestURL(), ex);
+        return Result.failWithException(new CommonException(ExceptionEnum.USER_NOT_AUHTORIZED));
+    }
     // Specify name of a specific view that will be used to display the error:
     @org.springframework.web.bind.annotation.ExceptionHandler({SQLException.class, DataAccessException.class})
     public Result databaseError(HttpServletRequest req, Exception ex) {
-        // Nothing to do.  Returns the logical view name of an error page, passed
-        // to the view-resolver(s) in usual way.
-        // Note that the exception is NOT available to this view (it is not added
-        // to the model) but see "Extending ExceptionHandlerExceptionResolver"
-        // below.
+
         logger.error("Request: " + req.getRequestURL(), ex);
 
         return new Result(ex);
@@ -49,32 +74,15 @@ public class ExceptionHandler {
 
     @org.springframework.web.bind.annotation.ExceptionHandler(CommonException.class)
     public @ResponseBody
-    Result<Object> handleCommonError(HttpServletRequest req, CommonException ex) {
+    Result handleCommonError(HttpServletRequest req, CommonException ex) {
         logger.error("Request: " + req.getRequestURL(), ex);
-
-        return new Result<Object>(ex);
+        return Result.failWithException(ex);
     }
-    @org.springframework.web.bind.annotation.ExceptionHandler(AccessDeniedException.class)
-    public @ResponseBody
-    Result<Object> handleError(HttpServletRequest req, AccessDeniedException ex) {
-        logger.error("Request: " + req.getRequestURL(), ex);
-
-        return new Result<Object>(new CommonException(ExceptionEnum.USER_ACCOUNT_ID_INVALID));
-    }
-    @org.springframework.web.bind.annotation.ExceptionHandler(AuthenticationCredentialsNotFoundException.class)
-    public @ResponseBody
-    Result<Object> handleError(HttpServletRequest req, AuthenticationCredentialsNotFoundException ex) {
-        logger.error("Request: " + req.getRequestURL(), ex);
-        return new Result<Object>(new CommonException(ExceptionEnum.USER_NOT_LOGIN));
-    }
-    // Total control - setup a model and return the view name yourself. Or
-    // consider subclassing ExceptionHandlerExceptionResolver (see below).
     @org.springframework.web.bind.annotation.ExceptionHandler(Exception.class)
     public @ResponseBody
-    Result<Object> handleError(HttpServletRequest req, Exception ex) {
+    Result handleError(HttpServletRequest req, Exception ex) {
         logger.error("Request: " + req.getRequestURL(), ex);
-
-        return new Result<Object>(ex);
+        return  Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
     }
 
 

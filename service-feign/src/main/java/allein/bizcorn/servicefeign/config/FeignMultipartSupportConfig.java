@@ -1,6 +1,8 @@
 package allein.bizcorn.servicefeign.config;
 
 
+import feign.codec.Decoder;
+import feign.codec.ErrorDecoder;
 import feign.form.spring.SpringFormEncoder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +15,10 @@ public class FeignMultipartSupportConfig {
     public Encoder feignFormEncoder() {
         return new FeignSpringFormEncoder();
 //        return new SpringFormEncoder();
+    }
+    @Bean
+    public ErrorDecoder errorDecoder(){
+        return new BizExceptionFeignErrorDecoder();
     }
 //
 //    @Bean

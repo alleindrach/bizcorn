@@ -57,7 +57,17 @@ public class UserServiceHystric implements  UserServiceProxy{
     }
 
     @Override
-    public Result bind(String mac) {
+    public Result firebind(String mac) {
+        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
+    }
+
+    @Override
+    public Result confirmBind(String token) {
+        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
+    }
+
+    @Override
+    public Result queryBind(String token) {
         return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
     }
 

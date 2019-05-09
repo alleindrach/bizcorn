@@ -2,14 +2,20 @@ package allein.bizcorn.service.implement;
 
 import allein.bizcorn.common.exception.CommonException;
 import allein.bizcorn.common.exception.ExceptionEnum;
+import allein.bizcorn.common.misc.MetaData;
 import allein.bizcorn.common.mq.Topic;
+import allein.bizcorn.common.util.FileUtil;
 import allein.bizcorn.common.util.SecurityUtil;
+import allein.bizcorn.common.util.UrlUtil;
 import allein.bizcorn.model.output.Result;
 import allein.bizcorn.service.facade.IFileService;
 import allein.bizcorn.service.facade.IMessageQueueService;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
 import com.mongodb.client.gridfs.model.GridFSFile;
+import com.mongodb.gridfs.GridFSDBFile;
+import org.apache.commons.io.FileExistsException;
+import org.apache.commons.io.FilenameUtils;
 import org.bson.BsonObjectId;
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -51,9 +57,10 @@ public class FileServiceImpl implements IFileService {
     private GridFSBucket gridFSBucket;
     @Autowired
     private IMessageQueueService messageQueueService;
-
-    @Value("${file.uploadRoot}")
-    private String FileRoot;
+    @Value("${bizcorn.filebase}")
+    private String filebase;
+//    @Value("${file.uploadRoot}")
+//    private String FileRoot;
 
 
     @Override
@@ -63,7 +70,7 @@ public class FileServiceImpl implements IFileService {
         String username= SecurityUtil.getUserName();
         logger.debug("upload by {}",username);
 
-        Result r= Result.successWithMessage("Success!");
+
         HashMap<String,Result > result=new HashMap<>();
 
         for (MultipartFile file:files) {
@@ -94,9 +101,9 @@ public class FileServiceImpl implements IFileService {
                         InputStream ins = file.getInputStream();
                         String contentType = file.getContentType();
                         Document metaData=new Document();
-                        metaData.append("_contentType",contentType);
-                        metaData.append("_fileSuffix",uploadFileSuffix);
-                        metaData.append("_originFileName",uploadFilePath);
+                        metaData.append(MetaData.CONTENT_TYPE.getValue(),contentType);
+                        metaData.append(MetaData.SUFFIX.getValue(),uploadFileSuffix);
+                        metaData.append(MetaData.ORIGIN_FILENAME.getValue(),uploadFilePath);
                         ObjectId gridFSFileId = gridFsTemplate.store(ins, md5Name, metaData);
                         result.put(file.getOriginalFilename(),Result.successWithData(gridFSFileId.toString()));
                         MimeType mimeType=MimeTypeUtils.parseMimeType(contentType);
@@ -123,7 +130,6 @@ public class FileServiceImpl implements IFileService {
                 logger.debug("上传文件为空");
             }
         }
-
         return Result.successWithData(result);
     }
     @Override
@@ -138,7 +144,7 @@ public class FileServiceImpl implements IFileService {
 // 查询单个文件
         GridFSFile gfsfile = gridFsTemplate.findOne(query);
         if (gfsfile == null) {
-            return entity;
+            throw new FileNotFoundException();
         }
         String fileName = gfsfile.getFilename().replace(",", "");
         //处理中文文件名乱码
@@ -161,8 +167,13 @@ public class FileServiceImpl implements IFileService {
 //            {
 //                headers.setContentType(new MediaType(mimeType));
 //            }
+            String fileOriginName=(String)gfsfile.getMetadata().get(MetaData.ORIGIN_FILENAME.getValue());
+
             MimeType type= MimeTypeUtils.parseMimeType((String) gfsfile.getMetadata().get("_contentType"));
             headers.setContentType(new MediaType(type.getType(),type.getSubtype()));
+            headers.setContentLength(gfsfile.getLength());
+            headers.set("Content-MD5",gfsfile.getMD5());
+            headers.setContentDispositionFormData("attachment",fileOriginName);
 //            if(gfsfile.getContentType()!=null)
 //                headers.setContentType(new MediaType(gfsfile.getContentType()));
         }catch(Exception ex)
@@ -170,40 +181,44 @@ public class FileServiceImpl implements IFileService {
             logger.debug("gfsfile:{} has no content type",gfsfile.getId());
         }
 
-        headers.setContentDispositionFormData("attachment",fileName);
-        HttpStatus status = HttpStatus.OK;
 
+        HttpStatus status = HttpStatus.OK;
+//        OutputStream sos = response.getOutputStream();
+//        GridFSDBFile gridFSDBFile = (GridFSDBFile)gfsfile;
         byte[] fileBuffer = new byte[(int) gfsfile.getLength()];
 
         GridFSDownloadStream in = gridFSBucket.openDownloadStream(gfsfile.getObjectId());
         in.read(fileBuffer);
         in.close();
         entity = new ResponseEntity<byte[]>(fileBuffer, headers, status);
-
         return entity;
     }
 
     @Override
     public ResponseEntity<byte[]> thumbById(@PathVariable("id") String fileId) throws IOException {
+        HttpServletResponse response=((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
         GridFSFile file=getFile(fileId);
         if(file==null)
         {
-            return  null ;//Result.failWithException(new CommonException(ExceptionEnum.FILE_NOT_EXISTS));
+            throw new FileNotFoundException();
         }
         GridFSFile thumbFile=getFileByName(file.getFilename()+".small");
         if(thumbFile==null)
         {
-            return null;
+            throw new FileNotFoundException();
         }
         return downloadById(((BsonObjectId) thumbFile.getId()).getValue().toString());
     }
 
     @Override
     public ResponseEntity<byte[]> downloadByName(@PathVariable("name") String fileName) throws IOException {
+        HttpServletResponse response=((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
         GridFSFile file=getFileByName(fileName);
         if(file==null)
         {
-            return  null ;//Result.failWithException(new CommonException(ExceptionEnum.FILE_NOT_EXISTS));
+            throw new FileNotFoundException();
+//            response.sendError(HttpServletResponse.SC_GONE);
+//            return  null ;//Result.failWithException(new CommonException(ExceptionEnum.FILE_NOT_EXISTS));
         }
         return this.downloadById(((BsonObjectId) file.getId()).getValue().toString());
     }
@@ -233,6 +248,32 @@ public class FileServiceImpl implements IFileService {
         gridFsTemplate.delete(Query.query(Criteria.where("_id").is(fileId)));
         return Result.successWithData(fileId);
     }
+    @Override
+    public String getFileUrl(String id) {
+        if (!UrlUtil.isUrl(id)) {
+            String imageSource = filebase + id;
+            return imageSource;
+        }
+        return id;
+    }
 
+    @Override
+    public String getFileID(Result multiUploadResult, String filename) {
+        String fileSource=null;
+        String filenameDup=filename;
+        if(filename.startsWith(filebase))
+            fileSource=filename.replaceFirst(filebase,"");
+        String fileBaseName = FilenameUtils.getName(filename);
+
+        Object dbFileUploadResult=((HashMap<String, String>) multiUploadResult.getData()).get(fileBaseName);
+        if(dbFileUploadResult!=null && ((Result)dbFileUploadResult).isSuccess())
+        {
+            fileSource=(String)((Result)dbFileUploadResult).getData();
+        }
+        if(fileSource==null && UrlUtil.isUrl(filenameDup)){
+            fileSource=filenameDup;
+        }
+        return fileSource;
+    }
 
 }
