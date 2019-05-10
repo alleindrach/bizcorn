@@ -41,11 +41,11 @@ public class CustomAuthenticationProvider extends AbstractUserDetailsAuthenticat
     @Override
     protected void additionalAuthenticationChecks(org.springframework.security.core.userdetails.UserDetails  userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
         String username = userDetails.getUsername();
-        IUser user = userSerivce.getUserByUsername(username).getData();
+        IUser user = userSerivce.getUser(username);
 
         // 检查验证码
         if (authentication.getDetails() instanceof CustomWebAuthenticationDetails) {
-            if (configService.isEnableCaptcha(userSerivce.getUserLoginErrorTimes(username).getData())) {
+            if (configService.isEnableCaptcha(userSerivce.getUserLoginErrorTimes(username))) {
                 CustomWebAuthenticationDetails details = (CustomWebAuthenticationDetails) authentication.getDetails();
                 String inputCaptcha = details.getInputCaptcha();
                 String cacheCaptcha = details.getCacheCaptcha();

@@ -2,6 +2,7 @@ package allein.bizcorn.model.entity;
 
 
 import allein.bizcorn.model.facade.IUser;
+import com.alibaba.fastjson.JSONObject;
 
 import java.io.Serializable;
 
@@ -79,5 +80,10 @@ public class User implements IUser {
 
 	public void setMobile(String mobile) {
 		this.mobile = mobile;
+	}
+
+	@Override
+	public JSONObject toResultJson() {
+		return null;
 	}
 }

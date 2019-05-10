@@ -41,11 +41,11 @@ public class RestTemplateConfig {
         //注册model,用于实现jackson joda time序列化和反序列化
         SimpleModule module = new SimpleModule();
 //        module.addSerializer(Result.class, new ResultSerializer());
-        module.addDeserializer(Result.class, new ResultDeserializer());
-        objectMapper.registerModule(module);
+//        module.addDeserializer(Result.class, new ResultDeserializer());
+//        objectMapper.registerModule(module);
 
         List<HttpMessageConverter<?>> messageConverters = Lists.newArrayList();
-        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+        BizMappingJackson2HttpMessageConverter converter = new BizMappingJackson2HttpMessageConverter();
         converter.setObjectMapper(objectMapper);
 
         //不加会出现异常

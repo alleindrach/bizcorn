@@ -58,14 +58,14 @@ public class UserServiceControl implements IUserServiceGate{
         logger.info("post login .......");
         HttpServletRequest request=((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();
         HttpServletResponse response=((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getResponse();
-        if(result.isSuccess())
-        {
-            request.removeAttribute(SessionRepositoryFilter.SESSION_REPOSITORY_ATTR+ ".CURRENT_SESSION");
-            String sessionCookieId=(String)result.getData();
-            DefaultCookieSerializer cookieSerializer=new DefaultCookieSerializer();
-            cookieSerializer.writeCookieValue(new CookieSerializer.CookieValue(request, response, sessionCookieId));
-
-        }
+//        if(result.isSuccess())
+//        {
+//            request.removeAttribute(SessionRepositoryFilter.SESSION_REPOSITORY_ATTR+ ".CURRENT_SESSION");
+//            String sessionCookieId=(String)result.getData();
+//            DefaultCookieSerializer cookieSerializer=new DefaultCookieSerializer();
+//            cookieSerializer.writeCookieValue(new CookieSerializer.CookieValue(request, response, sessionCookieId));
+//
+//        }
 
         return result ;
     }

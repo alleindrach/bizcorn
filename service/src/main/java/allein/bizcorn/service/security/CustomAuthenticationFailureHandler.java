@@ -3,6 +3,7 @@ package allein.bizcorn.service.security;
 import allein.bizcorn.common.exception.CommonException;
 import allein.bizcorn.common.exception.ExceptionEnum;
 import allein.bizcorn.model.facade.IUser;
+import allein.bizcorn.model.mongo.User;
 import allein.bizcorn.model.output.Result;
 import allein.bizcorn.service.facade.IUserService;
 import com.alibaba.fastjson.JSON;
@@ -43,7 +44,7 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
                     exception.getMessage());
         }
         if (exception instanceof BadCredentialsException) {
-            IUser user = userService.getUserByUsername(username).getData();
+            User user = userService.getUser(username);
             userService.incUserLoginErrorTimes(username);
         }
         String ajaxHeader = ((HttpServletRequest) request).getHeader("X-Requested-With");

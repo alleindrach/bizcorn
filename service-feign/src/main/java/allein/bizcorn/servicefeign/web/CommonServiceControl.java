@@ -44,13 +44,13 @@ public class CommonServiceControl implements ICommonServiceGate{
     {
         HttpServletResponse response=((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
         Result result= commonService.mobileCaptcha(mobile,captcha);
-        if(result.isSuccess())
-        {
-            Map captchaResult= (Map) result.getData();
-            Cookie captchaKeyCookie=new Cookie(SecurityConstants.MOBILE_CAPTCHA_KEY_COOKIE_NAME,(String)captchaResult.get("captchaKey"));
-            captchaKeyCookie.setPath("/");
-            response.addCookie(captchaKeyCookie);
-        }
+//        if(result.isSuccess())
+//        {
+//            Map captchaResult= (Map) result.getData();
+//            Cookie captchaKeyCookie=new Cookie(SecurityConstants.MOBILE_CAPTCHA_KEY_COOKIE_NAME,(String)captchaResult.get("captchaKey"));
+//            captchaKeyCookie.setPath("/");
+//            response.addCookie(captchaKeyCookie);
+//        }
         return result;
     }
 }

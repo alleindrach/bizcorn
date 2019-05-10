@@ -2,6 +2,7 @@ package allein.bizcorn.service.security;
 
 import allein.bizcorn.common.mq.Topic;
 import allein.bizcorn.model.facade.IUser;
+import allein.bizcorn.model.mongo.User;
 import allein.bizcorn.model.output.Result;
 import allein.bizcorn.service.facade.IMessageQueueService;
 import allein.bizcorn.service.facade.IUserService;
@@ -43,11 +44,11 @@ public class CustomAuthenticationSuccessHandler extends SavedRequestAwareAuthent
                                         Authentication authentication) throws IOException, ServletException {
         String username = request.getParameter("username");
         userService.rstUserLoginErrorTimes(username);
-        HttpSession session = request.getSession(true);
-        if (session != null) {
-            session.setAttribute("username", username);
-            logger.info("Auth session>>>>{},{}",session.getId(),base64Encode(session.getId()));
-        }
+//        HttpSession session = request.getSession(false);
+//        if (session != null) {
+//            session.setAttribute("username", username);
+//            logger.info("Auth session>>>>{},{}",session.getId(),base64Encode(session.getId()));
+//        }
         this.clearAuthenticationAttributes(request);
 
         String ajaxHeader = ((HttpServletRequest) request).getHeader("X-Requested-With");
@@ -57,9 +58,10 @@ public class CustomAuthenticationSuccessHandler extends SavedRequestAwareAuthent
             response.setCharacterEncoding("UTF-8");
             response.setContentType("application/json; charset=utf-8");
 
-//            Result<IUser> user= userService.getMaskedUserByUsername( ((UserDetails) authentication.getPrincipal()).getUsername());
-            Result<String> sessionIdCookie=Result.successWithData(session.getId());
-            response.getWriter().print(JSON.toJSONString(sessionIdCookie));
+            User user= userService.getUser( ((UserDetails) authentication.getPrincipal()).getUsername());
+            response.getWriter().print(JSON.toJSONString(Result.successWithData(user)));
+//            Result<String> sessionIdCookie=Result.successWithData(session.getId());
+//            response.getWriter().print(JSON.toJSONString(sessionIdCookie));
             response.getWriter().flush();
             messageQueueService.send(Topic.USER_LOGIN,"user login success!");
         } else {

@@ -117,28 +117,13 @@ public class UserServiceMongoImpl implements IUserService {
         String username=SecurityUtil.getUserName();
         if(username!=null){
                 userDAO.update(new Query(Criteria.where("username").is(username)),new Update().set("mobile",mobile));
-                return Result.successWithData(this.getMaskedUserByUsername(username).getData());
+                return Result.successWithData(this.getUser(username).toResultJson());
         }
 
         return  Result.failWithException(new CommonException(ExceptionEnum.USER_ACCOUNT_ID_INVALID));
     }
 
-    @Override
-    public Result<IUser> getUserByUsername(@PathVariable("username") String userName) {
 
-        User user=userDAO.selectByName(userName);
-        return Result.successWithData(user);
-
-    }
-    @Override
-    public Result<IUser> getMaskedUserByUsername(@PathVariable("username") String userName) {
-
-        User user=userDAO.selectByName(userName);
-        user.setMobile(Masker.getMaskCharWay(user.getMobile(),3,9));
-        user.setPassword("");
-        return Result.successWithData(user);
-
-    }
     private User getMaskedUser(User userOri)
     {
         User user=userOri;
@@ -149,31 +134,25 @@ public class UserServiceMongoImpl implements IUserService {
     @Value("${bizcorn.user.login.errortimes.cache.key.prefix}")
     String ErrorTimesKey="user_login_error_times_cache_";
     @Override
-    public Result<Long> getUserLoginErrorTimes(String userName)
+    public Long getUserLoginErrorTimes(String userName)
     {
-        return Result.successWithData(cacheAccessor.getLong(this.ErrorTimesKey+userName));
+        return cacheAccessor.getLong(this.ErrorTimesKey+userName);
     }
     @Override
-    public Result<Long> incUserLoginErrorTimes(String userName)
+    public Long incUserLoginErrorTimes(String userName)
     {
-        return Result.successWithData(cacheAccessor.inc(this.ErrorTimesKey+userName));
+        return cacheAccessor.inc(this.ErrorTimesKey+userName);
     }
     @Override
-    public Result<Boolean> rstUserLoginErrorTimes(String userName)
+    public Boolean rstUserLoginErrorTimes(String userName)
     {
-        return Result.successWithData(cacheAccessor.del(this.ErrorTimesKey+userName));
+        return cacheAccessor.del(this.ErrorTimesKey+userName);
     }
     @Override
     public Result<Integer> update(User user)
     {
         userDAO.save(user);
         return Result.successWithData(user.getId());
-    }
-    @Override
-    public User  getUserByMobile(@PathVariable("mobile") String mobile)
-    {
-        User user=userDAO.findOne(Query.query(Criteria.where("mobile").is(mobile)));
-        return user;
     }
 
     @Override
@@ -182,14 +161,14 @@ public class UserServiceMongoImpl implements IUserService {
     }
 
     @Override
-    public Result<List<String>> getUserAuthorities(@PathVariable("id") String userId) {
+    public List<String> getUserAuthorities(@PathVariable("id") String userId) {
         User user=userDAO.get(userId);
         List<String> auths=new ArrayList<>();
         for (String auth:user.getAuthorities()
              ) {
             auths.add(auth);
         }
-        return Result.successWithData(auths);
+        return auths;
     }
 
 

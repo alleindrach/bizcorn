@@ -1,3 +1,17 @@
+2019-05-10
+1 Feign Header 穿透问题
+入向：client---request1-->feign.encoder--request2--->service
+这里的request1.headers向request2.headers的复制，通过SessionReplicateInterceptor 进行。
+出向:service---response1-->feign.decoder---response2-->client
+这里的response1.headers向resposne2的复制，通过自定义的decoder进行。
+
+2 IResultor接口
+用于从mongodb实体类向输出JSON对象的转化，比如说User的打码，
+另外在JSON转化过程中可能出现无限递归的情况，要使用FastJson的@JsonField(Serialize=false)来标注
+比如说User.curPartner 字段，也是一个User的引用，这样会导致无限递归。
+
+
+
 2019-05-09
 1 用户Users 的authorities字段变为普通的字符串数组：
 更新脚本：

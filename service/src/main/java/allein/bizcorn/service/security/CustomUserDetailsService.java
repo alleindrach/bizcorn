@@ -25,16 +25,14 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
         //SUser对应数据库中的用户表，是最终存储用户和密码的表，可自定义
         //本例使用SUser中的email作为用户名:
-        IUser user = userService.getUserByUsername(userName).getData();
-        if (user == null) {
-            user = userService.getUserByMobile(userName);
-        }
+        allein.bizcorn.model.mongo.User user = userService.getUser(userName);
+
         if (user == null) {
             throw new UsernameNotFoundException("用户名密码错误！");
         }
         // SecurityUser实现UserDetails并将SUser的Email映射为username
         ArrayList<SimpleGrantedAuthority> authorities= new ArrayList<SimpleGrantedAuthority>();
-        List<String> authoritiesInDB=   userService.getUserAuthorities(user.getId()).getData();
+        List<String> authoritiesInDB=   userService.getUserAuthorities(user.getId());
         if(authoritiesInDB!=null && authoritiesInDB.size()>0)
         {
             for (String authority:authoritiesInDB) {

@@ -16,28 +16,44 @@ import java.util.List;
 
 public interface IUserService extends IUserServiceGate {
 
-
-    @RequestMapping(value = "/user/byname/{username}",method = RequestMethod.GET)
-    public Result<IUser> getUserByUsername(@PathVariable("username") String userName);
-
-    @RequestMapping(value = "/user/masked/{username}",method = RequestMethod.GET)
-    public Result<IUser> getMaskedUserByUsername(@PathVariable("username") String userName);
-
-
-    @RequestMapping(value = "/user/login/errortimes/{username}",method = RequestMethod.GET)
-    public Result<Long> getUserLoginErrorTimes(@PathVariable("username") String userName);
-
-    @RequestMapping("/user/login/errortimes/inc/{username}")
-    public Result<Long> incUserLoginErrorTimes(@PathVariable("username") String userName);
-
-    @RequestMapping("/user/login/errortimes/rst/{username}")
-    public Result<Boolean> rstUserLoginErrorTimes(@PathVariable("username") String userName);
-
-    public User getUserByMobile(String mobile);
+/*
+@Description: 获取缓存里用户登录失败次数，超过一定数量后，需要验证码
+@Param:
+@Return:
+@Author:Alleindrach@gmail.com
+@Date:2019/5/10
+@Time:2:52 PM
+*/
+    public Long getUserLoginErrorTimes(String userName);
+/*
+@Description:递增缓存中用户登录失败次数
+@Param:
+@Return:
+@Author:Alleindrach@gmail.com
+@Date:2019/5/10
+@Time:2:52 PM
+*/
+    public Long incUserLoginErrorTimes(String userName);
+/*
+@Description:缓存中用户登录失败次数清零
+@Param:
+@Return:
+@Author:Alleindrach@gmail.com
+@Date:2019/5/10
+@Time:2:53 PM
+*/
+    public Boolean rstUserLoginErrorTimes( String userName);
+/*
+@Description:获得用户实体，principal可以是id/username/mobile的一种
+@Param:
+@Return:
+@Author:Alleindrach@gmail.com
+@Date:2019/5/10
+@Time:2:54 PM
+*/
     public User getUser(String principal);
 
-    @RequestMapping("/user/authorities/id")
-    public Result<List<String>> getUserAuthorities(@PathVariable("id") String userId);
+    public List<String> getUserAuthorities(String userId);
 /*
     @Description: 上线处理
     @Param:
@@ -56,7 +72,14 @@ public interface IUserService extends IUserServiceGate {
     @Time:6:04 PM
     */
     void checkOut(String username);
-
+/*
+@Description:当成人向小童发消息时，重建绑定关系
+@Param:
+@Return:
+@Author:Alleindrach@gmail.com
+@Date:2019/5/10
+@Time:3:03 PM
+*/
     boolean rebind(User binder, Kid kid);
 
 }
