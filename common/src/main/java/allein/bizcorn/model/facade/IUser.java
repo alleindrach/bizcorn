@@ -1,10 +1,8 @@
 package allein.bizcorn.model.facade;
 
-import allein.bizcorn.model.output.IResultor;
-
 import java.io.Serializable;
 
-public interface IUser extends IResultor {
+public interface IUser extends Serializable {
 
     public String getId();
 

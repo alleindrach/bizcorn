@@ -73,12 +73,12 @@ public class StoryServiceControl implements IStoryServiceGate {
     }
 
     @Override
-    public Result msgCopy(String messageId) {
+    public Result msgCopy(@PathVariable("id") String  messageId) {
         return storyService.msgCopy(messageId);
     }
 
     @Override
-    public Result msgList(String criteria, Integer pageIndex, Integer pageSize) {
+    public Result msgList(@RequestParam("criteria") String criteria, @RequestParam("page") Integer  pageIndex,@RequestParam("size") Integer  pageSize) {
         return storyService.msgList(criteria,pageIndex,pageSize);
     }
     @Override

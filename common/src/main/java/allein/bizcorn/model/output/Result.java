@@ -2,10 +2,15 @@ package allein.bizcorn.model.output;
 
 import allein.bizcorn.common.exception.ErrorCode;
 import allein.bizcorn.common.exception.ErrorCodeException;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.io.Serializable;
+import java.lang.reflect.Array;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Result<T> implements Serializable{
     final static public int FAILED = 0;
@@ -83,22 +88,7 @@ public class Result<T> implements Serializable{
 
     static public Result successWithData(Object data)
     {
-        if(data instanceof  IResultor){
-            Result result=null;
-            try {
-                JSONObject json = ((IResultor) data).toResultJson();
-                result = new Result(1, null, null, json);
-
-            }catch(Exception ex)
-            {
-                System.out.println(ex);
-            }
-            return result;
-
-        }else{
-            return new Result(1,null,  null,data);
-        }
-
+        return new Result(1,null,  null, JSON.toJSON(data));
     }
     static public Result successWithMessage(String msg)
     {

@@ -82,8 +82,4 @@ public class User implements IUser {
 		this.mobile = mobile;
 	}
 
-	@Override
-	public JSONObject toResultJson() {
-		return null;
-	}
 }

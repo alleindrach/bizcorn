@@ -362,7 +362,8 @@ public class StoryServiceMongoImpl implements IStoryService{
         {
             return Result.failWithException(new CommonException(ExceptionEnum.USER_NOT_LOGIN));
         }
-        List<SoundMessage> soundMessages=soundMessageDAO.find(Query.query(Criteria.where("destId").is(user.getId())).skip(pageIndex*pageSize).limit(pageSize));
+        List<SoundMessage> soundMessages=soundMessageDAO.find(Query.query(Criteria.where("talkee").is(user.getId())).skip(pageIndex*pageSize).limit(pageSize));
+//        JSONObject[] resultData= (JSONObject[]) soundMessages.stream().map((SoundMessage x)->{return x.toResultJson();}).toArray();
         return Result.successWithData(soundMessages);
 
     }

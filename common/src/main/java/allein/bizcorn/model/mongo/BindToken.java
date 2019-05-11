@@ -5,10 +5,11 @@
 
 package allein.bizcorn.model.mongo;
 
-import allein.bizcorn.model.output.IResultor;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson.serializer.JSONSerializable;
+import com.alibaba.fastjson.serializer.JSONSerializer;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
@@ -16,7 +17,9 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.util.Date;
 
 /**
@@ -26,7 +29,7 @@ import java.util.Date;
  * @create: 2019-05-09 09:08
  **/
 @Document(collection="BindToken")
-public class BindToken  implements IResultor {
+public class BindToken  implements Serializable {
 
     @Id
     @Getter
@@ -61,11 +64,5 @@ public class BindToken  implements IResultor {
 
     }
 
-    @Override
-    public JSONObject toResultJson() {
-        JSONObject result= (JSONObject) JSON.toJSON(this);
-        result.put("binder",binder.getUsername());
-        result.put("bindee",binder.getUsername());
-        return result;
-    }
+
 }

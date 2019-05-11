@@ -7,6 +7,9 @@ import allein.bizcorn.model.facade.IUser;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson.serializer.JSONSerializable;
+import com.alibaba.fastjson.serializer.JSONSerializer;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
@@ -14,12 +17,14 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
 @Document(collection="Users")
-public class User  implements  IUser {
+public class User  implements  IUser,JSONSerializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -48,6 +53,7 @@ public class User  implements  IUser {
     private IProfile profile;
     @Getter
     @Setter
+    @JSONField(serialzeFeatures = { SerializerFeature.WriteNullListAsEmpty})
     Set<String> Authorities;
     @Getter
     @Setter
@@ -67,15 +73,12 @@ public class User  implements  IUser {
     @Setter
     protected  Role role=Role.ADULT;
 
+
     @Override
-    public JSONObject toResultJson() {
-        JSONObject result= (JSONObject) JSON.toJSON(this);
-        if(result.getString("mobile")!=null)
-            result.put("mobile",Masker.getMaskCharWay(result.getString("mobile"),3,9));
-        if(curPartner!=null)
-        {
-            result.put("curPartner",this.getCurPartner().getUsername());
-        }
-        return result;
+    public void write(JSONSerializer serializer, Object fieldName, Type fieldType, int features) throws IOException {
+        JSONObject jsonUser=new JSONObject();
+        jsonUser.put("id",this.getId());
+        jsonUser.put("username",this.getUsername());
+        serializer.write(jsonUser);
     }
 }

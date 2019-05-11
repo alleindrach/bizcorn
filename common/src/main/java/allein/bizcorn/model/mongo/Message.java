@@ -2,7 +2,6 @@ package allein.bizcorn.model.mongo;
 
 import allein.bizcorn.common.websocket.Action;
 import allein.bizcorn.model.facade.IMessage;
-import allein.bizcorn.model.output.IResultor;
 import allein.bizcorn.model.output.Result;
 import com.alibaba.fastjson.JSON;
 import lombok.Getter;
@@ -87,7 +86,7 @@ public class Message implements IMessage {
         msg.setDestName(message.getTalkee().getUsername());
         msg.setSrcName(message.getTalker().getUsername());
         msg.setContentType(ContentType.SOUND_MESSAGE);
-        msg.setContent(JSON.toJSONString(message.toResultJson()));
+        msg.setContent(JSON.toJSONString(message));
         msg.setAction(Action.SOUND_ARRIVED);
         msg.setCreateDate(message.getCreateDate());
         msg.setStatus(MessageStatus.INIT);
