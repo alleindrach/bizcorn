@@ -127,6 +127,12 @@ public class UserServiceControl implements IUserServiceGate{
         return userService.resetPassowrd(password,captcha,mobile,mobileCaptchaKey);
     }
 
+    @Override
+    public Result changePassowrd( @RequestParam(value = "password") String password,
+                                  @RequestParam(value = "oldPassword") String oldPassword) {
+        return userService.changePassowrd(password,oldPassword);
+    }
+
     @RequestMapping(value = "/register")
     public Result register(
             @RequestParam(value = "username") String username,

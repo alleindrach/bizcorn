@@ -61,7 +61,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //        AnonymousAuthenticationFilter 的 主要功能就是给没有登陆的用户，填充AnonymousAuthenticationToken到SecurityContextHolder的Authentication，后续依赖Authentication的代码可以统一处理。
 //        参见 SecurityFilters.class,FilterComparator
         http.authorizeRequests()
-                .antMatchers("/user","/user/*","/kid/register/*","/websocket","/story/*","/sound/*").authenticated()
+                .antMatchers("/user","/user/*","/kid/register/*","/websocket","/story/*","/sound/*","/password/change").authenticated()
                 .and()
                 .formLogin().loginPage("/login")
                 .authenticationDetailsSource(authenticationDetailsSource)

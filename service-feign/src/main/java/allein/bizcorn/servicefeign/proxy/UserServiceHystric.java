@@ -81,5 +81,10 @@ public class UserServiceHystric implements  UserServiceProxy{
         return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
     }
 
+    @Override
+    public Result changePassowrd(String password, String oldPassword) {
+        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
+    }
+
 
 }

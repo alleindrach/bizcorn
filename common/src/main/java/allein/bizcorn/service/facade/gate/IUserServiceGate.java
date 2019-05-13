@@ -155,5 +155,9 @@ public interface IUserServiceGate {
             @RequestParam(value = "mobile") String mobile,
             @CookieValue(value = SecurityConstants.MOBILE_CAPTCHA_KEY_COOKIE_NAME) String mobileCaptchaKey
     );
-
+    @RequestMapping(value = "/password/change")
+    Result changePassowrd(
+            @RequestParam(value = "password") String password,
+            @RequestParam(value = "oldPassword") String oldPassword
+    );
 }

@@ -463,6 +463,30 @@ public class UserServiceMongoImpl implements IUserService {
         return  Result.successWithData(getMaskedUser(user));
     }
 
+    @Override
+    @PreAuthorize("hasRole('USER')")
+    public Result changePassowrd(
+            @RequestParam(value = "password") String password,
+                                 @RequestParam(value = "oldPassword") String oldPassword
+    ) {
+        User user =  getUserFromSession();
+        if (user == null) {
+            return Result.failWithException(new CommonException(ExceptionEnum.USER_NOT_LOGIN));
+        }
+        String md5Pwd=DigestUtils.md5DigestAsHex(oldPassword.toString().getBytes());
+        if(user.getPassword()!=md5Pwd)
+        {
+            return Result.failWithException(new CommonException(ExceptionEnum.USER_PASSWORD_ERROR));
+        }
+        else
+        {
+            user.setPassword(DigestUtils.md5DigestAsHex(password.toString().getBytes()));
+            userDAO.save(user);
+            return Result.successWithMessage("修改成功");
+        }
+
+    }
+
     @PreAuthorize("hasRole('USER')")
     @ResponseBody
     public Result<IUser> fetchHomepage()

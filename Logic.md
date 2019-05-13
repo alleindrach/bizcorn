@@ -39,6 +39,14 @@
             mobileCaptcha:手机验证码
             password:新的密码.
             
+    * 修改密码
+            POST /password/change
+            参数：
+                password:新的密码.    
+                oldPassword:旧密码
+                
+            返回：
+                result:state=0 失败，state=1 成功        
     * 绑定 用户A绑定用户B
         - 用户B获取绑定二维码
           POST /user/bind/token
