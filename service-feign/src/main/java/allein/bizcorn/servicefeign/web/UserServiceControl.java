@@ -100,6 +100,11 @@ public class UserServiceControl implements IUserServiceGate{
     }
 
     @Override
+    public Result newBindToken() {
+        return userService.newBindToken();
+    }
+
+    @Override
     public Result firebind(@PathVariable(value = "mac") String mac) {
         return userService.firebind(mac);
     }

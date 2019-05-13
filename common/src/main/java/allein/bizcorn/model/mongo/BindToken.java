@@ -55,14 +55,13 @@ public class BindToken  implements Serializable {
     public BindToken(){
 
     }
-    public BindToken(User binder,User bindee)
+
+    public BindToken(User bindee)
     {
         this.bindee=bindee;
-        this.binder=binder;
         this.createDate=new Date();
         this.status=BindTokenStatus.INIT;
 
     }
-
 
 }

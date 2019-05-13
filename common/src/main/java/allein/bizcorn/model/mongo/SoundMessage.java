@@ -29,7 +29,7 @@ import java.util.Date;
 //        @CompoundIndex(name = "session_index", def = "{'sessionId', 1, 'createDate': -1}")
 //
 //})
-public class SoundMessage {
+public class SoundMessage implements  Serializable{
     @Id
     @Getter @Setter
     private String id;

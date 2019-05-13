@@ -117,7 +117,7 @@ public class UserServiceMongoImpl implements IUserService {
         String username=SecurityUtil.getUserName();
         if(username!=null){
                 userDAO.update(new Query(Criteria.where("username").is(username)),new Update().set("mobile",mobile));
-                return Result.successWithData(this.getUser(username).toResultJson());
+                return Result.successWithData(this.getUser(username));
         }
 
         return  Result.failWithException(new CommonException(ExceptionEnum.USER_ACCOUNT_ID_INVALID));
@@ -236,6 +236,17 @@ public class UserServiceMongoImpl implements IUserService {
         }
         return  Result.successWithData(getMaskedUser(kid));
     }
+    @Override
+    @PreAuthorize("hasRole('USER')")
+    public Result newBindToken() {
+        Kid kid = (Kid) getUserFromSession();
+        if (kid == null) {
+            return Result.failWithException(new CommonException(ExceptionEnum.USER_ACCOUNT_NOT_EXIST));
+        }
+        BindToken newBindToken=new BindToken(kid);
+        bindTokenDAO.save(newBindToken);
+        return Result.successWithData(newBindToken);
+    }
 
 
     @Override
@@ -329,7 +340,7 @@ public class UserServiceMongoImpl implements IUserService {
             return Result.failWithException(new CommonException(ExceptionEnum.USER_NOT_LOGIN));
         }
         BindToken token= bindTokenDAO.get(tokenId);
-        if(token.getStatus()!=BindTokenStatus.INIT)
+        if(token.getStatus()!=BindTokenStatus.FIRED)
         {
             return Result.failWithException(new CommonException(ExceptionEnum.BIND_TOKEN_INVALID));
         }
@@ -340,15 +351,25 @@ public class UserServiceMongoImpl implements IUserService {
                 && token.getBinder().getId().compareToIgnoreCase(bindParticipator.getId())!=0) {
             return Result.failWithException(new CommonException(ExceptionEnum.BIND_TOKEN_INVALID));
         }
-        return Result.successWithData(token.toResultJson());
+        return Result.successWithData(token);
     }
 
     @Override
     @PreAuthorize("hasRole('USER')")
     public Result firebind(
-            @PathVariable(value = "mac") String mac
+            @PathVariable(value = "token") String tokenId
     ) {
-        Kid kid = (Kid) userDAO.selectByName(mac);
+        BindToken token =bindTokenDAO.get(tokenId);
+        if(token==null)
+        {
+            return Result.failWithException(new CommonException(ExceptionEnum.BIND_TOKEN_NOT_EXIST));
+        }
+        if(token.getCreateDate().before(new Date(System.currentTimeMillis()-serviceProp.getBindTokenTimout()*1000))) {
+            token.setStatus(BindTokenStatus.EXPIRED);
+            bindTokenDAO.save(token);
+            return Result.failWithException(new CommonException(ExceptionEnum.BIND_TOKEN_EXPIRED));
+        }
+        Kid kid = (Kid) token.getBindee();
         if (kid == null) {
             return Result.failWithException(new CommonException(ExceptionEnum.USER_KID_ACCOUNT_NOT_EXIST));
         }
@@ -359,7 +380,8 @@ public class UserServiceMongoImpl implements IUserService {
         if (binder == null) {
             return Result.failWithException(new CommonException(ExceptionEnum.USER_ACCOUNT_NOT_EXIST));
         }
-        BindToken token = new BindToken(binder,kid);
+        token.setBinder(binder);
+        token.setStatus(BindTokenStatus.FIRED);
         token = bindTokenDAO.save(token);
         Message bindRequireMsg = Message.BindRequireMessage(token);
         messageBrokerService.send(bindRequireMsg);

@@ -90,8 +90,18 @@ public interface IUserServiceGate {
     Result register(
             @PathVariable(value = "mac") String mac
     );
-
-    @RequestMapping(value = "/user/bind/fire/{mac}")
+/*
+@Description:生成一个绑定的凭据
+@Param:
+@Return:
+@Author:Alleindrach@gmail.com
+@Date:2019/5/13
+@Time:8:51 AM
+*/
+    @RequestMapping(value = "/user/bind/token")
+    Result newBindToken();
+    
+    @RequestMapping(value = "/user/bind/fire/{token}")
     /*
     @Description:绑定小童，发起绑定者可以是普通用户，也可以是小童
     @Param:[mac]
@@ -101,7 +111,7 @@ public interface IUserServiceGate {
     @Time:12:02 PM
     */
     Result firebind(
-            @PathVariable(value = "mac") String mac
+            @PathVariable(value = "token") String token
     );
     @RequestMapping(value = "/user/bind/confirm/{token}")
     /*

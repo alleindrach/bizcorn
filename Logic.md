@@ -38,27 +38,32 @@
             mobile:注册手机
             mobileCaptcha:手机验证码
             password:新的密码.
-    * 绑定
-        - 发起绑定，POST /user/bind/fire/{mac}
+            
+    * 绑定 用户A绑定用户B
+        - 用户B获取绑定二维码
+          POST /user/bind/token
+          返回：result：data为token
+          
+        - 用户A扫码，发起绑定，POST /user/bind/fire/{token}
         
-        参数：mac为设备mac
+        参数：token为用户B获取到的tokenid
         返回：result:
              data为token
              token为数据库BindToken.id
         
-        - 被绑定方接收到消息
+        - 被绑定方B接收到消息
         STOMP{
             action:"bind.require",
             content:[token],
             srcName:[绑定人用户名]
             ...
         }
-        - 被绑定方确认绑定
+        - 被绑定方B确认绑定
         POST /user/bind/confirm/{token}
         
         参数：token为发起绑定生成的tokenid
         
-        - 绑定方收到成功消息
+        - 绑定方A收到成功消息
         STOMP {
             action:"bind.ack",
             content:[Result],
