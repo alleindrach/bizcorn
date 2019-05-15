@@ -35,12 +35,12 @@ public class BindToken  implements Serializable {
     @Getter
     @Setter
     private String id;
-    @DBRef
+    @DBRef(lazy = true)
     @Indexed
     @Getter    @Setter
     @JSONField(serialize = false)
     private User binder;
-    @DBRef
+    @DBRef(lazy = true)
     @Indexed
     @Getter    @Setter
     @JSONField(serialize = false)

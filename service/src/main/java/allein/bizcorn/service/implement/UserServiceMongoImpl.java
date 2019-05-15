@@ -257,7 +257,7 @@ public class UserServiceMongoImpl implements IUserService {
             return Result.failWithException(new CommonException(ExceptionEnum.USER_KID_ACCOUNT_NOT_EXIST));
         }
         BindToken token= bindTokenDAO.get(tokenId);
-        if(token.getStatus()!=BindTokenStatus.INIT)
+        if(token.getStatus()!=BindTokenStatus.FIRED)
         {
             return Result.failWithException(new CommonException(ExceptionEnum.BIND_TOKEN_INVALID));
         }
@@ -284,6 +284,8 @@ public class UserServiceMongoImpl implements IUserService {
                 if(kid.isCanBind()){
                     binder.setCurPartner(kid);
                     kid.setCurPartner(binder);
+                    binder.addFriend(kid);
+                    kid.addFriend(binder);
                     isDirt=true;
                 }else
                 {
@@ -296,6 +298,8 @@ public class UserServiceMongoImpl implements IUserService {
                     kid.setParent(binder);
                     kid.setCurPartner(binder);
                     binder.setCurPartner(kid);
+                    binder.addFriend(kid);
+                    kid.addFriend(binder);
                     isDirt=true;
                 }else
                 {
@@ -303,6 +307,8 @@ public class UserServiceMongoImpl implements IUserService {
                     {
                         kid.setCurPartner(binder);
                         binder.setCurPartner(kid);
+                        binder.addFriend(kid);
+                        kid.addFriend(binder);
                         isDirt=true;
                     }
                     else

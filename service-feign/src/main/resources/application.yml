@@ -74,7 +74,7 @@ hystrix:
                isolation:
 #                   strategy: SEMAPHORE
                    thread:
-                       timeoutInMilliseconds: 5000
+                       timeoutInMilliseconds: 50000
 #               timeout:
 #                   enabled: false
 feign:
@@ -85,12 +85,12 @@ feign:
         #使用apache的httpclient，连接池，替换feign原生的httpclient
     httpclient:
         enabled: true
-        connection-timeout: 5000
-        read_timeout: 5000
+        connection-timeout: 50000
+        read_timeout: 50000
 ribbon:
     ReadTimeout: 60000
     ConnectTimeout: 60000
-    MaxAutoRetries: 0
+    MaxAutoRetries: 2
     MaxAutoRetriesNextServer: 1
 #hystrix:
 #  command:

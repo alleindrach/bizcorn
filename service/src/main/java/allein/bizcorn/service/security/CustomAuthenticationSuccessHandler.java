@@ -8,6 +8,9 @@ import allein.bizcorn.service.facade.IMessageQueueService;
 import allein.bizcorn.service.facade.IUserService;
 import allein.bizcorn.service.implement.UserServiceMongoImpl;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.ObjectSerializer;
+import com.alibaba.fastjson.serializer.SerializeConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,12 +57,13 @@ public class CustomAuthenticationSuccessHandler extends SavedRequestAwareAuthent
         String ajaxHeader = ((HttpServletRequest) request).getHeader("X-Requested-With");
         boolean isAjax =true;// "XMLHttpRequest".equals(ajaxHeader);
         if (isAjax) {
-
             response.setCharacterEncoding("UTF-8");
             response.setContentType("application/json; charset=utf-8");
-
             User user= userService.getUser( ((UserDetails) authentication.getPrincipal()).getUsername());
-            response.getWriter().print(JSON.toJSONString(Result.successWithData(user)));
+            SerializeConfig config=new SerializeConfig();
+            config.put(user.getClass(),new User.FullSerializer());
+            JSONObject jsonUser= (JSONObject) JSON.parse( JSON.toJSONString(user,config));
+            response.getWriter().print(JSON.toJSONString(Result.successWithData(jsonUser)));
 //            Result<String> sessionIdCookie=Result.successWithData(session.getId());
 //            response.getWriter().print(JSON.toJSONString(sessionIdCookie));
             response.getWriter().flush();

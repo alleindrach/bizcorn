@@ -52,7 +52,8 @@ public class FeignHeadersSpringDecoder implements Decoder {
         for (Map.Entry<String ,Collection<String>> header:response.headers().entrySet()
                 ) {
             for(String val:header.getValue()) {
-                response2Client.setHeader((String) header.getKey(),val);
+                if(((String)header.getKey()).compareToIgnoreCase("set-cookie")==0)
+                    response2Client.setHeader((String) header.getKey(),val);
             }
         }
         return;

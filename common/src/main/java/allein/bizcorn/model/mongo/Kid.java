@@ -3,6 +3,8 @@ package allein.bizcorn.model.mongo;
 import allein.bizcorn.model.facade.IKid;
 import allein.bizcorn.model.facade.IParent;
 import allein.bizcorn.model.facade.IUser;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -12,39 +14,16 @@ import java.util.List;
 @Document(collection="Users")
 public class Kid extends User implements IKid {
 
-
-    List<String> elderNumbers;//可绑定的长辈的电话号码
+    @Getter
+    @Setter
+    private List<String> elderNumbers;//可绑定的长辈的电话号码
+    @Getter
+    @Setter
     private boolean canBind=true;
     @DBRef
+    @Getter
+    @Setter
     private User parent;
-
-    public Kid(){
-        this.role=Role.KID;//kid
-    }
-
-    public boolean isCanBind() {
-        return canBind;
-    }
-
-    public void setCanBind(boolean canBind) {
-        this.canBind = canBind;
-    }
-
-    public User getParent() {
-        return parent;
-    }
-
-    public void setParent(User parent) {
-        this.parent = parent;
-    }
-
-    public List<String> getElderNumbers() {
-        return elderNumbers;
-    }
-
-    public void setElderNumbers(List<String> elderNumbers) {
-        this.elderNumbers = elderNumbers;
-    }
 
     public boolean isValidElder(String phoneNumber){
         if(phoneNumber==null ||phoneNumber.isEmpty() )

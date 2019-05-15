@@ -1,34 +1,18 @@
 package allein.bizcorn.model.mongo;
 
 import allein.bizcorn.model.facade.IScene;
+import lombok.Getter;
+import lombok.Setter;
 
 public class Scene implements IScene {
-
+    @Getter
+    @Setter
     private String title;
+    @Getter
+    @Setter
     private String img;
+    @Getter
+    @Setter
     private String snd;
 
-    public String getImg() {
-        return img;
-    }
-
-    public void setImg(String img) {
-        this.img = img;
-    }
-
-    public String getSnd() {
-        return snd;
-    }
-
-    public void setSnd(String snd) {
-        this.snd = snd;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
 }

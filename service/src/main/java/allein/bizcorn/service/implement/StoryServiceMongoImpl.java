@@ -24,6 +24,7 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -334,6 +335,7 @@ public class StoryServiceMongoImpl implements IStoryService{
             {
                 return Result.failWithException(new CommonException(ExceptionEnum.USER_NOT_AUHTORIZED));
             }
+            savedSoundMessage.setCreateDate(new Date());
             savedSoundMessage.setStatus(MessageStatus.COPIED);
             soundMessageDAO.save(savedSoundMessage);
             return Result.successWithData(messageId);
@@ -362,7 +364,7 @@ public class StoryServiceMongoImpl implements IStoryService{
         {
             return Result.failWithException(new CommonException(ExceptionEnum.USER_NOT_LOGIN));
         }
-        List<SoundMessage> soundMessages=soundMessageDAO.find(Query.query(Criteria.where("talkee").is(user.getId())).skip(pageIndex*pageSize).limit(pageSize));
+        List<SoundMessage> soundMessages=soundMessageDAO.find(Query.query(Criteria.where("status").ne(MessageStatus.COPIED).orOperator(Criteria.where("talkee").is(user.getId()),Criteria.where("talker").is(user.getId()))).with(Sort.by(Sort.Direction.DESC, "createDate")).skip(pageIndex*pageSize).limit(pageSize));
 //        JSONObject[] resultData= (JSONObject[]) soundMessages.stream().map((SoundMessage x)->{return x.toResultJson();}).toArray();
         return Result.successWithData(soundMessages);
 

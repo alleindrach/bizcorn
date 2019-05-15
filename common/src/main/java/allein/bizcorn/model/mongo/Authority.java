@@ -1,20 +1,16 @@
 package allein.bizcorn.model.mongo;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
 
 public class Authority implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    @Getter
+    @Setter
     private String authority;
 
-    public String getAuthority() {
-        return authority;
-    }
-
-    public Authority setAuthority(String authority) {
-        this.authority = authority;
-        return this;
-    }
 
 }

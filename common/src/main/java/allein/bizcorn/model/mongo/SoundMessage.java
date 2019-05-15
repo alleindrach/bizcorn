@@ -16,6 +16,8 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.IndexDirection;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -23,6 +25,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.Date;
+import java.util.List;
 
 @Document(collection="SoundMessage")
 //@CompoundIndexes({
@@ -34,11 +37,11 @@ public class SoundMessage implements  Serializable{
     @Getter @Setter
     private String id;
 
-    @DBRef
+    @DBRef(lazy = true)
     @Getter @Setter
     private User talker;
 
-    @DBRef
+    @DBRef(lazy = true)
     @Setter @Getter
     private User talkee;
 
@@ -48,7 +51,12 @@ public class SoundMessage implements  Serializable{
     @Setter @Getter
     private Integer channel;
 
+    @Getter
+    @Setter
+    private List<String> tags;
+
     @Setter @Getter
+    @Indexed(direction = IndexDirection.DESCENDING)
     @JSONField(serialzeFeatures = {SerializerFeature.WriteDateUseDateFormat})
     private Date createDate;
     @Setter @Getter
