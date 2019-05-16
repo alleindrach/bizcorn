@@ -157,3 +157,9 @@ bizcorn:
 #endpoints:
 #  refresh:
 #    sensitive: false
+
+smsmessage:
+    clan:
+        url: 1
+        account: 1
+        pwd: 1

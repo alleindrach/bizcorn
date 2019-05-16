@@ -11,6 +11,7 @@ import allein.bizcorn.service.captcha.CaptchaImageHelper;
 import allein.bizcorn.service.captcha.CaptchaMessageHelper;
 import allein.bizcorn.service.db.mysql.dao.UserDAO;
 import allein.bizcorn.service.facade.ICommonService;
+import allein.bizcorn.service.facade.IMessageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +56,9 @@ public class CommonServiceImpl implements ICommonService {
     @Autowired
     private CaptchaMessageHelper captchaMessageHelper;
 
+    @Autowired
+    IMessageService CLanMessageServiceImpl;
+
 //    public void captcha(HttpServletRequest request, HttpServletResponse response) {
 //        captchaImageHelper.generateAndWriteCaptchaImage(request,response, SecurityConstants.SECURITY_KEY);
 //    }
@@ -83,6 +87,7 @@ public class CommonServiceImpl implements ICommonService {
             if (captchaResult.isSuccess()) {
                 // 模拟发送验证码
                 logger.info("【BizCorn】 您的短信验证码是 {}。若非本人发送，请忽略此短信。", captchaResult.getCaptcha());
+                CLanMessageServiceImpl.sendMsg(mobile,captchaResult.getCaptcha());
                 captchaResult.clearCaptcha();
                 Cookie captchaKeyCookie=new Cookie(SecurityConstants.MOBILE_CAPTCHA_KEY_COOKIE_NAME,captchaResult.getCaptchaKey());
                 captchaKeyCookie.setPath("/");
