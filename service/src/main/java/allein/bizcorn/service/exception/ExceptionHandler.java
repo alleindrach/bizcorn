@@ -59,7 +59,8 @@ public class ExceptionHandler {
 //    @ResponseStatus(value = HttpStatus.FORBIDDEN,
 //            reason = "无权")  // 403
     @org.springframework.web.bind.annotation.ExceptionHandler(AccessDeniedException.class)
-    public Result fileNotFound(HttpServletRequest req, AccessDeniedException ex) {
+    @ResponseBody
+    public Result notAuthoried(HttpServletRequest req, AccessDeniedException ex) {
         logger.error("Request: " + req.getRequestURL(), ex);
         return Result.failWithException(new CommonException(ExceptionEnum.USER_NOT_AUHTORIZED));
     }

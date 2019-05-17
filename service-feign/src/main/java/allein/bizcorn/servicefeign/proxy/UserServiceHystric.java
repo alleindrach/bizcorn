@@ -86,5 +86,10 @@ public class UserServiceHystric implements  UserServiceProxy{
         return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
     }
 
+    @Override
+    public Result adminUserList(String criteria, String sort, Integer page, Integer size) {
+        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
+    }
+
 
 }

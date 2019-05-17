@@ -13,6 +13,10 @@ public enum ExceptionEnum {
     USER_ACCOUNT_LOGIN_FAIL("000005","用户名或者密码错误"),
     USER_KID_ACCOUNT_NOT_EXIST("000006","小童账户错误"),
     USER_PASSWORD_ERROR("000007","密码错误"),
+    USER_CAPTCHA_ERROR("000008","用户登录图形验证码密码错误"),
+    USER_MOBILE_CAPTCHA_ERROR("000009","用户登录短信验证码密码错误"),
+
+
     USER_NOT_AUHTORIZED("000102", "当前用户无权限"),
     USER_EXISTS ("000201", "此用户名已经被占用"),
     USER_REGISTER_FAIL("000202", "用户注册失败"),

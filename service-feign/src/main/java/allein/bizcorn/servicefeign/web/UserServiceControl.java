@@ -134,6 +134,14 @@ public class UserServiceControl implements IUserServiceGate{
         return userService.changePassowrd(password,oldPassword);
     }
 
+    @Override
+    public Result adminUserList(@RequestParam(value = "criteria") String criteria,
+                                @RequestParam(value = "sort") String sort,
+                                @RequestParam(value = "page") Integer page,
+                                @RequestParam(value = "size") Integer size) {
+        return userService.adminUserList(criteria,sort,page,size);
+    }
+
     @RequestMapping(value = "/register")
     public Result register(
             @RequestParam(value = "username") String username,

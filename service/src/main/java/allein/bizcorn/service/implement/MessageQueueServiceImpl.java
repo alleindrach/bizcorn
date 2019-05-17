@@ -2,9 +2,11 @@ package allein.bizcorn.service.implement;
 import allein.bizcorn.common.mq.Receiver;
 import allein.bizcorn.common.mq.Topic;
 import allein.bizcorn.service.facade.IMessageQueueService;
+import allein.bizcorn.service.facade.IMessageService;
 import allein.bizcorn.service.facade.IUserService;
 import allein.bizcorn.service.task.MessageQueueReceiverExecutor;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
 import com.mongodb.client.gridfs.model.GridFSFile;
@@ -64,6 +66,10 @@ public class MessageQueueServiceImpl implements IMessageQueueService,Initializin
     private GridFSBucket gridFSBucket;
     @Autowired
     private IUserService userService;
+
+    @Autowired
+    IMessageService CLanMessageServiceImpl;
+
     @Override
     public void send(String message) {
         kafkaTemplate.send(defaultTopic,message);
@@ -166,6 +172,14 @@ public class MessageQueueServiceImpl implements IMessageQueueService,Initializin
                 String username=message;
                 userService.checkOut(username);
 
+            }
+        });
+        this.registerReceiver(Topic.USER_SMS_SENDDING, new Receiver() {
+            @Override
+            public void onMessage(String topic, String key, String ts, String message) {
+                logger.info("on sms message:{}",message);
+                JSONObject jsonMsg=JSON.parseObject(message);
+                CLanMessageServiceImpl.sendMsg(jsonMsg.getString("mobile"),jsonMsg.getString("captcha"));
             }
         });
     }

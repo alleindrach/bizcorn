@@ -160,4 +160,13 @@ public interface IUserServiceGate {
             @RequestParam(value = "password") String password,
             @RequestParam(value = "oldPassword") String oldPassword
     );
+
+    @RequestMapping(value = "/admin/user/list")
+    Result adminUserList(
+            @RequestParam(value = "criteria") String criteria,
+            @RequestParam(value = "sort") String sort,
+            @RequestParam(value = "page") Integer page,
+            @RequestParam(value = "size") Integer size
+
+    );
 }

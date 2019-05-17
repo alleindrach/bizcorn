@@ -4,6 +4,7 @@ import allein.bizcorn.common.cache.ICacheAccessor;
 import allein.bizcorn.common.config.SecurityConstants;
 import allein.bizcorn.common.exception.CommonException;
 import allein.bizcorn.common.exception.ExceptionEnum;
+import allein.bizcorn.common.mq.Topic;
 import allein.bizcorn.model.entity.User;
 import allein.bizcorn.model.output.Result;
 import allein.bizcorn.model.security.CaptchaResult;
@@ -11,7 +12,9 @@ import allein.bizcorn.service.captcha.CaptchaImageHelper;
 import allein.bizcorn.service.captcha.CaptchaMessageHelper;
 import allein.bizcorn.service.db.mysql.dao.UserDAO;
 import allein.bizcorn.service.facade.ICommonService;
+import allein.bizcorn.service.facade.IMessageQueueService;
 import allein.bizcorn.service.facade.IMessageService;
+import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,8 +59,9 @@ public class CommonServiceImpl implements ICommonService {
     @Autowired
     private CaptchaMessageHelper captchaMessageHelper;
 
+
     @Autowired
-    IMessageService CLanMessageServiceImpl;
+    IMessageQueueService messageQueueService;
 
 //    public void captcha(HttpServletRequest request, HttpServletResponse response) {
 //        captchaImageHelper.generateAndWriteCaptchaImage(request,response, SecurityConstants.SECURITY_KEY);
@@ -87,7 +91,10 @@ public class CommonServiceImpl implements ICommonService {
             if (captchaResult.isSuccess()) {
                 // 模拟发送验证码
                 logger.info("【BizCorn】 您的短信验证码是 {}。若非本人发送，请忽略此短信。", captchaResult.getCaptcha());
-                CLanMessageServiceImpl.sendMsg(mobile,captchaResult.getCaptcha());
+                JSONObject jsonObject=new JSONObject();
+                jsonObject.put("mobile",mobile);
+                jsonObject.put("captcha",captchaResult.getCaptcha());
+                messageQueueService.send(Topic.USER_SMS_SENDDING,jsonObject);
                 captchaResult.clearCaptcha();
                 Cookie captchaKeyCookie=new Cookie(SecurityConstants.MOBILE_CAPTCHA_KEY_COOKIE_NAME,captchaResult.getCaptchaKey());
                 captchaKeyCookie.setPath("/");

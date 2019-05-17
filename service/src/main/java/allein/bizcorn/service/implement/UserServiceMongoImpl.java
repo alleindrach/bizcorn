@@ -493,6 +493,20 @@ public class UserServiceMongoImpl implements IUserService {
 
     }
 
+    @Override
+    @PreAuthorize("hasRole('ADMIN')")
+    public Result adminUserList( @RequestParam(value = "criteria") String criteria,
+                                 @RequestParam(value = "sort") String sort,
+                                 @RequestParam(value = "page") Integer page,
+                                 @RequestParam(value = "size") Integer size) {
+        if(page==null)
+            page=0;
+        if(size==null|| size<=0||size>20)
+            size=20;
+        List<User> users=  userDAO.find(new Query().skip(page*size).limit(size));
+        return Result.successWithData(users);
+    }
+
     @PreAuthorize("hasRole('USER')")
     @ResponseBody
     public Result<IUser> fetchHomepage()

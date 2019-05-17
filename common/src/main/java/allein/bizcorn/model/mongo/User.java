@@ -91,6 +91,7 @@ public class User   implements IUser, JSONSerializable {
             jsonUser.put("friends",user.getFriends());
             jsonUser.put("profile",user.getProfile());
             jsonUser.put("curPartner",user.getCurPartner());
+            jsonUser.put("authorities",user.getAuthorities());
             serializer.write(jsonUser);
         }
     }

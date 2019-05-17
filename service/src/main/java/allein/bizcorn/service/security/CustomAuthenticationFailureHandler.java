@@ -58,7 +58,7 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
             }
             else if("login.captcha.error".compareToIgnoreCase(exception.getMessage())==0)
             {
-                error=Result.failWithException(new CommonException(ExceptionEnum.CAPTCH_INVALID));
+                error=Result.failWithException(new CommonException(ExceptionEnum.USER_CAPTCHA_ERROR));
             }else // if("login.username-or-password.error".compareToIgnoreCase(exception.getMessage())==0)
             {
                 error=Result.failWithException(new CommonException(ExceptionEnum.USER_NOT_LOGIN));
