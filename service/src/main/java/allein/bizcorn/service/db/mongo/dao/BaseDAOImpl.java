@@ -1,7 +1,11 @@
 package allein.bizcorn.service.db.mongo.dao;
 
+import allein.bizcorn.model.mongo.User;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -11,6 +15,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.List;
 
 public class BaseDAOImpl<T extends Serializable> implements  BaseDAO<T>{
@@ -60,6 +65,11 @@ public class BaseDAOImpl<T extends Serializable> implements  BaseDAO<T>{
     @Override
     public List find(Query query) {
         return mongoTemplate.find(query, this.getEntityClass());
+    }
+
+    @Override
+    public Long count(Query query) {
+        return mongoTemplate.count(query,this.getEntityClass());
     }
 
     @Override
@@ -134,4 +144,86 @@ public class BaseDAOImpl<T extends Serializable> implements  BaseDAO<T>{
     protected Class<T> getEntityClass() {
         return ((Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0]);
     }
+    public JSONObject list(JSONObject params)
+    {
+        Integer from=params.getInteger("from");
+        Integer size=params.getInteger("size");
+        JSONArray filters=params.getJSONArray("filters");
+        JSONArray sorters=params.getJSONArray("sorters");
+        Criteria criteria=new Criteria();
+//        Class<T> ec = getEntityClass();
+//        Type ecft=null;
+        if(filters!=null && filters.size()>0)
+        for (Object o:filters
+                ) {
+            JSONObject jso=(JSONObject) o;
+            criteria=criteria.and(jso.getString("key"));
+//            try {
+//                Field ecf=ec.getField(jso.getString("key"));
+//
+//                ecft=ecf.getType();
+//                ecft.getTypeName();//like java.lang.Integer
+//            } catch (NoSuchFieldException e) {
+//
+//            }
+            switch (jso.getString("op")){
+
+                case "is":
+                    criteria=criteria.is(jso.getString("val"));
+                    break;
+                case "==":
+                    criteria=criteria.is(jso.getLong("val"));
+                    break;
+                case ">":
+                    criteria=criteria.gt(jso.getLong("val"));
+                    break;
+                case ">=":
+                    criteria=criteria.gte(jso.getLong("val"));
+                    break;
+                case "<=":
+                    criteria=criteria.lte(jso.getLong("val"));
+                    break;
+                case "<":
+                    criteria=criteria.lt(jso.getLong("val"));
+                    break;
+                case "re"://正则表达式
+                    criteria=criteria.regex(jso.getString("val"));
+                    break;
+                case "has":
+                    criteria=criteria.all(jso.getString("val").split(","));
+                    break;
+            }
+        }
+
+        Query query=new Query(criteria);
+        if(sorters!=null && sorters.size()>0)
+        for(Object s:sorters){
+            JSONObject jso=(JSONObject) s;
+            String dir=jso.getString("dir");
+            Sort.Direction d= Sort.Direction.ASC;
+            if(dir.compareToIgnoreCase("desc")==0)
+            {
+                d=Sort.Direction.DESC;
+            }
+            String key=jso.getString("key");
+
+
+            Sort sort=new Sort(
+                    d,key
+            );
+            query=query.with(sort);
+        }
+//        if(page==null)
+//            page=0;
+//        if(size==null|| size<=0||size>20)
+//            size=20;
+
+        Long count=this.count(query);
+        List<T> list=  this.find(query.skip(from).limit(size));
+        JSONObject result=new JSONObject();
+        result.put("count",count);
+        result.put("list",list);
+        return result;
+    }
+
 }

@@ -1,6 +1,5 @@
 package allein.bizcorn.service.db.mysql.dao;
 
-import allein.bizcorn.model.entity.Authority;
 import allein.bizcorn.model.entity.User;
 import org.springframework.cache.annotation.Cacheable;
 
@@ -51,6 +50,5 @@ public interface UserDAO extends BaseDAO<User> {
 
 
 
-    @org.apache.ibatis.annotations.Select("select id,user_id,authority  from authorities where user_id = #{userId}")
-    List<Authority> selectAuthorities(String userId);
+
 }

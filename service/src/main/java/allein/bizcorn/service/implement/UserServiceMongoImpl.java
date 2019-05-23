@@ -12,6 +12,7 @@ import allein.bizcorn.common.websocket.Status;
 import allein.bizcorn.model.facade.IUser;
 import allein.bizcorn.model.mongo.*;
 import allein.bizcorn.model.output.Result;
+import allein.bizcorn.model.security.Authority;
 import allein.bizcorn.model.security.CaptchaResult;
 import allein.bizcorn.service.captcha.CaptchaImageHelper;
 import allein.bizcorn.service.captcha.CaptchaMessageHelper;
@@ -21,12 +22,17 @@ import allein.bizcorn.service.db.mongo.dao.UserDAO;
 import allein.bizcorn.service.facade.IMessageBrokerService;
 import allein.bizcorn.service.facade.IMessageQueueService;
 import allein.bizcorn.service.facade.IUserService;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializeConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -107,7 +113,7 @@ public class UserServiceMongoImpl implements IUserService {
     }
 
     public
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','user')")
 //    @Transactional
 //    @AuthLogin(injectUidFiled = "userId")
     Result update(
@@ -205,15 +211,15 @@ public class UserServiceMongoImpl implements IUserService {
         newuser.setPassword( DigestUtils.md5DigestAsHex(password.toString().getBytes()));
         newuser.setMobile(mobile);
 
-        HashSet<String> auths=new HashSet<String>();
-        auths.add("ROLE_USER");
+        ArrayList<String> auths=new ArrayList<String>();
+        auths.add(Authority.ROLE_USER.getValue());
         newuser.setAuthorities(auths);
         userDAO.save(newuser);
         return  Result.successWithData(newuser);
     }
 
     @Override
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('USER','user')")
     public Result register(@PathVariable("mac")  String mac) {
 
         if(userDAO.selectByName(mac)!=null){
@@ -225,8 +231,8 @@ public class UserServiceMongoImpl implements IUserService {
         String mobileCaptchaKey=null;
 
         kid.setPassword( DigestUtils.md5DigestAsHex(mac.toString().getBytes()));
-        HashSet<String> auths=new HashSet<String>();
-        auths.add("ROLE_USER");
+        ArrayList<String> auths=new ArrayList<String>();
+        auths.add(Authority.ROLE_USER.getValue());
         kid.setAuthorities(auths);
         try {
             userDAO.save(kid);
@@ -237,7 +243,7 @@ public class UserServiceMongoImpl implements IUserService {
         return  Result.successWithData(getMaskedUser(kid));
     }
     @Override
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','user')")
     public Result newBindToken() {
         Kid kid = (Kid) getUserFromSession();
         if (kid == null) {
@@ -250,7 +256,7 @@ public class UserServiceMongoImpl implements IUserService {
 
 
     @Override
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','user')")
     public Result confirmBind(@PathVariable(value = "token") String tokenId) {
         Kid kid = (Kid) getUserFromSession();
         if (kid == null) {
@@ -361,7 +367,7 @@ public class UserServiceMongoImpl implements IUserService {
     }
 
     @Override
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','user')")
     public Result firebind(
             @PathVariable(value = "token") String tokenId
     ) {
@@ -470,7 +476,7 @@ public class UserServiceMongoImpl implements IUserService {
     }
 
     @Override
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','user')")
     public Result changePassowrd(
             @RequestParam(value = "password") String password,
                                  @RequestParam(value = "oldPassword") String oldPassword
@@ -494,20 +500,28 @@ public class UserServiceMongoImpl implements IUserService {
     }
 
     @Override
-    @PreAuthorize("hasRole('ADMIN')")
-    public Result adminUserList( @RequestParam(value = "criteria") String criteria,
-                                 @RequestParam(value = "sort") String sort,
-                                 @RequestParam(value = "page") Integer page,
-                                 @RequestParam(value = "size") Integer size) {
-        if(page==null)
-            page=0;
-        if(size==null|| size<=0||size>20)
-            size=20;
-        List<User> users=  userDAO.find(new Query().skip(page*size).limit(size));
-        return Result.successWithData(users);
+    @PreAuthorize("hasAnyRole('ADMIN','admin')")
+    /*
+    @Description:
+    @Param:[params]
+    @Return:allein.bizcorn.model.output.Result
+    @Author:Alleindrach@gmail.com
+    @Date:2019/5/21
+    @Time:12:11 PM
+    */
+    public Result adminUserList( @RequestBody JSONObject params) {
+
+        SerializeConfig config=new SerializeConfig();
+        config.put(User.class,new User.FullSerializer());
+        config.put(Kid.class,new User.FullSerializer());
+
+        JSONObject result= (JSONObject)userDAO.list(params);
+
+        result.put("list",JSONArray.parse( JSON.toJSONString(result.get("list"),config)));
+        return Result.successWithData(result);
     }
 
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','user')")
     @ResponseBody
     public Result<IUser> fetchHomepage()
     {
@@ -523,6 +537,43 @@ public class UserServiceMongoImpl implements IUserService {
 //            }
 //        }
         return  Result.failWithException(new CommonException(ExceptionEnum.USER_NOT_LOGIN));
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN','admin')")
+    @ResponseBody
+    public Result adminChangeUserAuthorities(
+            @RequestParam(value = "id") String id,
+            @RequestParam(value = "authorities") String authorities)
+    {
+        User user=userDAO.get(id);
+        if(user==null )
+        {
+            return Result.failWithException(new CommonException(ExceptionEnum.ADMIN_USER_ACCOUNT_NOT_EXIST));
+        }
+        JSONArray jsonAuthorities =null;
+        try {
+            jsonAuthorities = JSONArray.parseArray(authorities);
+        }catch(Exception ex)
+        {
+            return Result.failWithException(new CommonException(ExceptionEnum.ADMIN_USER_AUTORITIES_INVALID));
+        }
+        user.setAuthorities(jsonAuthorities.toJavaList(String.class));
+        userDAO.save(user);
+        return Result.successWithData(user.getAuthorities());
+    }
+
+    @Override
+    public Result adminUpdateUser(@RequestBody JSONObject user) {
+//        User user=JSON.parseObject(userJson,User.class);
+        User userInDB=userDAO.get(user.getString("id"));
+        if(userInDB==null)
+        {
+            return Result.failWithException(new CommonException(ExceptionEnum.ADMIN_USER_ACCOUNT_NOT_EXIST));
+        }
+        userInDB.setAuthorities(user.getJSONArray("authorities").toJavaList(String.class));
+        userInDB.setEnabled(user.getInteger("enabled"));
+        userDAO.save(userInDB);
+        return Result.successWithData(userInDB.fullJsonString());
     }
 
 }

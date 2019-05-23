@@ -1,0 +1,1 @@
+docker build -f redis.dockerfile  . -t redis.bizcorn

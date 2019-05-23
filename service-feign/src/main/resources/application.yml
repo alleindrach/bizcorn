@@ -102,6 +102,6 @@ ribbon:
 logging:
     level:
         root: INFO
-        org.springframework.web: INFO
+        org.springframework.web: DEBUG
         com.memorynotfound: INFO
         allein.bizcorn.servicefeign: DEBUG

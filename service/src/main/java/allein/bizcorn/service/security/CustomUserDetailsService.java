@@ -1,7 +1,5 @@
 package allein.bizcorn.service.security;
 
-import allein.bizcorn.model.entity.Authority;
-
 import allein.bizcorn.model.facade.IUser;
 import allein.bizcorn.service.db.mysql.dao.UserDAO;
 import allein.bizcorn.service.facade.IUserService;

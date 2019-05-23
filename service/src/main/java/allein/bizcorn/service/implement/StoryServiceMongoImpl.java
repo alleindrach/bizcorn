@@ -131,7 +131,7 @@ public class StoryServiceMongoImpl implements IStoryService{
 //    }
 
     @Override
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','user')")
     public Result syncStory(@RequestPart MultipartFile[] files, String id, String work){
         String username= SecurityUtil.getUserName();
 
@@ -170,7 +170,7 @@ public class StoryServiceMongoImpl implements IStoryService{
     }
 
     @Override
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','user')")
     public Result getOneStory(@PathVariable("id") String id) {
         String username= SecurityUtil.getUserName();
 
@@ -183,7 +183,7 @@ public class StoryServiceMongoImpl implements IStoryService{
     }
 
     @Override
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','user')")
     public Result getAllStory(@PathVariable("username") String username) {
         if(username==null)
         {
@@ -199,7 +199,7 @@ public class StoryServiceMongoImpl implements IStoryService{
     }
 
     @Override
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','user')")
     public Result deleteStory(@PathVariable("id") String id) {
         String username= SecurityUtil.getUserName();
 
@@ -226,8 +226,7 @@ public class StoryServiceMongoImpl implements IStoryService{
     }
 
     @Override
-    @PreAuthorize("hasRole('USER')")
-
+    @PreAuthorize("hasAnyRole('USER','user')")
     public Result getSoundChannelBGs() {
         List<SoundChannel> soundChannels= soundChannelDAO.find(new Query());
 
@@ -244,7 +243,7 @@ public class StoryServiceMongoImpl implements IStoryService{
         });
         return Result.successWithData(channels);
     }
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','admin')")
     @Override
     public Result setSoundChannelBG(@RequestPart MultipartFile[] files,@RequestParam("channels") String  channelsJson) {
         Result fileResult=fileService.upload(files);
@@ -281,7 +280,7 @@ public class StoryServiceMongoImpl implements IStoryService{
     }
 
     @Override
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','user')")
     public Result msgUp(@RequestPart MultipartFile[] files,@RequestParam("message") String msgJson) {
         User user=userDAO.select(SecurityUtil.getUserName());
         if(user==null)
@@ -321,7 +320,7 @@ public class StoryServiceMongoImpl implements IStoryService{
     }
 
     @Override
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','user')")
     public Result msgCopy(@PathVariable("id") String  messageId) {
         User user=userDAO.select(SecurityUtil.getUserName());
         if(user==null)

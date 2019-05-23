@@ -1,5 +1,10 @@
 package allein.bizcorn.servicefeign.config;
 
+import allein.bizcorn.model.mongo.Kid;
+import allein.bizcorn.model.mongo.User;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializeConfig;
 import feign.RequestTemplate;
 import feign.codec.EncodeException;
 import feign.codec.Encoder;
@@ -57,6 +62,10 @@ public class FeignSpringFormEncoder extends FormEncoder {
                 super.encode(data, MAP_STRING_WILDCARD, template);
                 return;
             }
+        } else if(object instanceof JSONObject)
+        {
+            super.encode(((JSONObject) object).toJSONString(),String.class,template);
+            return ;
         }
         super.encode(object, bodyType, template);
     }

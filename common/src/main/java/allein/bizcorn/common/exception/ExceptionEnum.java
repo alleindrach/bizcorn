@@ -40,6 +40,9 @@ public enum ExceptionEnum {
     CHANNELS_NOT_INITED("020101", "频道未初始化"),
     MESSAGE_NOT_EXIST("020102", "文件不存在"),
 
+
+    ADMIN_USER_ACCOUNT_NOT_EXIST("100001","用户账户错误"),
+    ADMIN_USER_AUTORITIES_INVALID("100002","用户权限错误"),
     ;
 
 

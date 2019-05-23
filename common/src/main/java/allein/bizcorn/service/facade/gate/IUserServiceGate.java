@@ -9,6 +9,9 @@ import allein.bizcorn.common.config.SecurityConstants;
 import allein.bizcorn.model.facade.IUser;
 import allein.bizcorn.model.mongo.User;
 import allein.bizcorn.model.output.Result;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -160,13 +163,19 @@ public interface IUserServiceGate {
             @RequestParam(value = "password") String password,
             @RequestParam(value = "oldPassword") String oldPassword
     );
-
+//    @RequestMapping(value = "/admin/user/summary")
+//    Result adminUserListSummary(
+//            @RequestBody JSONObject filter
+//    );
     @RequestMapping(value = "/admin/user/list")
     Result adminUserList(
-            @RequestParam(value = "criteria") String criteria,
-            @RequestParam(value = "sort") String sort,
-            @RequestParam(value = "page") Integer page,
-            @RequestParam(value = "size") Integer size
+            @RequestBody JSONObject params);
+    @RequestMapping(value = "/admin/user/authorities/update")
+    Result adminChangeUserAuthorities(
+            @RequestParam(value = "id") String id,
+            @RequestParam(value = "authorities") String authorities);
 
-    );
+    @RequestMapping(value = "/admin/user/update",consumes={ "application/json", "text/plain" },produces = {"application/json"})
+    Result adminUpdateUser(
+            @RequestBody JSONObject jsoUser);
 }

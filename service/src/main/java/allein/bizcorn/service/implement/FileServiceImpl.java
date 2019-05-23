@@ -64,7 +64,7 @@ public class FileServiceImpl implements IFileService {
 
 
     @Override
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','user')")
     public Result upload(@RequestPart MultipartFile[] files) {
 //        HttpServletRequest request=((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         String username= SecurityUtil.getUserName();

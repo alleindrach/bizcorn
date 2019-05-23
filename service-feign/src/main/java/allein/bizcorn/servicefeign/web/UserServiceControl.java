@@ -3,11 +3,14 @@ package allein.bizcorn.servicefeign.web;
 
 import allein.bizcorn.common.config.SecurityConstants;
 import allein.bizcorn.model.facade.IUser;
+import allein.bizcorn.model.mongo.Kid;
 import allein.bizcorn.model.mongo.User;
 import allein.bizcorn.service.facade.gate.IUserServiceGate;
 import allein.bizcorn.servicefeign.proxy.UserServiceProxy;
 import allein.bizcorn.model.output.Result;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializeConfig;
 import feign.RequestTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -135,11 +138,21 @@ public class UserServiceControl implements IUserServiceGate{
     }
 
     @Override
-    public Result adminUserList(@RequestParam(value = "criteria") String criteria,
-                                @RequestParam(value = "sort") String sort,
-                                @RequestParam(value = "page") Integer page,
-                                @RequestParam(value = "size") Integer size) {
-        return userService.adminUserList(criteria,sort,page,size);
+    public Result adminUserList(@RequestBody JSONObject params) {
+        return userService.adminUserList(params);
+    }
+
+    @Override
+    public Result adminChangeUserAuthorities(
+            @RequestParam(value = "id") String id,
+            @RequestParam(value = "authorities") String authorities) {
+        return userService.adminChangeUserAuthorities(id,authorities);
+    }
+
+    @Override
+    public Result adminUpdateUser(@RequestBody JSONObject user) {
+
+        return userService.adminUpdateUser(user);
     }
 
     @RequestMapping(value = "/register")

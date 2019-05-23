@@ -8,10 +8,12 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
-import com.alibaba.fastjson.serializer.JSONSerializable;
-import com.alibaba.fastjson.serializer.JSONSerializer;
-import com.alibaba.fastjson.serializer.ObjectSerializer;
-import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.alibaba.fastjson.parser.DefaultJSONParser;
+import com.alibaba.fastjson.parser.deserializer.ObjectDeserializer;
+import com.alibaba.fastjson.serializer.*;
+import com.fasterxml.jackson.annotation.JacksonAnnotation;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
@@ -35,6 +37,7 @@ public class User   implements IUser, JSONSerializable {
     @Id
     @Getter
     @Setter
+    @JsonProperty
     private String id;
 
     @Indexed(unique = true)
@@ -43,6 +46,7 @@ public class User   implements IUser, JSONSerializable {
     private String username;
     @Getter
     @Setter
+    @JsonIgnore
     @JSONField(serialize = false)
     private String password;
     @Indexed
@@ -51,14 +55,14 @@ public class User   implements IUser, JSONSerializable {
     private String mobile;
     @Getter
     @Setter
-    private Integer enabled;
+    private Integer enabled=1;
     @Getter
     @Setter
     private IProfile profile;
     @Getter
     @Setter
     @JSONField(serialzeFeatures = { SerializerFeature.WriteNullListAsEmpty})
-    Set<String> Authorities;
+    List<String> authorities;
     @Getter
     @Setter
     private Date createDate;
@@ -79,8 +83,7 @@ public class User   implements IUser, JSONSerializable {
     @DBRef(lazy = true)
     @Getter @Setter
     private List<User> friends;
-
-    static public class FullSerializer implements ObjectSerializer {
+    static public class SimpleSerializer implements ObjectSerializer {
 
         @Override
         public void write(JSONSerializer serializer, Object object, Object fieldName, Type fieldType, int features) throws IOException {
@@ -88,10 +91,33 @@ public class User   implements IUser, JSONSerializable {
             User user=(User) object;
             jsonUser.put("id",user.getId());
             jsonUser.put("username",user.getUsername());
-            jsonUser.put("friends",user.getFriends());
+            serializer.write(jsonUser);
+        }
+    }
+    static public class FullSerializer implements ObjectSerializer {
+
+        @Override
+        public void write(JSONSerializer serializer, Object object, Object fieldName, Type fieldType, int features) throws IOException {
+            JSONObject jsonUser=new JSONObject();
+            SerializeConfig config=new SerializeConfig();
+            config.put(User.class,new User.SimpleSerializer());
+            config.put(Kid.class,new User.SimpleSerializer());
+
+            User user=(User) object;
+            jsonUser.put("id",user.getId());
+            jsonUser.put("username",user.getUsername());
+            if(user.getFriends()!=null && user.getFriends().size()>0)
+                jsonUser.put("friends",JSON.toJSONString(user.getFriends(),config));
             jsonUser.put("profile",user.getProfile());
-            jsonUser.put("curPartner",user.getCurPartner());
-            jsonUser.put("authorities",user.getAuthorities());
+            if(user.getCurPartner()!=null)
+                jsonUser.put("curPartner",JSON.toJSONString(user.getCurPartner(),config));
+            if(user.getAuthorities()!=null && user.getAuthorities().size()>0)
+                jsonUser.put("authorities",user.getAuthorities());
+            jsonUser.put("enabled",user.getEnabled());
+            jsonUser.put("mobile",user.getMobile());
+            jsonUser.put("createDate",user.getCreateDate());
+            jsonUser.put("lastVisit",user.getLastVisit());
+            jsonUser.put("role",user.getRole());
             serializer.write(jsonUser);
         }
     }
@@ -107,5 +133,11 @@ public class User   implements IUser, JSONSerializable {
         if(this.friends==null)
             this.friends= new ArrayList<>(10);
         this.friends.add(user);
+    }
+    public  String fullJsonString(){
+        SerializeConfig config=new SerializeConfig();
+        config.put(User.class,new User.FullSerializer());
+        config.put(Kid.class,new User.FullSerializer());
+        return JSON.toJSONString(this,config);
     }
 }
