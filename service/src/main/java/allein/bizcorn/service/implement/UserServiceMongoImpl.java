@@ -5,6 +5,7 @@ import allein.bizcorn.common.config.SecurityConstants;
 import allein.bizcorn.common.exception.CommonException;
 import allein.bizcorn.common.exception.ExceptionEnum;
 
+import allein.bizcorn.common.util.ExcelUtil;
 import allein.bizcorn.common.util.Masker;
 import allein.bizcorn.common.util.SecurityUtil;
 import allein.bizcorn.common.websocket.Action;
@@ -36,6 +37,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -45,11 +47,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
 
 @RestController
 @RefreshScope
@@ -575,5 +577,73 @@ public class UserServiceMongoImpl implements IUserService {
         userDAO.save(userInDB);
         return Result.successWithData(userInDB.fullJsonString());
     }
+
+    @RequestMapping(value = "/admin/user/add",consumes={ "application/json", "text/plain" },produces = {"application/json"})
+    public Result adminAddUser(
+            @RequestBody JSONObject jsoUser)
+    {
+        User userInDB=new User();
+
+        userInDB.setAuthorities(jsoUser.getJSONArray("authorities").toJavaList(String.class));
+        userInDB.setEnabled(jsoUser.getInteger("enabled"));
+        userInDB.setUsername(jsoUser.getString("username"));
+        userInDB.setMobile(jsoUser.getString("mobile"));
+        if(jsoUser.getString("role")!=null)
+            userInDB.setRole(Role.valueOf(jsoUser.getString("role")));
+        userDAO.save(userInDB);
+        return Result.successWithData(userInDB.fullJsonString());
+
+    }
+    /*
+    @Description:
+    @Param:
+    格式：
+    第2列为mac地址，只保留字符
+    @Return:
+    @Author:Alleindrach@gmail.com
+    @Date:2019/5/24
+    @Time:11:05 AM
+    */
+    @RequestMapping(value = "/admin/user/import",consumes = MediaType.MULTIPART_FORM_DATA_VALUE,produces = {"application/json"})
+    public Result adminImportUser(
+            @RequestPart MultipartFile file) throws Exception {
+
+
+        InputStream ins = file.getInputStream();
+        Map<String,List<List<Object>>>  data= ExcelUtil.getBankListByExcel(ins,file.getOriginalFilename());
+        List<List<Object>> sheet= (List<List<Object>>) data.values().toArray()[0];
+        List<Result> results=new ArrayList<>(100);
+        for(List<Object> row:sheet){
+            String mac = (String) row.get(1);
+            try {
+                if(mac!=null && !mac.isEmpty())
+                {
+                    Result result = this.register(mac);
+                    if(result.isSuccess())
+                    {
+                        JSONObject jso=new JSONObject();
+                        jso.put("name",mac);
+                        jso.put("id",((JSONObject)result.getData()).getString("id"));
+                        results.add(Result.successWithData(jso));
+                    }
+                    else {
+                        JSONObject jso=new JSONObject();
+                        jso.put("name",mac);
+                        jso.put("message",result.getMessage());
+                        results.add(Result.failWithMessage(result.getMessage(),jso));
+                    }
+                }
+
+            }catch(Exception ex)
+            {
+                JSONObject jso=new JSONObject();
+                jso.put("name",mac);
+                jso.put("message",ex.getMessage());
+                results.add(Result.failWithMessage(ex.getMessage(),jso));
+            }
+        }
+        return Result.successWithData(results);
+    }
+
 
 }

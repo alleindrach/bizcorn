@@ -29,6 +29,7 @@ import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -153,6 +154,16 @@ public class UserServiceControl implements IUserServiceGate{
     public Result adminUpdateUser(@RequestBody JSONObject user) {
 
         return userService.adminUpdateUser(user);
+    }
+
+    @Override
+    public Result adminAddUser(@RequestBody  JSONObject user) {
+        return userService.adminAddUser(user);
+    }
+
+    @Override
+    public Result adminImportUser(@RequestPart MultipartFile file) throws Exception {
+        return userService.adminImportUser(file);
     }
 
     @RequestMapping(value = "/register")

@@ -13,7 +13,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 
@@ -178,4 +180,14 @@ public interface IUserServiceGate {
     @RequestMapping(value = "/admin/user/update",consumes={ "application/json", "text/plain" },produces = {"application/json"})
     Result adminUpdateUser(
             @RequestBody JSONObject jsoUser);
+
+    @RequestMapping(value = "/admin/user/add",consumes={ "application/json", "text/plain" },produces = {"application/json"})
+    Result adminAddUser(
+            @RequestBody JSONObject jsoUser);
+
+    @RequestMapping(value = "/admin/user/import",consumes = MediaType.MULTIPART_FORM_DATA_VALUE,produces = {"application/json"})
+    Result adminImportUser(
+            @RequestPart MultipartFile file) throws Exception;
+
 }
+

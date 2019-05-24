@@ -9,6 +9,7 @@ import allein.bizcorn.model.mongo.User;
 import allein.bizcorn.model.output.Result;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -99,6 +100,16 @@ public class UserServiceHystric implements  UserServiceProxy{
 
     @Override
     public Result adminUpdateUser(JSONObject user) {
+        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
+    }
+
+    @Override
+    public Result adminAddUser(JSONObject jsoUser) {
+        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
+    }
+
+    @Override
+    public Result adminImportUser(MultipartFile files) {
         return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
     }
 

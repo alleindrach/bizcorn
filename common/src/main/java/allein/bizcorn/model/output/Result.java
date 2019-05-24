@@ -102,4 +102,8 @@ public class Result<T> implements Serializable{
     {
         return new Result(0,message, null,null);
     }
+    static public Result failWithMessage(String message,Object data)
+    {
+        return new Result(0,message,null,data);
+    }
 }
