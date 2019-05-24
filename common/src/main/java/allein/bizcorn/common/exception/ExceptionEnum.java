@@ -38,11 +38,14 @@ public enum ExceptionEnum {
     FILE_UPLOAD_FAIL("020001", "素材上传错误"),
     FILE_NOT_EXISTS("020002", "素材不存在"),
     CHANNELS_NOT_INITED("020101", "频道未初始化"),
+
     MESSAGE_NOT_EXIST("020102", "文件不存在"),
 
 
     ADMIN_USER_ACCOUNT_NOT_EXIST("100001","用户账户错误"),
     ADMIN_USER_AUTORITIES_INVALID("100002","用户权限错误"),
+    ADMIN_SOUND_CHANNEL_OCCUPIED("100010","频道被占用"),
+    ADMIN_SOUND_CHANNEL_NOT_EXIST("100011","频道不存在"),
     ;
 
 

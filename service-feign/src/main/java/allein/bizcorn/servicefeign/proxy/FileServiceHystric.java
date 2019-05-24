@@ -23,7 +23,11 @@ public class FileServiceHystric implements  FileServiceProxy{
     @Override
     public Result upload(MultipartFile[] files) {
         return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
+    }
 
+    @Override
+    public Result upload(MultipartFile file) {
+        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
     }
 
     @Override

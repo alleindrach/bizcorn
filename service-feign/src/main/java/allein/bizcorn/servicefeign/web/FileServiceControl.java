@@ -2,6 +2,7 @@ package allein.bizcorn.servicefeign.web;
 
 
 import allein.bizcorn.model.output.Result;
+import allein.bizcorn.service.facade.gate.IFileServiceGate;
 import allein.bizcorn.servicefeign.proxy.CommonServiceProxy;
 import allein.bizcorn.servicefeign.proxy.FileServiceProxy;
 import org.slf4j.Logger;
@@ -19,7 +20,7 @@ import java.io.IOException;
 @RestController
 @RefreshScope
 
-public class FileServiceControl {
+public class FileServiceControl implements IFileServiceGate {
 
     private static final Logger logger = LoggerFactory.getLogger(FileServiceControl.class);
 
@@ -36,6 +37,13 @@ public class FileServiceControl {
         Result result=fileService.upload(files);
         return result;
     }
+
+    @Override
+    public Result upload(@RequestPart MultipartFile file) {
+        Result result=fileService.upload(file);
+        return result;
+    }
+
     @RequestMapping(value = "/file/{id}",method = RequestMethod.GET)
     public ResponseEntity<byte[]> downloadById(@PathVariable("id") String fileId)
             throws IOException

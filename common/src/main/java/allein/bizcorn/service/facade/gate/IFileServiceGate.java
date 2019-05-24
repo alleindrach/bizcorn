@@ -7,6 +7,7 @@ package allein.bizcorn.service.facade.gate;
 
 import allein.bizcorn.model.output.Result;
 import com.mongodb.client.gridfs.model.GridFSFile;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,8 +19,11 @@ import java.io.IOException;
 
 public interface IFileServiceGate {
 
-    @RequestMapping(value = "/files",method = RequestMethod.POST)
+    @RequestMapping(value = "/files",method = RequestMethod.POST,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Result upload(@RequestPart MultipartFile[] files) ;
+
+    @RequestMapping(value = "/file",method = RequestMethod.POST,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Result upload(@RequestPart MultipartFile file) ;
 
     @RequestMapping(value = "/file/{id}",method = RequestMethod.GET)
     public ResponseEntity<byte[]> downloadById(@PathVariable("id") String fileId)

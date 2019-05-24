@@ -368,4 +368,53 @@ public class StoryServiceMongoImpl implements IStoryService{
         return Result.successWithData(soundMessages);
 
     }
+
+    @Override
+    @PreAuthorize("hasAnyRole('ADMIN','admin')")
+    public Result adminGetSoundChannels() {
+        List<SoundChannel> soundChannels= soundChannelDAO.find(new Query());
+
+        return Result.successWithData(soundChannels);
+
+    }
+
+    @Override
+    @PreAuthorize("hasAnyRole('ADMIN','admin')")
+    public Result adminAddSoundChannel(@RequestBody  JSONObject channel) {
+        SoundChannel soundChannel= (SoundChannel) soundChannelDAO.findOne(new Query(Criteria.where("index").is(channel.getLong("index"))));
+        if(soundChannel!=null)
+            return Result.failWithException(new CommonException(ExceptionEnum.ADMIN_SOUND_CHANNEL_OCCUPIED));
+        soundChannel=new SoundChannel();
+        soundChannel.setImg(channel.getString("img"));
+        soundChannel.setIndex(channel.getInteger("index"));
+        soundChannel.setDesc(channel.getString("desc"));
+        soundChannel.setName(channel.getString("name"));
+        soundChannel=soundChannelDAO.save(soundChannel);
+        return Result.successWithData(soundChannel);
+    }
+
+    @Override
+    @PreAuthorize("hasAnyRole('ADMIN','admin')")
+    public Result adminUpdateSoundChannel(@RequestBody  JSONObject channel) {
+        SoundChannel soundChannel= (SoundChannel) soundChannelDAO.get(channel.getString("id"));
+        if(soundChannel==null)
+            return Result.failWithException(new CommonException(ExceptionEnum.ADMIN_SOUND_CHANNEL_NOT_EXIST));
+        soundChannel.setImg(channel.getString("img"));
+        soundChannel.setIndex(channel.getInteger("index"));
+        soundChannel.setDesc(channel.getString("desc"));
+        soundChannel.setName(channel.getString("name"));
+        soundChannel=soundChannelDAO.save(soundChannel);
+        return Result.successWithData(soundChannel);
+    }
+
+    @Override
+    @PreAuthorize("hasAnyRole('ADMIN','admin')")
+    public Result adminDeleteSoundChannel(@RequestBody  JSONObject channel) {
+        SoundChannel soundChannel= (SoundChannel) soundChannelDAO.get(channel.getString("id"));
+        if(soundChannel==null)
+            return Result.failWithException(new CommonException(ExceptionEnum.ADMIN_SOUND_CHANNEL_NOT_EXIST));
+
+        soundChannelDAO.deleteById(soundChannel);
+        return Result.successWithData(soundChannel.getIndex());
+    }
 }

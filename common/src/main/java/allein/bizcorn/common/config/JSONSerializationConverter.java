@@ -38,7 +38,11 @@ public class JSONSerializationConverter extends AbstractHttpMessageConverter<Obj
         // 使用Serializable，这里可以直接返回true
         // 使用object，这里还要加上Serializable接口实现类判断
         // 根据自己的业务需求加上其他判断
-        return true;
+        if(clazz.getName().compareToIgnoreCase( JSONObject.class.getName())==0)
+        {
+            return true;
+        }
+        return false;
     }
 
     @Override

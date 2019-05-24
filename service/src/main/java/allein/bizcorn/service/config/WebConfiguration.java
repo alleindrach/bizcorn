@@ -24,7 +24,7 @@ import java.util.List;
 public class WebConfiguration implements WebMvcConfigurer {
 
     @Override
-    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+    public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
 //        Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder()
 //                .indentOutput(true)
 //                .modulesToInstall(new ParameterNamesModule());

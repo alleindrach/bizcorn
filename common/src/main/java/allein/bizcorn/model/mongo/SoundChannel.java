@@ -21,7 +21,7 @@ public class SoundChannel implements Serializable {
     @Getter
     @Setter
     private String id;
-    @Indexed
+    @Indexed(unique = true)
     @Getter
     @Setter
     private Integer index ;
@@ -30,5 +30,9 @@ public class SoundChannel implements Serializable {
     private String  img;
     @Getter
     @Setter
+    @Indexed(unique = true)
     private String name;
+    @Getter
+    @Setter
+    private String desc;
 }

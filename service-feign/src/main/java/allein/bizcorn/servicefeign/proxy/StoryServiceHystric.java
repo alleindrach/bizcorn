@@ -5,6 +5,7 @@ import allein.bizcorn.common.exception.ExceptionEnum;
 import allein.bizcorn.model.input.SoundChannelIO;
 import allein.bizcorn.model.input.SoundMessageIO;
 import allein.bizcorn.model.output.Result;
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -71,7 +72,26 @@ public class StoryServiceHystric implements  StoryServiceProxy{
     @Override
     public Result msgList(String criteria, Integer pageIndex, Integer pageSize) {
         return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
+    }
 
+    @Override
+    public Result adminGetSoundChannels() {
+        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
+    }
+
+    @Override
+    public Result adminAddSoundChannel(JSONObject channel) {
+        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
+    }
+
+    @Override
+    public Result adminUpdateSoundChannel(JSONObject channel) {
+        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
+    }
+
+    @Override
+    public Result adminDeleteSoundChannel(JSONObject channel) {
+        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
     }
 
 }

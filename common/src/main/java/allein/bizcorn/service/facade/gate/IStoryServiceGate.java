@@ -8,6 +8,7 @@ package allein.bizcorn.service.facade.gate;
 import allein.bizcorn.model.input.SoundChannelIO;
 import allein.bizcorn.model.input.SoundMessageIO;
 import allein.bizcorn.model.output.Result;
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -52,5 +53,21 @@ public interface IStoryServiceGate {
     @RequestMapping(value="/sound/msg/list")
     @ResponseBody
     public Result msgList(@RequestParam("criteria") String criteria, @RequestParam("page") Integer  pageIndex,@RequestParam("size") Integer  pageSize);
+
+    @RequestMapping("/admin/sound/channel/list")
+    @ResponseBody
+    public Result adminGetSoundChannels();
+
+    @RequestMapping("/admin/sound/channel/add")
+    @ResponseBody
+    public Result adminAddSoundChannel(@RequestBody JSONObject channel);
+
+    @RequestMapping("/admin/sound/channel/update")
+    @ResponseBody
+    public Result adminUpdateSoundChannel(@RequestBody JSONObject channel);
+
+    @RequestMapping("/admin/sound/channel/delete")
+    @ResponseBody
+    public Result adminDeleteSoundChannel(@RequestBody JSONObject channel);
 
 }

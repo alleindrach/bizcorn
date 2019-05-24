@@ -74,50 +74,60 @@ public class FileServiceImpl implements IFileService {
         HashMap<String,Result > result=new HashMap<>();
 
         for (MultipartFile file:files) {
-            if (!file.isEmpty()) {
-                try {
-                    String uploadFilePath = file.getOriginalFilename();
-                    logger.debug("uploadFlePath:{}" , uploadFilePath);
-                    // 截取上传文件的文件名
-                    String uploadFileName = uploadFilePath
-                            .substring(uploadFilePath.lastIndexOf('\\') + 1,
-                                    uploadFilePath.indexOf('.'));
-                    logger.debug("multiReq.getFile {}" , uploadFileName);
-                    // 截取上传文件的后缀
-                    String uploadFileSuffix = uploadFilePath.substring(
-                            uploadFilePath.indexOf('.') + 1, uploadFilePath.length());
-                    logger.debug("uploadFileSuffix:{}" , uploadFileSuffix);
+
+            result.put(file.getOriginalFilename(),processOneFile(file));
+
+        }
+        return Result.successWithData(result);
+    }
+
+    private Result  processOneFile(MultipartFile file)
+    {
+        if (!file.isEmpty()) {
+            try {
+                String uploadFilePath = file.getOriginalFilename();
+                logger.debug("uploadFlePath:{}" , uploadFilePath);
+                // 截取上传文件的文件名
+                String uploadFileName = uploadFilePath
+                        .substring(uploadFilePath.lastIndexOf('\\') + 1,
+                                uploadFilePath.indexOf('.'));
+                logger.debug("multiReq.getFile {}" , uploadFileName);
+                // 截取上传文件的后缀
+                String uploadFileSuffix = uploadFilePath.substring(
+                        uploadFilePath.indexOf('.') + 1, uploadFilePath.length());
+                logger.debug("uploadFileSuffix:{}" , uploadFileSuffix);
 //                    stream = new BufferedOutputStream(new FileOutputStream(new File(
 //                            FileRoot + uploadFileName + "." + uploadFileSuffix)));
 
 
-                    String md5Name= DigestUtils.md5DigestAsHex(file.getBytes());
-                    GridFSFile gridFSFile=gridFsTemplate.findOne(Query.query(GridFsCriteria.whereFilename() .is(md5Name)));
+                String md5Name= DigestUtils.md5DigestAsHex(file.getBytes());
+                GridFSFile gridFSFile=gridFsTemplate.findOne(Query.query(GridFsCriteria.whereFilename() .is(md5Name)));
 
-                    if(gridFSFile!=null) {
-                        result.put(file.getOriginalFilename(),Result.successWithData(((BsonObjectId) gridFSFile.getId()).getValue().toString()));
+                if(gridFSFile!=null) {
+                    return Result.successWithData(((BsonObjectId) gridFSFile.getId()).getValue().toString());
+                }
+                else{
+                    InputStream ins = file.getInputStream();
+                    String contentType = file.getContentType();
+                    Document metaData=new Document();
+                    metaData.append(MetaData.CONTENT_TYPE.getValue(),contentType);
+                    metaData.append(MetaData.SUFFIX.getValue(),uploadFileSuffix);
+                    metaData.append(MetaData.ORIGIN_FILENAME.getValue(),uploadFilePath);
+                    ObjectId gridFSFileId = gridFsTemplate.store(ins, md5Name, metaData);
+
+                    MimeType mimeType=MimeTypeUtils.parseMimeType(contentType);
+                    if(mimeType.isCompatibleWith(MimeType.valueOf("image/*"))){
+                        messageQueueService.send(Topic.IMAGE_THUMB,gridFSFileId.toString());
                     }
-                    else{
-                        InputStream ins = file.getInputStream();
-                        String contentType = file.getContentType();
-                        Document metaData=new Document();
-                        metaData.append(MetaData.CONTENT_TYPE.getValue(),contentType);
-                        metaData.append(MetaData.SUFFIX.getValue(),uploadFileSuffix);
-                        metaData.append(MetaData.ORIGIN_FILENAME.getValue(),uploadFilePath);
-                        ObjectId gridFSFileId = gridFsTemplate.store(ins, md5Name, metaData);
-                        result.put(file.getOriginalFilename(),Result.successWithData(gridFSFileId.toString()));
-                        MimeType mimeType=MimeTypeUtils.parseMimeType(contentType);
-                        if(mimeType.isCompatibleWith(MimeType.valueOf("image/*"))){
-                            messageQueueService.send(Topic.IMAGE_THUMB,gridFSFileId.toString());
-                        }
-                    }
+                    return Result.successWithData(gridFSFileId.toString());
+                }
 //
 //                    byte[] bytes = file.getBytes();
 //                    stream.write(bytes,0,bytes.length);
-                } catch (Exception e) {
-                    logger.debug("上传文件错误:",e);
-                    result.put(file.getOriginalFilename(),Result.failWithException(e));
-                } finally {
+            } catch (Exception e) {
+                logger.debug("上传文件错误:",e);
+                return Result.failWithException(e);
+            } finally {
 //                    try {
 ////                        if (stream != null) {
 ////                            stream.close();
@@ -125,13 +135,21 @@ public class FileServiceImpl implements IFileService {
 //                    } catch (IOException e) {
 //                        logger.debug("上传文件错误:",e);
 //                    }
-                }
-            } else {
-                logger.debug("上传文件为空");
             }
+        } else {
+            logger.debug("上传文件为空");
         }
-        return Result.successWithData(result);
+        return Result.failWithMessage("上传失败");
     }
+    @Override
+    @PreAuthorize("hasAnyRole('USER','user')")
+    public Result upload(@RequestPart  MultipartFile file) {
+        String username= SecurityUtil.getUserName();
+        logger.debug("upload by {}",username);
+
+        return processOneFile(file);
+    }
+
     @Override
     public ResponseEntity<byte[]> downloadById(@PathVariable("id") String fileId) throws IOException {
         HttpServletRequest request=((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();

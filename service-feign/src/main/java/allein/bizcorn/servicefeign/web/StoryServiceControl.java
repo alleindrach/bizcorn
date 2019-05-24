@@ -8,12 +8,12 @@ import allein.bizcorn.model.output.Result;
 import allein.bizcorn.service.facade.gate.IStoryServiceGate;
 import allein.bizcorn.servicefeign.proxy.FileServiceProxy;
 import allein.bizcorn.servicefeign.proxy.StoryServiceProxy;
+import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -81,6 +81,27 @@ public class StoryServiceControl implements IStoryServiceGate {
     public Result msgList(@RequestParam("criteria") String criteria, @RequestParam("page") Integer  pageIndex,@RequestParam("size") Integer  pageSize) {
         return storyService.msgList(criteria,pageIndex,pageSize);
     }
+
+    @Override
+    public Result adminGetSoundChannels() {
+        return storyService.adminGetSoundChannels();
+    }
+
+    @Override
+    public Result adminAddSoundChannel(@RequestBody  JSONObject channel) {
+        return storyService.adminAddSoundChannel(channel);
+    }
+
+    @Override
+    public Result adminUpdateSoundChannel(@RequestBody  JSONObject channel) {
+        return storyService.adminUpdateSoundChannel(channel);
+    }
+
+    @Override
+    public Result adminDeleteSoundChannel(@RequestBody  JSONObject channel) {
+        return storyService.adminDeleteSoundChannel(channel);
+    }
+
     @Override
     public Result setSoundChannelBG(@RequestPart MultipartFile[] files,@RequestParam("channels")String channelsJson) {
         return storyService.setSoundChannelBG(files,channelsJson);
