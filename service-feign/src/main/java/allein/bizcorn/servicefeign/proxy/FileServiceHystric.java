@@ -2,6 +2,7 @@ package allein.bizcorn.servicefeign.proxy;
 
 import allein.bizcorn.common.exception.CommonException;
 import allein.bizcorn.common.exception.ExceptionEnum;
+import allein.bizcorn.common.web.BizResponseEntity;
 import allein.bizcorn.model.facade.IUser;
 import allein.bizcorn.model.output.Result;
 import org.springframework.http.ResponseEntity;
@@ -31,28 +32,28 @@ public class FileServiceHystric implements  FileServiceProxy{
     }
 
     @Override
-    public ResponseEntity<byte[]> downloadById(String fileId) throws IOException {
+    public BizResponseEntity<byte[]> downloadById(String fileId) throws IOException {
         HttpServletResponse response=((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
         response.sendError(500);
         return null;
     }
 
     @Override
-    public ResponseEntity<byte[]> thumbById(String fileId) throws IOException {
+    public BizResponseEntity<byte[]> thumbById(String fileId) throws IOException {
         HttpServletResponse response=((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
         response.sendError(500);
         return null;
     }
 
     @Override
-    public ResponseEntity<byte[]> downloadByName(String fileName) throws IOException {
+    public BizResponseEntity<byte[]> downloadByName(String fileName) throws IOException {
         HttpServletResponse response=((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
         response.sendError(500);
         return null;
     }
 
     @Override
-    public ResponseEntity<byte[]> thumbByName(String fileName) throws IOException {
+    public BizResponseEntity<byte[]> thumbByName(String fileName) throws IOException {
         HttpServletResponse response=((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
         response.sendError(500);
         return null;

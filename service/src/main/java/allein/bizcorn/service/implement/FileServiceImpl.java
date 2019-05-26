@@ -1,5 +1,6 @@
 package allein.bizcorn.service.implement;
 
+import allein.bizcorn.common.annotation.CacheMethod30S;
 import allein.bizcorn.common.exception.CommonException;
 import allein.bizcorn.common.exception.ExceptionEnum;
 import allein.bizcorn.common.misc.MetaData;
@@ -7,9 +8,11 @@ import allein.bizcorn.common.mq.Topic;
 import allein.bizcorn.common.util.FileUtil;
 import allein.bizcorn.common.util.SecurityUtil;
 import allein.bizcorn.common.util.UrlUtil;
+import allein.bizcorn.common.web.BizResponseEntity;
 import allein.bizcorn.model.output.Result;
 import allein.bizcorn.service.facade.IFileService;
 import allein.bizcorn.service.facade.IMessageQueueService;
+import com.alibaba.fastjson.JSONObject;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSDownloadStream;
 import com.mongodb.client.gridfs.model.GridFSFile;
@@ -23,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -142,19 +146,15 @@ public class FileServiceImpl implements IFileService {
         return Result.failWithMessage("上传失败");
     }
     @Override
-    @PreAuthorize("hasAnyRole('USER','user')")
+//    @PreAuthorize("hasAnyRole('USER','user')")
     public Result upload(@RequestPart  MultipartFile file) {
         String username= SecurityUtil.getUserName();
         logger.debug("upload by {}",username);
 
         return processOneFile(file);
     }
-
     @Override
-    public ResponseEntity<byte[]> downloadById(@PathVariable("id") String fileId) throws IOException {
-        HttpServletRequest request=((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        HttpServletResponse response=((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
-
+    public JSONObject getFileEntity(String fileId) throws FileNotFoundException, UnsupportedEncodingException {
         ResponseEntity<byte[]> entity = null;
         HttpHeaders headers = new HttpHeaders();
 
@@ -165,26 +165,10 @@ public class FileServiceImpl implements IFileService {
             throw new FileNotFoundException();
         }
         String fileName = gfsfile.getFilename().replace(",", "");
-        //处理中文文件名乱码
-        if (request.getHeader("User-Agent").toUpperCase().contains("MSIE") ||
-                request.getHeader("User-Agent").toUpperCase().contains("TRIDENT")
-                || request.getHeader("User-Agent").toUpperCase().contains("EDGE")) {
-            fileName = java.net.URLEncoder.encode(fileName, "UTF-8");
-        } else {
-            //非IE浏览器的处理：
-            fileName = new String(fileName.getBytes("UTF-8"), "ISO-8859-1");
-        }
+
+        fileName = new String(fileName.getBytes("UTF-8"), "ISO-8859-1");
         // 通知浏览器进行文件下载
         try {
-//            String mimeType=(String) gfsfile.getMetadata().get("_contentType");
-//            String[] mimeTypes=mimeType.split("/");
-//            if(mimeTypes!=null&&mimeTypes.length>0 )
-//            {
-//                headers.setContentType(new MediaType(mimeTypes[0],mimeTypes[1]));
-//            }else
-//            {
-//                headers.setContentType(new MediaType(mimeType));
-//            }
             String fileOriginName=(String)gfsfile.getMetadata().get(MetaData.ORIGIN_FILENAME.getValue());
 
             MimeType type= MimeTypeUtils.parseMimeType((String) gfsfile.getMetadata().get("_contentType"));
@@ -198,22 +182,37 @@ public class FileServiceImpl implements IFileService {
         {
             logger.debug("gfsfile:{} has no content type",gfsfile.getId());
         }
-
-
         HttpStatus status = HttpStatus.OK;
 //        OutputStream sos = response.getOutputStream();
 //        GridFSDBFile gridFSDBFile = (GridFSDBFile)gfsfile;
         byte[] fileBuffer = new byte[(int) gfsfile.getLength()];
-
+        int pos=0;
         GridFSDownloadStream in = gridFSBucket.openDownloadStream(gfsfile.getObjectId());
-        in.read(fileBuffer);
+        while(true) {
+            pos += in.read(fileBuffer, pos, 1024);
+            if(pos>=gfsfile.getLength())
+                break;
+        }
         in.close();
-        entity = new ResponseEntity<byte[]>(fileBuffer, headers, status);
+        JSONObject result=new JSONObject();
+        result.put("headers",headers);
+        result.put("body",fileBuffer);
+        return result;
+    }
+    @Override
+//    @Cacheable(value="method", keyGenerator = "MethodKeyGeneratorCache30S")
+    public BizResponseEntity<byte[]> downloadById(@PathVariable("id") String fileId) throws IOException {
+        HttpServletRequest request=((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        HttpServletResponse response=((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
+        JSONObject jsoResult=this.getFileEntity(fileId);
+        BizResponseEntity entity = new BizResponseEntity<byte[]>(
+                jsoResult.getBytes("body"),(HttpHeaders) jsoResult.get("headers"),HttpStatus.OK);
+
         return entity;
     }
 
     @Override
-    public ResponseEntity<byte[]> thumbById(@PathVariable("id") String fileId) throws IOException {
+    public BizResponseEntity<byte[]> thumbById(@PathVariable("id") String fileId) throws IOException {
         HttpServletResponse response=((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
         GridFSFile file=getFile(fileId);
         if(file==null)
@@ -229,7 +228,7 @@ public class FileServiceImpl implements IFileService {
     }
 
     @Override
-    public ResponseEntity<byte[]> downloadByName(@PathVariable("name") String fileName) throws IOException {
+    public BizResponseEntity<byte[]> downloadByName(@PathVariable("name") String fileName) throws IOException {
         HttpServletResponse response=((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
         GridFSFile file=getFileByName(fileName);
         if(file==null)
@@ -242,7 +241,7 @@ public class FileServiceImpl implements IFileService {
     }
 
     @Override
-    public ResponseEntity<byte[]> thumbByName(@PathVariable("name") String oriFileName) throws IOException {
+    public BizResponseEntity<byte[]> thumbByName(@PathVariable("name") String oriFileName) throws IOException {
 
         return downloadByName(oriFileName+".small");
     }

@@ -2,9 +2,12 @@ package allein.bizcorn.service.facade;
 
 import allein.bizcorn.model.output.Result;
 import allein.bizcorn.service.facade.gate.IFileServiceGate;
+import com.alibaba.fastjson.JSONObject;
 import com.mongodb.client.gridfs.model.GridFSFile;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 public interface IFileService extends IFileServiceGate {
 
@@ -15,6 +18,9 @@ public interface IFileService extends IFileServiceGate {
     public GridFSFile getFile(String id) throws IOException;
 
     public String getFileUrl(String id) ;
+
+    public JSONObject getFileEntity(String id) throws FileNotFoundException, UnsupportedEncodingException;
+
 /*
 @Description:根据多文件上传的结果集，读取文件ID
 @Param:

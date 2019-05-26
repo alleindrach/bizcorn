@@ -34,6 +34,7 @@ public class ExceptionHandler {
     @ResponseStatus(value = HttpStatus.CONFLICT,
             reason = "Data integrity violation")  // 409
     @org.springframework.web.bind.annotation.ExceptionHandler(DataIntegrityViolationException.class)
+    @ResponseBody
     public Result conflict(HttpServletRequest req, DataIntegrityViolationException ex) {
         logger.error("Request: " + req.getRequestURL(), ex);
 
@@ -43,14 +44,17 @@ public class ExceptionHandler {
     // Convert a predefined exception to an HTTP Status code
     @ResponseStatus(value = HttpStatus.GONE,
             reason = "资源不存在")  // 410
+    @ResponseBody
     @org.springframework.web.bind.annotation.ExceptionHandler(FileNotFoundException.class)
     public Result fileNotFound(HttpServletRequest req, FileNotFoundException ex) {
         logger.error("Request: " + req.getRequestURL(), ex);
         return Result.failWithException(ex);
     }
 //用户未登录
+    @ResponseStatus(value = HttpStatus.OK)
+    @ResponseBody
     @org.springframework.web.bind.annotation.ExceptionHandler(AuthenticationCredentialsNotFoundException.class)
-    public Result fileNotFound(HttpServletRequest req, AuthenticationCredentialsNotFoundException ex) throws IOException {
+    public Result userNotLogin(HttpServletRequest req, AuthenticationCredentialsNotFoundException ex)  {
         logger.error("Request: " + req.getRequestURL(), ex);
 
         return Result.failWithException(new CommonException(ExceptionEnum.USER_NOT_LOGIN));
@@ -66,6 +70,7 @@ public class ExceptionHandler {
     }
     // Specify name of a specific view that will be used to display the error:
     @org.springframework.web.bind.annotation.ExceptionHandler({SQLException.class, DataAccessException.class})
+    @ResponseBody
     public Result databaseError(HttpServletRequest req, Exception ex) {
 
         logger.error("Request: " + req.getRequestURL(), ex);

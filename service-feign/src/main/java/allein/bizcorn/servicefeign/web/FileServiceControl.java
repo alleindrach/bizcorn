@@ -1,6 +1,7 @@
 package allein.bizcorn.servicefeign.web;
 
 
+import allein.bizcorn.common.web.BizResponseEntity;
 import allein.bizcorn.model.output.Result;
 import allein.bizcorn.service.facade.gate.IFileServiceGate;
 import allein.bizcorn.servicefeign.proxy.CommonServiceProxy;
@@ -45,10 +46,10 @@ public class FileServiceControl implements IFileServiceGate {
     }
 
     @RequestMapping(value = "/file/{id}",method = RequestMethod.GET)
-    public ResponseEntity<byte[]> downloadById(@PathVariable("id") String fileId)
+    public BizResponseEntity<byte[]> downloadById(@PathVariable("id") String fileId)
             throws IOException
     {
-        ResponseEntity<byte[]> result=fileService.downloadById(fileId);
+        BizResponseEntity<byte[]> result=fileService.downloadById(fileId);
         return result;
     }
 
@@ -60,7 +61,7 @@ public class FileServiceControl implements IFileServiceGate {
     }
 
     @RequestMapping(value = "/file/small/{id}",method = RequestMethod.GET)
-    public ResponseEntity<byte[]> thumbById(@PathVariable("id") String fileId)
+    public BizResponseEntity<byte[]> thumbById(@PathVariable("id") String fileId)
             throws IOException
     {
         return fileService.thumbById(fileId);
@@ -68,14 +69,14 @@ public class FileServiceControl implements IFileServiceGate {
 
 
     @RequestMapping(value = "/file/byname/{name}",method = RequestMethod.GET)
-    public ResponseEntity<byte[]> downloadByName(@PathVariable("name") String fileName)
+    public BizResponseEntity<byte[]> downloadByName(@PathVariable("name") String fileName)
             throws IOException
     {
         return fileService.downloadByName(fileName);
     }
 
     @RequestMapping(value = "/file/small/byname/{name}",method = RequestMethod.GET)
-    public ResponseEntity<byte[]> thumbByName(@PathVariable("name") String fileName)
+    public BizResponseEntity<byte[]> thumbByName(@PathVariable("name") String fileName)
             throws IOException
     {
         return fileService.thumbByName(fileName);

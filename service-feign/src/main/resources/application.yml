@@ -13,12 +13,19 @@ eureka:
 
 server:
     port: 8765
-
+    tomcat:
+        uri-encoding: UTF-8
+        max-http-header-size: 102400000
+        max-http-post-size: 102400000
 
 
 spring:
     application:
         name: service-feign
+    servlet:
+        multipart:
+            max-file-size: 20Mb
+            max-request-size: 60Mb
     cloud:
         config:
             label: master

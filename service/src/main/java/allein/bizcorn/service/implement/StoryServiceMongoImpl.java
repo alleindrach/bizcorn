@@ -371,6 +371,7 @@ public class StoryServiceMongoImpl implements IStoryService{
 
     @Override
     @PreAuthorize("hasAnyRole('ADMIN','admin')")
+    @ResponseBody
     public Result adminGetSoundChannels() {
         List<SoundChannel> soundChannels= soundChannelDAO.find(new Query());
 
@@ -380,6 +381,7 @@ public class StoryServiceMongoImpl implements IStoryService{
 
     @Override
     @PreAuthorize("hasAnyRole('ADMIN','admin')")
+    @ResponseBody
     public Result adminAddSoundChannel(@RequestBody  JSONObject channel) {
         SoundChannel soundChannel= (SoundChannel) soundChannelDAO.findOne(new Query(Criteria.where("index").is(channel.getLong("index"))));
         if(soundChannel!=null)
@@ -395,6 +397,7 @@ public class StoryServiceMongoImpl implements IStoryService{
 
     @Override
     @PreAuthorize("hasAnyRole('ADMIN','admin')")
+    @ResponseBody
     public Result adminUpdateSoundChannel(@RequestBody  JSONObject channel) {
         SoundChannel soundChannel= (SoundChannel) soundChannelDAO.get(channel.getString("id"));
         if(soundChannel==null)
@@ -409,12 +412,13 @@ public class StoryServiceMongoImpl implements IStoryService{
 
     @Override
     @PreAuthorize("hasAnyRole('ADMIN','admin')")
+    @ResponseBody
     public Result adminDeleteSoundChannel(@RequestBody  JSONObject channel) {
         SoundChannel soundChannel= (SoundChannel) soundChannelDAO.get(channel.getString("id"));
         if(soundChannel==null)
             return Result.failWithException(new CommonException(ExceptionEnum.ADMIN_SOUND_CHANNEL_NOT_EXIST));
 
         soundChannelDAO.deleteById(soundChannel);
-        return Result.successWithData(soundChannel.getIndex());
+        return Result.successWithData(soundChannel);
     }
 }

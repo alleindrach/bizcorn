@@ -83,21 +83,25 @@ public class StoryServiceControl implements IStoryServiceGate {
     }
 
     @Override
+    @ResponseBody
     public Result adminGetSoundChannels() {
         return storyService.adminGetSoundChannels();
     }
 
     @Override
+    @ResponseBody
     public Result adminAddSoundChannel(@RequestBody  JSONObject channel) {
         return storyService.adminAddSoundChannel(channel);
     }
 
     @Override
+    @ResponseBody
     public Result adminUpdateSoundChannel(@RequestBody  JSONObject channel) {
         return storyService.adminUpdateSoundChannel(channel);
     }
 
     @Override
+    @ResponseBody
     public Result adminDeleteSoundChannel(@RequestBody  JSONObject channel) {
         return storyService.adminDeleteSoundChannel(channel);
     }
