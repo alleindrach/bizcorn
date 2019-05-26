@@ -146,7 +146,7 @@ public class FileServiceImpl implements IFileService {
         return Result.failWithMessage("上传失败");
     }
     @Override
-//    @PreAuthorize("hasAnyRole('USER','user')")
+    @PreAuthorize("hasAnyRole('USER','user')")
     public Result upload(@RequestPart  MultipartFile file) {
         String username= SecurityUtil.getUserName();
         logger.debug("upload by {}",username);
