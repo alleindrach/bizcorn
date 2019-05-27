@@ -201,18 +201,18 @@ public class FileServiceImpl implements IFileService {
     }
     @Override
 //    @Cacheable(value="method", keyGenerator = "MethodKeyGeneratorCache30S")
-    public BizResponseEntity<byte[]> downloadById(@PathVariable("id") String fileId) throws IOException {
+    public ResponseEntity<byte[]> downloadById(@PathVariable("id") String fileId) throws IOException {
         HttpServletRequest request=((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         HttpServletResponse response=((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
         JSONObject jsoResult=this.getFileEntity(fileId);
-        BizResponseEntity entity = new BizResponseEntity<byte[]>(
+        ResponseEntity entity = new ResponseEntity<byte[]>(
                 jsoResult.getBytes("body"),(HttpHeaders) jsoResult.get("headers"),HttpStatus.OK);
 
         return entity;
     }
 
     @Override
-    public BizResponseEntity<byte[]> thumbById(@PathVariable("id") String fileId) throws IOException {
+    public ResponseEntity<byte[]> thumbById(@PathVariable("id") String fileId) throws IOException {
         HttpServletResponse response=((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
         GridFSFile file=getFile(fileId);
         if(file==null)
@@ -228,7 +228,7 @@ public class FileServiceImpl implements IFileService {
     }
 
     @Override
-    public BizResponseEntity<byte[]> downloadByName(@PathVariable("name") String fileName) throws IOException {
+    public ResponseEntity<byte[]> downloadByName(@PathVariable("name") String fileName) throws IOException {
         HttpServletResponse response=((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
         GridFSFile file=getFileByName(fileName);
         if(file==null)
@@ -241,7 +241,7 @@ public class FileServiceImpl implements IFileService {
     }
 
     @Override
-    public BizResponseEntity<byte[]> thumbByName(@PathVariable("name") String oriFileName) throws IOException {
+    public ResponseEntity<byte[]> thumbByName(@PathVariable("name") String oriFileName) throws IOException {
 
         return downloadByName(oriFileName+".small");
     }

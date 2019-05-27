@@ -32,28 +32,28 @@ public class FileServiceHystric implements  FileServiceProxy{
     }
 
     @Override
-    public BizResponseEntity<byte[]> downloadById(String fileId) throws IOException {
+    public ResponseEntity<byte[]> downloadById(String fileId) throws IOException {
         HttpServletResponse response=((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
         response.sendError(500);
         return null;
     }
 
     @Override
-    public BizResponseEntity<byte[]> thumbById(String fileId) throws IOException {
+    public ResponseEntity<byte[]> thumbById(String fileId) throws IOException {
         HttpServletResponse response=((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
         response.sendError(500);
         return null;
     }
 
     @Override
-    public BizResponseEntity<byte[]> downloadByName(String fileName) throws IOException {
+    public ResponseEntity<byte[]> downloadByName(String fileName) throws IOException {
         HttpServletResponse response=((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
         response.sendError(500);
         return null;
     }
 
     @Override
-    public BizResponseEntity<byte[]> thumbByName(String fileName) throws IOException {
+    public ResponseEntity<byte[]> thumbByName(String fileName) throws IOException {
         HttpServletResponse response=((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
         response.sendError(500);
         return null;

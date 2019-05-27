@@ -46,10 +46,10 @@ public class FileServiceControl implements IFileServiceGate {
     }
 
     @RequestMapping(value = "/file/{id}",method = RequestMethod.GET)
-    public BizResponseEntity<byte[]> downloadById(@PathVariable("id") String fileId)
+    public ResponseEntity<byte[]> downloadById(@PathVariable("id") String fileId)
             throws IOException
     {
-        BizResponseEntity<byte[]> result=fileService.downloadById(fileId);
+        ResponseEntity<byte[]> result=fileService.downloadById(fileId);
         return result;
     }
 
@@ -61,7 +61,7 @@ public class FileServiceControl implements IFileServiceGate {
     }
 
     @RequestMapping(value = "/file/small/{id}",method = RequestMethod.GET)
-    public BizResponseEntity<byte[]> thumbById(@PathVariable("id") String fileId)
+    public ResponseEntity<byte[]> thumbById(@PathVariable("id") String fileId)
             throws IOException
     {
         return fileService.thumbById(fileId);
@@ -69,14 +69,14 @@ public class FileServiceControl implements IFileServiceGate {
 
 
     @RequestMapping(value = "/file/byname/{name}",method = RequestMethod.GET)
-    public BizResponseEntity<byte[]> downloadByName(@PathVariable("name") String fileName)
+    public ResponseEntity<byte[]> downloadByName(@PathVariable("name") String fileName)
             throws IOException
     {
         return fileService.downloadByName(fileName);
     }
 
     @RequestMapping(value = "/file/small/byname/{name}",method = RequestMethod.GET)
-    public BizResponseEntity<byte[]> thumbByName(@PathVariable("name") String fileName)
+    public ResponseEntity<byte[]> thumbByName(@PathVariable("name") String fileName)
             throws IOException
     {
         return fileService.thumbByName(fileName);

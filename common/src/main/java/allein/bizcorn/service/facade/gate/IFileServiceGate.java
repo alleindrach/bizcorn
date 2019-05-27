@@ -28,18 +28,18 @@ public interface IFileServiceGate {
     public Result upload(@RequestPart MultipartFile file) ;
 
     @RequestMapping(value = "/file/{id}",method = RequestMethod.GET)
-    public BizResponseEntity<byte[]> downloadById(@PathVariable("id") String fileId)
+    public ResponseEntity<byte[]> downloadById(@PathVariable("id") String fileId)
             throws IOException;
     @RequestMapping(value = "/file/small/{id}",method = RequestMethod.GET)
-    public BizResponseEntity<byte[]> thumbById(@PathVariable("id") String fileId)
+    public ResponseEntity<byte[]> thumbById(@PathVariable("id") String fileId)
             throws IOException;
 
     @RequestMapping(value = "/file/byname/{name}",method = RequestMethod.GET)
-    public BizResponseEntity<byte[]> downloadByName(@PathVariable("name") String fileName)
+    public ResponseEntity<byte[]> downloadByName(@PathVariable("name") String fileName)
             throws IOException;
 
     @RequestMapping(value = "/file/small/byname/{name}",method = RequestMethod.GET)
-    public BizResponseEntity<byte[]> thumbByName(@PathVariable("name") String fileName)
+    public ResponseEntity<byte[]> thumbByName(@PathVariable("name") String fileName)
             throws IOException;
 
 
