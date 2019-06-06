@@ -13,7 +13,7 @@ public class Profile  implements IProfile {
     String kindGarden;//幼儿园id
     @Getter
     @Setter
-    String face;//头像地址
+    String avatar;//头像地址
     @Getter
     @Setter
     String mail;//邮件地址

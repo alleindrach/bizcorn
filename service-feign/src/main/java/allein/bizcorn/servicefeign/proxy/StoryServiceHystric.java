@@ -62,6 +62,11 @@ public class StoryServiceHystric implements  StoryServiceProxy{
 
     }
 
+    @Override
+    public Result msg(String msgId) {
+        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
+    }
+
 
     @Override
     public Result msgCopy(String messageId) {
@@ -70,9 +75,10 @@ public class StoryServiceHystric implements  StoryServiceProxy{
     }
 
     @Override
-    public Result msgList(String criteria, Integer pageIndex, Integer pageSize) {
+    public Result msgList(JSONObject filter) {
         return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
     }
+
 
     @Override
     public Result adminGetSoundChannels() {
@@ -91,6 +97,16 @@ public class StoryServiceHystric implements  StoryServiceProxy{
 
     @Override
     public Result adminDeleteSoundChannel(JSONObject channel) {
+        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
+    }
+
+    @Override
+    public Result adminGetSounds(JSONObject filter) {
+        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
+    }
+
+    @Override
+    public Result adminAuditSound(JSONObject data) {
         return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
     }
 

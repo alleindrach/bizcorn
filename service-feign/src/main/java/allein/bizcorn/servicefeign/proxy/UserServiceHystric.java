@@ -5,6 +5,7 @@ import allein.bizcorn.common.exception.ExceptionEnum;
 
 
 import allein.bizcorn.model.facade.IUser;
+import allein.bizcorn.model.mongo.Profile;
 import allein.bizcorn.model.mongo.User;
 import allein.bizcorn.model.output.Result;
 import com.alibaba.fastjson.JSONObject;
@@ -30,6 +31,15 @@ public class UserServiceHystric implements  UserServiceProxy{
         return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
     }
 
+    @Override
+    public Result updateProfile(JSONObject profile) {
+        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
+    }
+
+    @Override
+    public Result<Profile> getProfile() {
+        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
+    }
 
     public Result update(String mobile) {
         return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
@@ -37,10 +47,6 @@ public class UserServiceHystric implements  UserServiceProxy{
 
 
 
-    @Override
-    public Result<Integer> update(User user) {
-        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
-    }
 
 
     @Override

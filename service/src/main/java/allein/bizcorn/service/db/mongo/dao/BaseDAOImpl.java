@@ -3,6 +3,7 @@ package allein.bizcorn.service.db.mongo.dao;
 import allein.bizcorn.model.mongo.User;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Sort;
@@ -16,6 +17,7 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 
 public class BaseDAOImpl<T extends Serializable> implements  BaseDAO<T>{
@@ -144,20 +146,40 @@ public class BaseDAOImpl<T extends Serializable> implements  BaseDAO<T>{
     protected Class<T> getEntityClass() {
         return ((Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0]);
     }
-    public JSONObject list(JSONObject params)
+
+
+    public Criteria combineCriteria(Criteria[] defines, String con) {
+        if(con==null || con.isEmpty())
+        {
+            con="and";
+        }
+        if(con.compareToIgnoreCase("and")==0)
+        {
+            return new Criteria().andOperator(defines);
+        }
+        if(con.compareToIgnoreCase("or")==0)
+        {
+            return new Criteria().andOperator(defines);
+        }
+        return null;
+    }
+    public Criteria buildCriteria(JSONArray defines)
     {
-        Integer from=params.getInteger("from");
-        Integer size=params.getInteger("size");
-        JSONArray filters=params.getJSONArray("filters");
-        JSONArray sorters=params.getJSONArray("sorters");
-        Criteria criteria=new Criteria();
-//        Class<T> ec = getEntityClass();
-//        Type ecft=null;
-        if(filters!=null && filters.size()>0)
-        for (Object o:filters
+        Criteria criterias[]= buildCriteriaArray(defines);
+        return combineCriteria(criterias,null);
+    }
+    public Criteria[] buildCriteriaArray(JSONArray defines )
+    {
+
+
+        List result=new ArrayList<Criteria>(10);
+        for (Object o:defines
                 ) {
             JSONObject jso=(JSONObject) o;
-            criteria=criteria.and(jso.getString("key"));
+            Criteria criteria=new Criteria();
+            if(jso.getString("key")!=null && !jso.getString("key").isEmpty())
+                criteria=Criteria.where(jso.getString("key"));
+
 //            try {
 //                Field ecf=ec.getField(jso.getString("key"));
 //
@@ -169,8 +191,15 @@ public class BaseDAOImpl<T extends Serializable> implements  BaseDAO<T>{
             switch (jso.getString("op")){
 
                 case "is":
-                    criteria=criteria.is(jso.getString("val"));
+                {
+                    if(criteria.getKey().endsWith("$id")){
+                        criteria=criteria.is(new ObjectId( jso.getString("val")));
+                    }else
+                        criteria=criteria.is(jso.getString("val"));
+
                     break;
+                }
+
                 case "==":
                     criteria=criteria.is(jso.getLong("val"));
                     break;
@@ -189,10 +218,42 @@ public class BaseDAOImpl<T extends Serializable> implements  BaseDAO<T>{
                 case "re"://正则表达式
                     criteria=criteria.regex(jso.getString("val"));
                     break;
+                case "ne"://not equal
+                    if(criteria.getKey().endsWith("$id")){
+                        criteria=criteria.ne(new ObjectId( jso.getString("val")));
+                    }else
+                        criteria=criteria.ne(jso.getString("val"));
+
+                    break;
                 case "has":
                     criteria=criteria.all(jso.getString("val").split(","));
                     break;
+                case "or":
+                case "and":
+                    JSONArray definesInner = jso.getJSONArray("val");
+                    Criteria inner[]=buildCriteriaArray(definesInner);
+                    criteria=combineCriteria(inner,jso.getString("op"));
+
+                    break;
+
             }
+            result.add(criteria);
+
+        }
+        return (Criteria[]) result.toArray(new Criteria[0]);
+    }
+    public JSONObject list(JSONObject params)
+    {
+        Integer from=params.getInteger("from");
+        Integer size=params.getInteger("size");
+        JSONArray filters=params.getJSONArray("filters");
+        JSONArray sorters=params.getJSONArray("sorters");
+        Criteria criteria=new Criteria();
+//        Class<T> ec = getEntityClass();
+//        Type ecft=null;
+        if(filters!=null && filters.size()>0)
+        {
+            criteria=buildCriteria(filters);
         }
 
         Query query=new Query(criteria);

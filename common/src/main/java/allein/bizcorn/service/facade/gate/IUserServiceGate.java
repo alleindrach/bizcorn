@@ -7,6 +7,7 @@ package allein.bizcorn.service.facade.gate;
 
 import allein.bizcorn.common.config.SecurityConstants;
 import allein.bizcorn.model.facade.IUser;
+import allein.bizcorn.model.mongo.Profile;
 import allein.bizcorn.model.mongo.User;
 import allein.bizcorn.model.output.Result;
 import com.alibaba.fastjson.JSON;
@@ -38,29 +39,26 @@ public interface IUserServiceGate {
     @RequestMapping(value = "/logout", method = RequestMethod.GET)
     Result logout();
 
-    @RequestMapping(value = "/user")
+    @RequestMapping(value = "/user/profile/set")
     /*
     @Description:用户更新
-    @Param:[mobile]
+    @Param:[profile:{
+    nickName:xxx,
+    avatar:fileid,
+    birthDate:number,
+    sex:M|F,
+    }]
     @Return:allein.bizcorn.model.output.Result
     @Author:Alleindrach@gmail.com
     @Date:2019/4/30
     @Time:2:42 PM
     */
-    Result update(
-            @RequestParam(value = "mobile") String mobile
+    Result updateProfile(
+            @RequestBody  JSONObject profile
     );
+    @RequestMapping(value="/user/profile/get")
+    public Result<Profile> getProfile();
 
-    @RequestMapping(value="/user/update")
-    /*
-    @Description:更新用户
-    @Param:[user]
-    @Return:allein.bizcorn.model.output.Result<java.lang.Integer>
-    @Author:Alleindrach@gmail.com
-    @Date:2019/4/30
-    @Time:2:47 PM
-    */
-    public Result<Integer> update(@RequestParam User user);
 
     @RequestMapping("/user/homepage")
     public Result<IUser> fetchHomepage();

@@ -1,7 +1,9 @@
 package allein.bizcorn.service.db.mongo.dao;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
@@ -65,4 +67,6 @@ public interface BaseDAO<T > {
 @Time:12:13 PM
 */
     public JSONObject list(JSONObject params);
+
+    public Criteria buildCriteria(JSONArray defines);
 }

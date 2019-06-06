@@ -46,13 +46,40 @@ public interface IStoryServiceGate {
     @ResponseBody
     public Result msgUp(@RequestPart MultipartFile[] files,@RequestParam("message") String messageJson);
 
+    @RequestMapping(value="/sound/msg/{id}")
+    @ResponseBody
+    public Result msg(@PathVariable("id") String msgId);
+
     @RequestMapping(value="/sound/msg/copy/{id}")
     @ResponseBody
+    /*
+    @Description:
+    @Param:[messageId 当messageId='all'时，置所有接收方为当前用户的状态status不为copied的对象为copied]
+    @Return:allein.bizcorn.model.output.Result
+    @Author:Alleindrach@gmail.com
+    @Date:2019/6/6
+    @Time:11:16 AM
+    */
     public Result msgCopy(@PathVariable("id") String  messageId);
 
     @RequestMapping(value="/sound/msg/list")
     @ResponseBody
-    public Result msgList(@RequestParam("criteria") String criteria, @RequestParam("page") Integer  pageIndex,@RequestParam("size") Integer  pageSize);
+    /*
+    @Description:
+    @Param:[filter]
+    {
+        from:1, 跳过记录序号，如果是1，则表明跳过一条记录，从第二条记录开始读取
+        size:10, 读取记录数
+        filters:[ {key:'status',op:'is',val:'INIT'}...], 过滤器
+        sorters:[ {key:'createTime',dir:'desc'}...] 排序字段
+        setCopied:0/1  是否标记为已读
+    }
+    @Return:allein.bizcorn.model.output.Result
+    @Author:Alleindrach@gmail.com
+    @Date:2019/6/6
+    @Time:10:00 AM
+    */
+    public Result msgList(@RequestBody JSONObject filter);
 
     @RequestMapping("/admin/sound/channel/list")
     @ResponseBody
@@ -70,4 +97,11 @@ public interface IStoryServiceGate {
     @ResponseBody
     public Result adminDeleteSoundChannel(@RequestBody JSONObject channel);
 
+    @RequestMapping("/admin/sound/audit/list")
+    @ResponseBody
+    public Result adminGetSounds(@RequestBody JSONObject filter);
+
+    @RequestMapping("/admin/sound/audit")
+    @ResponseBody
+    public Result adminAuditSound(@RequestBody JSONObject data);
 }

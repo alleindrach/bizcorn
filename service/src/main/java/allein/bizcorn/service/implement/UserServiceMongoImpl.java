@@ -114,6 +114,30 @@ public class UserServiceMongoImpl implements IUserService {
         return Result.successWithMessage("log out!");
     }
 
+    @Override
+    @PreAuthorize("hasAnyRole('USER','user')")
+    public Result updateProfile(JSONObject profile) {
+        String username=SecurityUtil.getUserName();
+        User user=userDAO.get(username);
+        if(user==null)
+            return  Result.failWithException(new CommonException(ExceptionEnum.USER_ACCOUNT_ID_INVALID));
+
+        Profile profilePOJO=JSON.parseObject(JSON.toJSONString(profile),Profile.class);
+        user.setProfile(profilePOJO);
+        userDAO.save(user);
+        return Result.successWithMessage("");
+    }
+
+    @Override
+    @PreAuthorize("hasAnyRole('USER','user')")
+    public Result<Profile> getProfile() {
+        String username=SecurityUtil.getUserName();
+        User user=userDAO.get(username);
+        if(user==null)
+            return  Result.failWithException(new CommonException(ExceptionEnum.USER_ACCOUNT_ID_INVALID));
+        return Result.successWithData(user.getProfile());
+    }
+
     public
     @PreAuthorize("hasAnyRole('USER','user')")
 //    @Transactional
@@ -156,12 +180,7 @@ public class UserServiceMongoImpl implements IUserService {
     {
         return cacheAccessor.del(this.ErrorTimesKey+userName);
     }
-    @Override
-    public Result<Integer> update(User user)
-    {
-        userDAO.save(user);
-        return Result.successWithData(user.getId());
-    }
+
 
     @Override
     public User getUser(String principal) {

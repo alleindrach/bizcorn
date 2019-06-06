@@ -10,6 +10,7 @@ import allein.bizcorn.model.facade.IMessage;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson.serializer.JSONSerializable;
 import com.alibaba.fastjson.serializer.JSONSerializer;
 import com.alibaba.fastjson.serializer.ObjectSerializer;
 import com.alibaba.fastjson.serializer.SerializerFeature;
@@ -32,17 +33,20 @@ import java.util.List;
 //        @CompoundIndex(name = "session_index", def = "{'sessionId', 1, 'createDate': -1}")
 //
 //})
-public class SoundMessage implements  Serializable{
+public class SoundMessage implements  Serializable //,JSONSerializable
+{
     @Id
     @Getter @Setter
     private String id;
 
     @DBRef(lazy = true)
     @Getter @Setter
+    @JSONField(serializeUsing =  UserSerializer.class)
     private User talker;
 
     @DBRef(lazy = true)
     @Setter @Getter
+    @JSONField(serializeUsing =  UserSerializer.class)
     private User talkee;
 
     @Setter @Getter
@@ -55,6 +59,19 @@ public class SoundMessage implements  Serializable{
     @Setter
     private List<String> tags;
 
+    @Getter
+    @Setter
+    private String name;
+
+    @Getter
+    @Setter
+    private String desc;
+
+    @Getter
+    @Setter
+    private AuditStatus auditStatus=AuditStatus.NONE;
+
+
     @Setter @Getter
     @Indexed(direction = IndexDirection.DESCENDING)
     @JSONField(serialzeFeatures = {SerializerFeature.WriteDateUseDateFormat})
@@ -66,5 +83,8 @@ public class SoundMessage implements  Serializable{
     private Date deliverDate;//送达时间
     @Setter @Getter
     private Date copyDate;//阅读时间
+
+    private Date auditDate;//审核时间
+
 
 }

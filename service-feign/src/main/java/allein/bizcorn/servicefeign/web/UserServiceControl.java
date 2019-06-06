@@ -4,6 +4,7 @@ package allein.bizcorn.servicefeign.web;
 import allein.bizcorn.common.config.SecurityConstants;
 import allein.bizcorn.model.facade.IUser;
 import allein.bizcorn.model.mongo.Kid;
+import allein.bizcorn.model.mongo.Profile;
 import allein.bizcorn.model.mongo.User;
 import allein.bizcorn.service.facade.gate.IUserServiceGate;
 import allein.bizcorn.servicefeign.proxy.UserServiceProxy;
@@ -74,20 +75,6 @@ public class UserServiceControl implements IUserServiceGate{
         return result ;
     }
 
-    @RequestMapping(value = "/user")
-    @ResponseBody
-    public Result update(@RequestParam String mobile) {
-
-        Result result= userService.update(mobile);
-        return result;
-    }
-
-    @Override
-    public Result<Integer> update(User user) {
-        return userService.update(user);
-    }
-
-
     @Override
     public Result<IUser> fetchHomepage() {
         return null;
@@ -98,6 +85,17 @@ public class UserServiceControl implements IUserServiceGate{
     {
         return  userService.logout();
     }
+
+    @Override
+    public Result updateProfile(@RequestBody  JSONObject profile) {
+        return userService.updateProfile(profile);
+    }
+
+    @Override
+    public Result<Profile> getProfile() {
+        return userService.getProfile();
+    }
+
     @RequestMapping(value = "/kid/register/{mac}")
     public Result register(@PathVariable("mac") String mac) {
         return userService.register(mac);

@@ -73,13 +73,18 @@ public class StoryServiceControl implements IStoryServiceGate {
     }
 
     @Override
+    public Result msg(@PathVariable("id") String msgId) {
+        return storyService.msg(msgId);
+    }
+
+    @Override
     public Result msgCopy(@PathVariable("id") String  messageId) {
         return storyService.msgCopy(messageId);
     }
 
     @Override
-    public Result msgList(@RequestParam("criteria") String criteria, @RequestParam("page") Integer  pageIndex,@RequestParam("size") Integer  pageSize) {
-        return storyService.msgList(criteria,pageIndex,pageSize);
+    public Result msgList(@RequestBody  JSONObject filter) {
+        return  storyService.msgList(filter);
     }
 
     @Override
@@ -104,6 +109,16 @@ public class StoryServiceControl implements IStoryServiceGate {
     @ResponseBody
     public Result adminDeleteSoundChannel(@RequestBody  JSONObject channel) {
         return storyService.adminDeleteSoundChannel(channel);
+    }
+
+    @Override
+    public Result adminGetSounds(@RequestBody  JSONObject filter) {
+        return storyService.adminGetSounds(filter);
+    }
+
+    @Override
+    public Result adminAuditSound(@RequestBody JSONObject data) {
+        return storyService.adminAuditSound(data);
     }
 
     @Override

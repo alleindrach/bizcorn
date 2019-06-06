@@ -6,6 +6,7 @@
          - mobilecaptcha 验证码
          - username 用户名
          - password 密码
+       - Content-Type:application/x-www-form-urlencoded
        -返回：
         result
             state=1 成功
@@ -16,6 +17,7 @@
         一个图形验证码只能使用一次，不管是否通过验证，都将从cache中删除。
     * 获取短信验证码
        GET /common/mobile/captcha
+       Content-Type:application/x-www-form-urlencoded
        参数：
        mobile:电话号码
        captcha:之前获取的图片验证码。
@@ -25,7 +27,9 @@
             state=0 失败
     * 登录
         POST /login
-        参数: username 用户名，也可以是电话号码
+        参数: 
+        Content-Type:application/x-www-form-urlencoded
+        username 用户名，也可以是电话号码
         password:密码
         captcha:非必须，只有超过3次验证错误时才需要，当登录返回CAPTCH_INVALID（000202）时，才需要进行图形验证码验证。
         返回：
@@ -34,6 +38,7 @@
                 state=0为失败，具体异常代码见reason字段，
     * 重置密码
         POST /password/reset
+        Content-Type:application/x-www-form-urlencoded
         参数：
             mobile:注册手机
             mobileCaptcha:手机验证码
@@ -41,6 +46,7 @@
             
     * 修改密码
             POST /password/change
+            Content-Type:application/x-www-form-urlencoded
             参数：
                 password:新的密码.    
                 oldPassword:旧密码
@@ -50,10 +56,12 @@
     * 绑定 用户A绑定用户B
         - 用户B获取绑定二维码
           POST /user/bind/token
+          Content-Type:application/x-www-form-urlencoded
           返回：result：data为token
           
-        - 用户A扫码，发起绑定，POST /user/bind/fire/{token}
-        
+        - 用户A扫码，发起绑定，
+        POST /user/bind/fire/{token}
+        Content-Type:application/x-www-form-urlencoded
         参数：token为用户B获取到的tokenid
         返回：result:
              data为token
@@ -68,7 +76,7 @@
         }
         - 被绑定方B确认绑定
         POST /user/bind/confirm/{token}
-        
+        Content-Type:application/x-www-form-urlencoded
         参数：token为发起绑定生成的tokenid
         
         - 绑定方A收到成功消息
@@ -88,6 +96,7 @@
             
     * 小童设备注册：
        POST/GET /kid/register/{mac}
+       Content-Type:application/x-www-form-urlencoded
           参数：mac mac地址
           权限：管理员 HasRole('ADMIN')
     * 文件下载
@@ -102,6 +111,13 @@
         Content-Disposition: form-data; name="attachment"; filename="xxx.jpg"
         Content-Type: image/jpeg
         Content-Length: 218936
+        
+    * 文件上传
+        POST /file  
+        Content-Type=multipart/form-data
+        file控件的name 为 'file'
+        返回：Result，data字段为fileId
+        
         
     * 声音变变变频道背景图片设置
         POST /sound/channels/up
@@ -136,23 +152,78 @@
             ] `
                    state =0 表明失败，reason为异常原因。
     * 声音变变变消息获取
-        /story/sound/{id}
+        /sound/msg/{id}
         参数：id为消息id
         返回：result.data 为消息实体，
-            {id: message.id,snd:file.id}
+            "talker":{
+            "id": "5cd3d4efc854351e3e725c79",
+            "username": "Allein"
+            },
+            "channel": 0,
+            "snd": "5cd648379a3782099aa3274b",
+            "tags": null,
+            "copyDate": null,
+            "talkee":{
+            "id": "5cd3dda3c854351f504508a9",
+            "username": "1020304050"
+            },
+            "name": null,
+            "auditStatus": "PENDING",
+            "deliverDate": null,
+            "id": "5cd648379a3782099aa3274d",
+            "createDate": 1557547063705,
+            "desc": null,
+            "status": "INIT"
+            
     * 声音变变变阅读回执
-        /story/sound/{id}/copy
-        参数：id为消息id
+        /sound/msg/copy/{id}
+        参数：id为消息id,如果为"all",则设置所有未读消息为已读
         返回：result
     * 声音变变变消息获取
-        /story/sound/fetch
+        POST /sound/msg/list
+        Content-Type=application/json
         参数:
-            pageIndex:起始页面
-            pageSize:页面长度
-            type: =0 全部消息
-                  =1 未读消息
+           {
+               from:1, 跳过记录序号，如果是1，则表明跳过一条记录，从第二条记录开始读取
+               size:10, 读取记录数
+               filters:[ {key:'status',op:'is',val:'INIT'}...], 过滤器
+               sorters:[ {key:'createTime',dir:'desc'}...] 排序字段
+               setCopied:0/1  是否标记为已读
+           }
         返回：
-            result.data => {count:xxx,msgs:[xxx]}
+            result.data => {count:xxx,list:[{
+            "talker":{"id": "5cd3d4efc854351e3e725c79", "username": "Allein"},
+            "talkee":{"id": "5cd3dda3c854351f504508a9", "username": "1020304050"},
+            "channel": 0,
+            "snd": "5cd648379a3782099aa3274b",
+            "auditStatus": "PENDING",
+            "id": "5cd648379a3782099aa3274d",
+            "createDate": 1557547063705,
+            "status": "INIT"
+            }]}
+            
+        说明：filter的写法
+        {op:"or",val:[
+        {        key:"status",        op:"eq",        val:"INIT"        },
+        {        key:"status",        op:"eq",        val:"COPIED"        },
+        { op:"and",val:[
+                {key:"talkee.$id",op:"is",val:"allein"},
+                {key:"talker.$id",op:"is",val:"lily"}
+            ]
+        }
+        ]}
+        翻译成：
+        {$or:[
+            {$eq:{"status","INIT"} ,
+            {$eq:{"status","COPIED"},
+            {$and:[
+                {$is:{"talkee.$id",ObjectId("allein")}},
+                {$is:{"talker.$id",ObjectId("lily")}}
+                ]}
+            }
+            ]
+        }
+        
     
             
 * websocket

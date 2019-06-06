@@ -20,6 +20,7 @@ import allein.bizcorn.service.facade.IUserService;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializeConfig;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,6 +28,7 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -321,13 +323,41 @@ public class StoryServiceMongoImpl implements IStoryService{
 
     @Override
     @PreAuthorize("hasAnyRole('USER','user')")
-    public Result msgCopy(@PathVariable("id") String  messageId) {
+    public Result msg(@PathVariable("id") String messageId) {
         User user=userDAO.select(SecurityUtil.getUserName());
         if(user==null)
         {
             return Result.failWithException(new CommonException(ExceptionEnum.USER_NOT_LOGIN));
         }
 
+        SoundMessage savedSoundMessage= soundMessageDAO.get(messageId);
+        if(savedSoundMessage!=null){
+            if(user.getId().compareToIgnoreCase(savedSoundMessage.getTalkee().getId())!=0)
+            {
+                return Result.failWithException(new CommonException(ExceptionEnum.USER_NOT_AUHTORIZED));
+            }
+//            SerializeConfig config=new SerializeConfig();
+//            config.put(User.class,new User.SimpleSerializer());
+//            config.put(Kid.class,new User.SimpleSerializer());
+
+            return Result.successWithData(savedSoundMessage);
+        }
+        return Result.failWithException(new CommonException(ExceptionEnum.MESSAGE_NOT_EXIST));
+    }
+
+    @Override
+    @PreAuthorize("hasAnyRole('USER','user')")
+    public Result msgCopy(@PathVariable("id") String  messageId) {
+        User user=userDAO.select(SecurityUtil.getUserName());
+        if(user==null)
+        {
+            return Result.failWithException(new CommonException(ExceptionEnum.USER_NOT_LOGIN));
+        }
+        if(messageId.compareToIgnoreCase("all")==0)
+        {
+            soundMessageDAO.update(Query.query(Criteria.where("talkee.$id").is(user.getId()).andOperator(Criteria.where("status").ne(MessageStatus.COPIED))),Update.update("status",MessageStatus.COPIED));
+            return Result.successWithData(messageId);
+        }
         SoundMessage savedSoundMessage= soundMessageDAO.get(messageId);
         if(savedSoundMessage!=null){
             if(user.getId().compareToIgnoreCase(savedSoundMessage.getTalkee().getId())!=0)
@@ -344,28 +374,38 @@ public class StoryServiceMongoImpl implements IStoryService{
     }
 
     @Override
-    public Result msgList(@RequestParam("criteria") String criteria, @RequestParam("page") Integer  pageIndex,@RequestParam("size") Integer  pageSize)
+    @PreAuthorize("hasAnyRole('USER','user')")
+    public Result msgList(@RequestBody JSONObject params)
     {
-        if(pageIndex==null)
-            pageIndex=0;
-        if(pageIndex<0)
-            pageIndex=0;
-
-        if(pageSize==null)
-            pageSize=10;
-        if(pageSize<0)
-            pageSize=10;
-        if(pageSize>20)
-            pageSize=20;
-
         User user=userDAO.select(SecurityUtil.getUserName());
         if(user==null)
         {
             return Result.failWithException(new CommonException(ExceptionEnum.USER_NOT_LOGIN));
         }
-        List<SoundMessage> soundMessages=soundMessageDAO.find(Query.query(Criteria.where("status").ne(MessageStatus.COPIED).orOperator(Criteria.where("talkee").is(user.getId()),Criteria.where("talker").is(user.getId()))).with(Sort.by(Sort.Direction.DESC, "createDate")).skip(pageIndex*pageSize).limit(pageSize));
-//        JSONObject[] resultData= (JSONObject[]) soundMessages.stream().map((SoundMessage x)->{return x.toResultJson();}).toArray();
-        return Result.successWithData(soundMessages);
+
+        JSONArray filters=params.getJSONArray("filters");
+
+        if(filters==null)
+            filters=new JSONArray();
+
+        filters.add(JSON.toJSON(new Filter("talkee.$id","is",user.getId())));
+
+        params.put("filters",filters);
+
+
+        JSONObject messages=soundMessageDAO.list(params);
+        if(params.getInteger("setCopied")!=null && params.getInteger("setCopied")==1)
+        {
+            Criteria criteria=soundMessageDAO.buildCriteria(filters);
+            soundMessageDAO.update(new Query(criteria),Update.update("status",MessageStatus.COPIED));
+        }
+
+
+        SerializeConfig config=new SerializeConfig();
+        config.put(User.class,new User.SimpleSerializer());
+        config.put(Kid.class,new User.SimpleSerializer());
+        messages.put("list",JSONArray.parse( JSON.toJSONString(messages.get("list"),config)));
+        return Result.successWithData(messages);
 
     }
 
@@ -420,5 +460,43 @@ public class StoryServiceMongoImpl implements IStoryService{
 
         soundChannelDAO.deleteById(soundChannel);
         return Result.successWithData(soundChannel);
+    }
+
+    @Override
+    @PreAuthorize("hasAnyRole('ADMIN','admin')")
+    public Result adminGetSounds(@RequestBody  JSONObject params) {
+        JSONArray filters=params.getJSONArray("filters");
+
+        if(filters==null)
+            filters=new JSONArray();
+
+//        filters.add(JSON.toJSON(new Filter("auditStatus","is",AuditStatus.PENDING)));
+
+//        params.put("filters",filters);
+
+        JSONObject result=soundMessageDAO.list(params);
+        SerializeConfig config=new SerializeConfig();
+        config.put(User.class,new User.SimpleSerializer());
+        config.put(Kid.class,new User.SimpleSerializer());
+        result.put("list",JSONArray.parse( JSON.toJSONString(result.get("list"),config)));
+        return Result.successWithData(result);
+
+    }
+
+    @Override
+    @PreAuthorize("hasAnyRole('ADMIN','admin')")
+    public Result adminAuditSound(@RequestBody  JSONObject data) {
+        JSONArray ids=data.getJSONArray("ids");
+
+        Boolean audit=data.getBoolean("audit");
+        soundMessageDAO.update(Query.query(Criteria.where("_id").in(ids.toJavaList(String.class))),
+                Update.update("auditStatus",audit?AuditStatus.APPROVED:AuditStatus.REJECTED).set("auditDate",new Date()));
+
+        List<SoundMessage> messages=soundMessageDAO.find(Query.query(Criteria.where("_id").in(ids.toJavaList(String.class))));
+        SerializeConfig config=new SerializeConfig();
+        config.put(User.class,new User.SimpleSerializer());
+        config.put(Kid.class,new User.SimpleSerializer());
+        JSONArray result= JSONArray.parseArray( JSON.toJSONString(messages,config));
+        return Result.successWithData(result);
     }
 }
