@@ -213,6 +213,9 @@ public class UserServiceMongoImpl implements IUserService {
         {
             return Result.failWithException(new CommonException(ExceptionEnum.USER_EXISTS));
         }
+        if(username==null || username.isEmpty()){
+            username="U"+mobile;
+        }
         if(username.matches("^[0-9]*$"))
         {
             return Result.failWithException(new CommonException(ExceptionEnum.USER_NAME_INVALID));
