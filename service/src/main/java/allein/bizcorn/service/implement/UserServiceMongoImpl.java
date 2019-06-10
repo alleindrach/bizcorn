@@ -116,9 +116,9 @@ public class UserServiceMongoImpl implements IUserService {
 
     @Override
     @PreAuthorize("hasAnyRole('USER','user')")
-    public Result updateProfile(JSONObject profile) {
+    public Result updateProfile(@RequestBody  JSONObject profile) {
         String username=SecurityUtil.getUserName();
-        User user=userDAO.get(username);
+        User user=userDAO.select(username);
         if(user==null)
             return  Result.failWithException(new CommonException(ExceptionEnum.USER_ACCOUNT_ID_INVALID));
 
@@ -132,8 +132,8 @@ public class UserServiceMongoImpl implements IUserService {
     @PreAuthorize("hasAnyRole('USER','user')")
     public Result<Profile> getProfile() {
         String username=SecurityUtil.getUserName();
-        User user=userDAO.get(username);
-        if(user==null)
+        User user=userDAO.select(username);
+         if(user==null)
             return  Result.failWithException(new CommonException(ExceptionEnum.USER_ACCOUNT_ID_INVALID));
         return Result.successWithData(user.getProfile());
     }
