@@ -52,7 +52,24 @@
                 oldPassword:旧密码
                 
             返回：
-                result:state=0 失败，state=1 成功        
+                result:state=0 失败，state=1 成功      
+                
+    * 用户Profile设定
+       POST /user/profile/set
+       Content-Type:application/json
+       参数：见Profile的定义
+       如：
+       {"kindGarden":0,
+        "avatar":"5cd431e5c8543526efb49233",
+        "realname":"nikky",
+        "sex":"F",
+        "tags":["a","b","c"]
+       }
+    * 用户Profile获取
+        POST/GET /user/profile/get
+        无参数
+        返回：Result.data 参见Profile的定义。
+    
     * 绑定 用户A绑定用户B
         - 用户B获取绑定二维码
           POST /user/bind/token
