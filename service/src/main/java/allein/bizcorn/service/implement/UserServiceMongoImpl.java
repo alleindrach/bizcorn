@@ -208,14 +208,14 @@ public class UserServiceMongoImpl implements IUserService {
             @CookieValue(value= SecurityConstants.MOBILE_CAPTCHA_KEY_COOKIE_NAME) String mobileCaptchaKey
     )
     {
-
+        if(username==null || username.isEmpty()){
+            username="U"+mobile;
+        }
         if(userDAO.select(username)!=null||userDAO.select(mobile)!=null)
         {
             return Result.failWithException(new CommonException(ExceptionEnum.USER_EXISTS));
         }
-        if(username==null || username.isEmpty()){
-            username="U"+mobile;
-        }
+
         if(username.matches("^[0-9]*$"))
         {
             return Result.failWithException(new CommonException(ExceptionEnum.USER_NAME_INVALID));
