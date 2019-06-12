@@ -24,6 +24,7 @@ public class UserDAOImpl extends   BaseDAOImpl<User> implements UserDAO  {
         user=this.selectByName(idNameMobile);
         if(user!=null) return user;
         user=this.selectByMobile(idNameMobile);
+        if(user!=null) return user;
         user=this.get(idNameMobile);
         if(user!=null) return user;
         return user;
