@@ -35,6 +35,9 @@ public enum ExceptionEnum {
     BIND_TOKEN_EXPIRED("010006","绑定凭据已过期"),
     BIND_TOKEN_INVALID("010007","绑定凭据错误"),
     BIND_NOT_EXIST("010008","绑定关系不存在"),
+
+    BIND_RELATION_ERROR("010009","绑定关系不合要求"),
+
     FILE_UPLOAD_FAIL("020001", "素材上传错误"),
     FILE_NOT_EXISTS("020002", "素材不存在"),
     CHANNELS_NOT_INITED("020101", "频道未初始化"),

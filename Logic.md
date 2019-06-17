@@ -70,6 +70,37 @@
         无参数
         返回：Result.data 参见Profile的定义。
     
+    * 用户设定绑定小童Profile
+    只有用户是小童的Parent 才可以设置
+           POST /user/kid/profile/set
+           Content-Type:application/json
+           参数：见Profile的定义
+           如：
+           {"kindGarden":0,
+            "avatar":"5cd431e5c8543526efb49233",
+            "realname":"nikky",
+            "sex":"F",
+            "tags":["a","b","c"]
+           }
+    * 用户获取绑定小童Profile
+    只有用户是小童的Parent 才可以获取
+            POST/GET /user/kid/profile/get
+            无参数
+            返回：Result.data 参见Profile的定义。
+        
+    * 用户设定小童长辈电话列表
+        只有用户是小童的Parent 才可以设置
+               POST /user/kid/elders/set
+               Content-Type:application/json
+               参数：
+               如：
+               {elders:['1232434','23232323']}
+    * 用户获取绑定小童长辈电话列表
+        只有用户是小童的Parent 才可以获取
+                POST/GET /user/kid/elders/get
+                无参数
+                返回：Result.data {elders:['1232434','23232323']}
+            
     * 绑定 用户A绑定用户B
         - 用户B获取绑定二维码
           POST /user/bind/token
@@ -105,9 +136,9 @@
          }
         参数：地址中的mac为需要绑定的设备的mac地址（去掉:间隔符）
           * 用户绑定小童
-            * 如果小童是初次绑定kid.owner==null，则设定小童的kid.owner=user，kid.curPartner=user，user.curPartner=kid
-            * 如果kid.owner!=null,且user in kid.ownerGroup ，设定小童的kid.owner=user，kid.curPartner=user，user.curPartner=kid
-            * 如果kid.owner!=null,且user not in kid.ownerGroup ，绑定失败。
+            * 如果小童是初次绑定kid.parent==null，则设定小童的kid.parent=user，kid.curPartner=user，user.curPartner=kid
+            * 如果kid.parent!=null,且user.mobile in kid.elderNumbers ，设定小童的kid.parent=user，kid.curPartner=user，user.curPartner=kid
+            * 如果kid.parent!=null,且user.mobile not in kid.elderNumbers ，绑定失败。
           * 小童绑定小童
             * 设定双方小童的curPartner=对方。
             

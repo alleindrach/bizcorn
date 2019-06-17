@@ -113,13 +113,25 @@ public class FileServiceImpl implements IFileService {
                 else{
                     InputStream ins = file.getInputStream();
                     String contentType = file.getContentType();
+                    MimeType mimeType=MimeTypeUtils.parseMimeType(contentType);
                     Document metaData=new Document();
+                    try {
+                        if (mimeType.isWildcardSubtype()) {
+                            contentType = mimeType.getType() + "/" + uploadFileSuffix;
+                            mimeType = MimeTypeUtils.parseMimeType(contentType);
+                        }
+                    }
+                    catch(Exception ex)
+                    {
+                        logger.error("解析ContentType 错误",ex);
+                    }
                     metaData.append(MetaData.CONTENT_TYPE.getValue(),contentType);
                     metaData.append(MetaData.SUFFIX.getValue(),uploadFileSuffix);
                     metaData.append(MetaData.ORIGIN_FILENAME.getValue(),uploadFilePath);
                     ObjectId gridFSFileId = gridFsTemplate.store(ins, md5Name, metaData);
+//                    java.nio.file.Files.probeContentType()
 
-                    MimeType mimeType=MimeTypeUtils.parseMimeType(contentType);
+
                     if(mimeType.isCompatibleWith(MimeType.valueOf("image/*"))){
                         messageQueueService.send(Topic.IMAGE_THUMB,gridFSFileId.toString());
                     }
@@ -172,10 +184,15 @@ public class FileServiceImpl implements IFileService {
             String fileOriginName=(String)gfsfile.getMetadata().get(MetaData.ORIGIN_FILENAME.getValue());
 
             MimeType type= MimeTypeUtils.parseMimeType((String) gfsfile.getMetadata().get("_contentType"));
-            headers.setContentType(new MediaType(type.getType(),type.getSubtype()));
             headers.setContentLength(gfsfile.getLength());
             headers.set("Content-MD5",gfsfile.getMD5());
             headers.setContentDispositionFormData("attachment",fileOriginName);
+            if(type.getSubtype().compareToIgnoreCase("*")==0)
+            {
+                headers.setContentType(new MediaType(type.getType(),(String)gfsfile.getMetadata().get(MetaData.SUFFIX.getValue())));
+            }else
+                headers.setContentType(new MediaType(type.getType(),type.getSubtype()));
+
 //            if(gfsfile.getContentType()!=null)
 //                headers.setContentType(new MediaType(gfsfile.getContentType()));
         }catch(Exception ex)

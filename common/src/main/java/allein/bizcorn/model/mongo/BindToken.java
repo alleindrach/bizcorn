@@ -38,12 +38,12 @@ public class BindToken  implements Serializable {
     @DBRef(lazy = true)
     @Indexed
     @Getter    @Setter
-    @JSONField(serialize = false)
+    @JSONField(serializeUsing = UserSerializer.class)
     private User binder;
     @DBRef(lazy = true)
     @Indexed
     @Getter    @Setter
-    @JSONField(serialize = false)
+    @JSONField(serializeUsing = UserSerializer.class)
     private User bindee;
     @Getter    @Setter
     private Date createDate;

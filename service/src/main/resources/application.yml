@@ -169,3 +169,10 @@ smsmessage:
         url: 1
         account: 1
         pwd: 1
+#logging:
+##    path: /data/log
+#    file: /data/log/service.log
+#    level:
+#        root: DEBUG
+#        allein.bizcorn.service: DEBUG
+#        allein.bizcorn.exception: DEBUG

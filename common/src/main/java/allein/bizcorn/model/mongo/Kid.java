@@ -5,6 +5,7 @@ import allein.bizcorn.model.facade.IParent;
 import allein.bizcorn.model.facade.IUser;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -20,7 +21,7 @@ public class Kid extends User implements IKid {
     @Getter
     @Setter
     private boolean canBind=true;
-    @DBRef
+    @DBRef(lazy=true)
     @Getter
     @Setter
     private User parent;

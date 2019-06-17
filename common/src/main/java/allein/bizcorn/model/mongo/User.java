@@ -91,6 +91,7 @@ public class User   implements IUser, JSONSerializable {
             User user=(User) object;
             jsonUser.put("id",user.getId());
             jsonUser.put("username",user.getUsername());
+            jsonUser.put("profile",user.getProfile());
             serializer.write(jsonUser);
         }
     }
@@ -126,6 +127,7 @@ public class User   implements IUser, JSONSerializable {
         JSONObject jsonUser=new JSONObject();
         jsonUser.put("id",this.getId());
         jsonUser.put("username",this.getUsername());
+        jsonUser.put("profile",getProfile());
         serializer.write(jsonUser);
     }
     public void addFriend(User user)

@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnResource;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.session.data.redis.RedisOperationsSessionRepository;
 import org.springframework.session.web.http.CookieSerializer;
 import org.springframework.session.web.http.DefaultCookieSerializer;
@@ -96,6 +97,18 @@ public class UserServiceControl implements IUserServiceGate{
         return userService.getProfile();
     }
 
+    @Override
+    @PreAuthorize("hasAnyRole('USER','user')")
+    public Result updateKidProfile(@RequestBody  JSONObject profile) {
+        return userService.updateKidProfile(profile);
+    }
+
+    @Override
+    @PreAuthorize("hasAnyRole('USER','user')")
+    public Result<Profile> getKidProfile() {
+        return userService.getKidProfile();
+    }
+
     @RequestMapping(value = "/kid/register/{mac}")
     public Result register(@PathVariable("mac") String mac) {
         return userService.register(mac);
@@ -120,6 +133,16 @@ public class UserServiceControl implements IUserServiceGate{
     @Override
     public Result queryBind(@PathVariable(value = "token") String token) {
         return userService.queryBind(token);
+    }
+
+    @Override
+    public Result setElderNumbers(@RequestBody  JSONObject params) {
+        return userService.setElderNumbers(params);
+    }
+
+    @Override
+    public Result getElderNumbers() {
+        return userService.getElderNumbers();
     }
 
     @Override

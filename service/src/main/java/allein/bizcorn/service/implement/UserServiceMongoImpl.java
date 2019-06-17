@@ -34,6 +34,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.convert.LazyLoadingProxy;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -90,14 +91,14 @@ public class UserServiceMongoImpl implements IUserService {
     @Autowired
     private IMessageQueueService messageQueueService;
 
-    private User getUserFromSession(){
+    public User getUserFromSession(){
         String username= SecurityUtil.getUserName();
         if(username!=null)
         {
             return userDAO.select(username);
         }else
         {
-            return null;
+            throw new CommonException(ExceptionEnum.USER_ACCOUNT_ID_INVALID);
         }
     }
     @Override
@@ -117,8 +118,7 @@ public class UserServiceMongoImpl implements IUserService {
     @Override
     @PreAuthorize("hasAnyRole('USER','user')")
     public Result updateProfile(@RequestBody  JSONObject profile) {
-        String username=SecurityUtil.getUserName();
-        User user=userDAO.select(username);
+        User user=getUserFromSession();
         if(user==null)
             return  Result.failWithException(new CommonException(ExceptionEnum.USER_ACCOUNT_ID_INVALID));
 
@@ -131,11 +131,53 @@ public class UserServiceMongoImpl implements IUserService {
     @Override
     @PreAuthorize("hasAnyRole('USER','user')")
     public Result<Profile> getProfile() {
-        String username=SecurityUtil.getUserName();
-        User user=userDAO.select(username);
-         if(user==null)
+        User user=getUserFromSession();
+        if(user==null)
             return  Result.failWithException(new CommonException(ExceptionEnum.USER_ACCOUNT_ID_INVALID));
         return Result.successWithData(user.getProfile());
+    }
+
+    public  Kid getChild(User user)
+    {
+        if(user.getCurPartner()==null)
+        {
+            throw new CommonException(ExceptionEnum.BIND_NOT_EXIST);
+        }
+        User kidUser=user.getCurPartner();
+        if(kidUser instanceof LazyLoadingProxy)
+            kidUser= (User) ((LazyLoadingProxy) kidUser).getTarget();
+
+        if(kidUser.getRole().getValue()!=Role.KID.getValue())
+            throw new CommonException(ExceptionEnum.BIND_KID_INVALID);
+
+        Kid kid=(Kid)kidUser;
+
+        User kidParent=kid.getParent();
+//        if(kidParent instanceof LazyLoadingProxy)
+//            kidParent=userDAO.get(kidParent.getId());
+        if(kidParent==null ||kidParent.getId()!=user.getId())
+        {
+            throw new CommonException(ExceptionEnum.BIND_RELATION_ERROR);
+        }
+        return kid;
+    }
+    @Override
+    @PreAuthorize("hasAnyRole('USER','user')")
+    public Result updateKidProfile(@RequestBody  JSONObject profile) {
+        User user=getUserFromSession();
+
+        Profile profilePOJO=JSON.parseObject(JSON.toJSONString(profile),Profile.class);
+        Kid kid=getChild(user);
+        kid.setProfile(profilePOJO);
+        userDAO.save(kid);
+        return Result.successWithMessage("");
+    }
+    @Override
+    @PreAuthorize("hasAnyRole('USER','user')")
+    public Result<Profile> getKidProfile() {
+        User user=getUserFromSession();
+        Kid kid=getChild(user);
+        return Result.successWithData(kid.getProfile());
     }
 
     public
@@ -388,6 +430,35 @@ public class UserServiceMongoImpl implements IUserService {
             return Result.failWithException(new CommonException(ExceptionEnum.BIND_TOKEN_INVALID));
         }
         return Result.successWithData(token);
+    }
+
+    @Override
+    public Result setElderNumbers(@RequestBody JSONObject params)
+    {
+        User user=getUserFromSession();
+        Kid kid=getChild(user);
+        List<String> eldersMobile=params.getJSONArray("elders").toJavaList(String.class);
+        kid.setElderNumbers(eldersMobile);
+        userDAO.save(kid);
+        JSONObject jsonObject=new JSONObject();
+        List numbers=kid.getElderNumbers();
+        if(numbers==null)
+            numbers=new ArrayList();
+        jsonObject.put("elders",new JSONArray(numbers));
+        return Result.successWithData(jsonObject);
+    }
+
+    @Override
+    public Result getElderNumbers() {
+        User user=getUserFromSession();
+        Kid kid=getChild(user);
+        JSONObject jsonObject=new JSONObject();
+        List numbers=kid.getElderNumbers();
+        if(numbers==null)
+            numbers=new ArrayList();
+        jsonObject.put("elders",new JSONArray(numbers));
+        return Result.successWithData(jsonObject);
+
     }
 
     @Override

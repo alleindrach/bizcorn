@@ -59,6 +59,13 @@ public interface IUserServiceGate {
     @RequestMapping(value="/user/profile/get")
     public Result<Profile> getProfile();
 
+    @RequestMapping(value = "/user/kid/profile/set")
+    Result updateKidProfile(
+            @RequestBody  JSONObject profile
+    );
+    @RequestMapping(value="/user/kid/profile/get")
+    public Result<Profile> getKidProfile();
+
 
     @RequestMapping("/user/homepage")
     public Result<IUser> fetchHomepage();
@@ -141,6 +148,20 @@ public interface IUserServiceGate {
     Result queryBind(
             @PathVariable(value = "token") String token
     );
+
+    /*
+    @Description:设定小童的长辈电话号码
+    @Param:{elders:['1232434','23232323']}
+    @Return:
+    @Author:Alleindrach@gmail.com
+    @Date:2019/6/17
+    @Time:10:12 AM
+    */
+    @RequestMapping(value = "/user/kid/elders/set",consumes={ "application/json", "text/plain" },produces = {"application/json"})
+    Result setElderNumbers(@RequestBody JSONObject params);
+
+    @RequestMapping(value = "/user/kid/elders/get",produces = {"application/json"})
+    Result getElderNumbers();
 
     @RequestMapping(value = "/password/reset")
     /*

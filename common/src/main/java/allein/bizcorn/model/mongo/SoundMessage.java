@@ -83,7 +83,7 @@ public class SoundMessage implements  Serializable //,JSONSerializable
     private Date deliverDate;//送达时间
     @Setter @Getter
     private Date copyDate;//阅读时间
-
+    @Setter @Getter
     private Date auditDate;//审核时间
 
 

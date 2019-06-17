@@ -51,7 +51,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //        WebSecurity主要是配置跟web资源相关的，比如css、js、images等等，但是这个还不是本质的区别，关键的区别如下：
 //        ingore是完全绕过了spring security的所有filter，相当于不走spring security
 //        https://www.baeldung.com/security-none-filters-none-access-permitAll
-        web.ignoring().antMatchers("/common/captcha.jpg","/user/mobile/captcha","/register","/password/reset");
+        web.ignoring().antMatchers("/websocket.html","/common/captcha.jpg","/user/mobile/captcha","/register","/password/reset");
     }
 
     @Override
@@ -61,7 +61,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //        AnonymousAuthenticationFilter 的 主要功能就是给没有登陆的用户，填充AnonymousAuthenticationToken到SecurityContextHolder的Authentication，后续依赖Authentication的代码可以统一处理。
 //        参见 SecurityFilters.class,FilterComparator
         http.authorizeRequests()
-                .antMatchers("/user","/user/*","/kid/register/*","/websocket","/story/*","/sound/*","/password/change","/admin/*").authenticated()
+                .antMatchers("/user","/user/*","/kid/register/*","/kid/*","/websocket","/story/*","/sound/*","/password/change","/admin/*").authenticated()
                 .and()
                 .formLogin().loginPage("/login")
                 .authenticationDetailsSource(authenticationDetailsSource)

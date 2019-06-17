@@ -82,4 +82,7 @@ public interface IUserService extends IUserServiceGate {
 */
     boolean rebind(User binder, Kid kid);
 
+    User getUserFromSession();
+
+    Kid getChild(User user);
 }
