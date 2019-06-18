@@ -6,6 +6,7 @@ import allein.bizcorn.model.facade.IUser;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.mongodb.core.convert.LazyLoadingProxy;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -22,7 +23,7 @@ public class Kid extends User implements IKid {
     @Setter
     private boolean canBind=true;
     @DBRef(lazy=true)
-    @Getter
+
     @Setter
     private User parent;
 
@@ -50,5 +51,11 @@ public class Kid extends User implements IKid {
         }
 
         return false;
+    }
+
+    public User getParent() {
+        if(parent instanceof LazyLoadingProxy)
+            return (User) ((LazyLoadingProxy)parent).getTarget();
+        return parent;
     }
 }

@@ -81,7 +81,7 @@ public class MessageBrokerServiceImpl implements IMessageBrokerService,Initializ
     public void send(Message message)
     {
         String username=message.getDestName();
-        simpMessagingTemplate.convertAndSendToUser(username, "/topic/message",message.toString());
+        simpMessagingTemplate.convertAndSendToUser(username, "/topic/message",JSON.toJSONString(message));
     }
 
     public void dispatch(JSONObject messageJson, String sender, String sessionId) {

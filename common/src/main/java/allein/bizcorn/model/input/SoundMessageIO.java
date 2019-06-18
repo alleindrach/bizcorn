@@ -5,6 +5,9 @@
 
 package allein.bizcorn.model.input;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
 
 /**
@@ -14,31 +17,15 @@ import java.io.Serializable;
  * @create: 2019-05-07 17:48
  **/
 public class SoundMessageIO implements Serializable{
+    @Getter @Setter
     private String id;
+    @Getter @Setter
     private Integer channel;
+    @Getter @Setter
     private String snd;
+    @Getter @Setter
+    private Boolean sync=true;
 
-    public Integer getChannel() {
-        return channel;
-    }
-
-    public void setChannel(Integer channel) {
-        this.channel = channel;
-    }
-
-    public String getSnd() {
-        return snd;
-    }
-
-    public void setSnd(String snd) {
-        this.snd = snd;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
+    @Getter @Setter
+    private Boolean echo=false;
 }

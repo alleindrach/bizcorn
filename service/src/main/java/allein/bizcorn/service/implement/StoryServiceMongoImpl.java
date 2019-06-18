@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.convert.LazyLoadingProxy;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -84,8 +85,8 @@ public class StoryServiceMongoImpl implements IStoryService{
 //
 //    }
 
-
-
+    @Value("${bizcorn.debug}")
+    private Boolean isDebug;
     private Story process(Result uploadResult , String detail)
     {
         Story story=new Story();
@@ -295,6 +296,8 @@ public class StoryServiceMongoImpl implements IStoryService{
         }
 
         User talkee=user.getCurPartner();
+        if(talkee instanceof LazyLoadingProxy)
+            talkee= (User) ((LazyLoadingProxy) talkee).getTarget();
 
         Result fileResult=fileService.upload(files);
         SoundMessageIO msg=JSON.parseObject(msgJson,SoundMessageIO.class);
@@ -313,10 +316,16 @@ public class StoryServiceMongoImpl implements IStoryService{
         soundMessage.setStatus(MessageStatus.INIT);
         SoundMessage savedSoundMessage= soundMessageDAO.save(soundMessage);
 
+        if(msg.getSync()) {
+            Message wsMsg = Message.SoundMorphyArrivedMessage(soundMessage);
+            messageBrokerService.send(wsMsg);
 
-        Message wsMsg = Message.SoundMorphyArrivedMessage(soundMessage);
-        messageBrokerService.send(wsMsg);
-
+        }
+        if(isDebug && msg.getEcho()){
+            soundMessage.setTalkee(soundMessage.getTalker());
+            Message wsMsg = Message.SoundMorphyArrivedMessage(soundMessage);
+            messageBrokerService.send(wsMsg);
+        }
         return  Result.successWithData(savedSoundMessage.getId());
 
     }

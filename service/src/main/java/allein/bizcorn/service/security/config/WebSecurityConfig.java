@@ -51,7 +51,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //        WebSecurity主要是配置跟web资源相关的，比如css、js、images等等，但是这个还不是本质的区别，关键的区别如下：
 //        ingore是完全绕过了spring security的所有filter，相当于不走spring security
 //        https://www.baeldung.com/security-none-filters-none-access-permitAll
-        web.ignoring().antMatchers("/websocket.html","/common/captcha.jpg","/user/mobile/captcha","/register","/password/reset");
+        web.ignoring().antMatchers("/msg/send/*","/websocket.html","/common/captcha.jpg","/user/mobile/captcha","/register","/password/reset");
     }
 
     @Override

@@ -166,7 +166,17 @@
         file控件的name 为 'file'
         返回：Result，data字段为fileId
         
-        
+    * 声音变变变消息上传一体接口
+         POST /sound/msg/up    
+         Content-Type=multipart/form-data
+         参数：
+            files:频道背景图片数组，注意，所有file控件的name字段必须为"files" 
+            message:字符串，JSON格式，
+            {
+                channel:1
+            }
+         返回：Result,data为messageId
+         
     * 声音变变变频道背景图片设置
         POST /sound/channels/up
         参数：

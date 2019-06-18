@@ -90,6 +90,10 @@ public class Result<T> implements Serializable{
     {
         return new Result(1,null,  null, JSON.toJSON(data));
     }
+    static public Result successWithRawData(Object data)
+    {
+        return new Result(1,null,  null,data);
+    }
     static public Result successWithMessage(String msg)
     {
         return new Result(1,msg, null,null);

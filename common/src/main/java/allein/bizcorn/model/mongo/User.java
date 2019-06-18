@@ -17,6 +17,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.convert.LazyLoadingProxy;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -72,9 +73,10 @@ public class User   implements IUser, JSONSerializable {
     @Getter
     @Setter
     private Status status;
+
+
     @JSONField(serialize = false)
     @DBRef(lazy = true)
-    @Getter
     @Setter
     private User curPartner;
     @Getter
@@ -83,6 +85,14 @@ public class User   implements IUser, JSONSerializable {
     @DBRef(lazy = true)
     @Getter @Setter
     private List<User> friends;
+
+    public User getCurPartner() {
+        if(this.curPartner instanceof LazyLoadingProxy)
+            return (User) ((LazyLoadingProxy)curPartner).getTarget();
+        return curPartner;
+    }
+
+
     static public class SimpleSerializer implements ObjectSerializer {
 
         @Override

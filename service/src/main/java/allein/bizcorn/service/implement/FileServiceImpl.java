@@ -82,7 +82,7 @@ public class FileServiceImpl implements IFileService {
             result.put(file.getOriginalFilename(),processOneFile(file));
 
         }
-        return Result.successWithData(result);
+        return Result.successWithRawData(result);
     }
 
     private Result  processOneFile(MultipartFile file)

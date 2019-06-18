@@ -74,6 +74,7 @@ bizcorn:
         attribute:
             user: user
             timeout: timeout
+    debug: true
 hystrix:
    command:
        default:

@@ -207,6 +207,8 @@ public interface IUserServiceGate {
     @RequestMapping(value = "/admin/user/import",consumes = MediaType.MULTIPART_FORM_DATA_VALUE,produces = {"application/json"})
     Result adminImportUser(
             @RequestPart MultipartFile file) throws Exception;
-
+//
+//    @RequestMapping(value = "/user/message/")
+//    Result msg(@RequestBody JSONObject jsoUser);
 }
 
