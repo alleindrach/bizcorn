@@ -13,6 +13,7 @@ import com.alibaba.fastjson.serializer.JSONSerializer;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.convert.LazyLoadingProxy;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -37,12 +38,12 @@ public class BindToken  implements Serializable {
     private String id;
     @DBRef(lazy = true)
     @Indexed
-    @Getter    @Setter
+    @Setter
     @JSONField(serializeUsing = UserSerializer.class)
     private User binder;
     @DBRef(lazy = true)
     @Indexed
-    @Getter    @Setter
+    @Setter
     @JSONField(serializeUsing = UserSerializer.class)
     private User bindee;
     @Getter    @Setter
@@ -64,4 +65,15 @@ public class BindToken  implements Serializable {
 
     }
 
+    public User getBinder() {
+        if(binder instanceof LazyLoadingProxy)
+            return (User) ((LazyLoadingProxy)binder).getTarget();
+        return binder;
+    }
+
+    public User getBindee() {
+        if(bindee instanceof LazyLoadingProxy)
+            return (User) ((LazyLoadingProxy)bindee).getTarget();
+        return bindee;
+    }
 }
