@@ -45,7 +45,7 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
         }
         if (exception instanceof BadCredentialsException) {
             User user = userService.getUser(username);
-            userService.incUserLoginErrorTimes(username);
+            userService.incUserLoginErrorTimes(user.getUsername());
         }
         String ajaxHeader = ((HttpServletRequest) request).getHeader("X-Requested-With");
         boolean isAjax =true;// "XMLHttpRequest".equals(ajaxHeader);

@@ -581,7 +581,7 @@ public class UserServiceMongoImpl implements IUserService {
             return Result.failWithException(new CommonException(ExceptionEnum.USER_NOT_LOGIN));
         }
         String md5Pwd=DigestUtils.md5DigestAsHex(oldPassword.toString().getBytes());
-        if(user.getPassword()!=md5Pwd)
+        if(!user.getPassword().equals(md5Pwd))
         {
             return Result.failWithException(new CommonException(ExceptionEnum.USER_PASSWORD_ERROR));
         }
