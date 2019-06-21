@@ -109,6 +109,16 @@ public class UserServiceControl implements IUserServiceGate{
         return userService.getKidProfile();
     }
 
+    @Override
+    public Result getFriends() {
+        return userService.getFriends();
+    }
+
+    @Override
+    public Result bindFriend(@PathVariable("id") String id) {
+        return userService.bindFriend(id);
+    }
+
     @RequestMapping(value = "/kid/register/{mac}")
     public Result register(@PathVariable("mac") String mac) {
         return userService.register(mac);

@@ -180,6 +180,39 @@ public class UserServiceMongoImpl implements IUserService {
         return Result.successWithData(kid.getProfile());
     }
 
+    @Override
+    @PreAuthorize("hasAnyRole('USER','user')")
+    public Result getFriends() {
+        User  user=getUserFromSession();
+
+        SerializeConfig config=new SerializeConfig();
+        config.put(User.class,new User.SimpleSerializer());
+        config.put(Kid.class,new User.SimpleSerializer());
+        String result=JSON.toJSONString(user.getFriends(),config);
+        return Result.successWithData(result);
+    }
+
+
+    @Override
+    @PreAuthorize("hasAnyRole('USER','user')")
+    public Result bindFriend(@PathVariable("id") String id) {
+        User  user=getUserFromSession();
+        if(!user.hasFriend(id))
+        {
+           return  Result.failWithException(new CommonException(ExceptionEnum.BIND_FRIEND_INVALID));
+        }
+        User bindee= userDAO.get(id);
+        if(bindee==null)
+            return  Result.failWithException(new CommonException(ExceptionEnum.BIND_FRIEND_NOT_EXIST));
+
+
+        BindToken newBindToken=new BindToken(bindee,user);
+        newBindToken = bindTokenDAO.save(newBindToken);
+        Message bindRequireMsg = Message.BindRequireMessage(newBindToken);
+        messageBrokerService.send(bindRequireMsg);
+        return Result.successWithData(newBindToken.getId());
+    }
+
     public
     @PreAuthorize("hasAnyRole('USER','user')")
 //    @Transactional

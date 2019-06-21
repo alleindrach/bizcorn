@@ -64,7 +64,14 @@ public class BindToken  implements Serializable {
         this.status=BindTokenStatus.INIT;
 
     }
+    public BindToken(User bindee,User binder)
+    {
+        this.bindee=bindee;
+        this.binder=binder;
+        this.createDate=new Date();
+        this.status=BindTokenStatus.FIRED;
 
+    }
     public User getBinder() {
         if(binder instanceof LazyLoadingProxy)
             return (User) ((LazyLoadingProxy)binder).getTarget();

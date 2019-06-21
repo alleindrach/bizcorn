@@ -83,7 +83,7 @@ public class User   implements IUser, JSONSerializable {
     @Setter
     protected  Role role=Role.ADULT;
     @DBRef(lazy = true)
-    @Getter @Setter
+    @Setter
     private List<User> friends;
 
     public User getCurPartner() {
@@ -144,6 +144,7 @@ public class User   implements IUser, JSONSerializable {
     {
         if(this.friends==null)
             this.friends= new ArrayList<>(10);
+
         for (Object o :this.friends
              ) {
             User friend=null;
@@ -158,8 +159,39 @@ public class User   implements IUser, JSONSerializable {
                 return;
             }
         }
+        if(friends.size()>10)
+            friends.remove(0);
         this.friends.add(user);
     }
+    public List<User> getFriends(){
+        List<User> realFriends=new ArrayList<>(10);
+        if(friends!=null && friends.size()>0){
+            for(Object o:friends){
+                if(o instanceof  LazyLoadingProxy)
+                    realFriends.add((User) ((LazyLoadingProxy) o).getTarget());
+                else
+                    realFriends.add((User)o);
+            }
+        }
+        return realFriends;
+    }
+    public Boolean hasFriend(String id){
+        for (Object o:
+             friends) {
+            if(o instanceof LazyLoadingProxy)
+            {
+                if(((User)((LazyLoadingProxy) o).getTarget()).getId().compareToIgnoreCase(id)==0)
+                    return true;
+            }else
+            {
+                if(((User)o).getId().compareToIgnoreCase(id)==0)
+                    return true;
+            }
+
+        }
+        return false;
+    }
+
     public  String fullJsonString(){
         SerializeConfig config=new SerializeConfig();
         config.put(User.class,new User.FullSerializer());

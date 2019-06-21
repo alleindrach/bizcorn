@@ -141,7 +141,20 @@
             * 如果kid.parent!=null,且user.mobile not in kid.elderNumbers ，绑定失败。
           * 小童绑定小童
             * 设定双方小童的curPartner=对方。
-            
+    * 朋友列表
+        POST/GET /user/friends
+        参数：无
+        权限：HasRole('user')
+        返回:Result,Data:
+        [
+        {username:"x",id:"xxxx"},{username:"y",id:"yyyyy"}
+        ]
+    * 绑定朋友
+         POST/GET /user/bind/friend/{id}
+         id:绑定对象的id
+         权限:HasRole('user')
+         返回：Result,Data: bindToken.id
+         
     * 小童设备注册：
        POST/GET /kid/register/{mac}
        Content-Type:application/x-www-form-urlencoded

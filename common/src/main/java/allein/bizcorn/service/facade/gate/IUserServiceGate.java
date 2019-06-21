@@ -66,6 +66,11 @@ public interface IUserServiceGate {
     @RequestMapping(value="/user/kid/profile/get")
     public Result<Profile> getKidProfile();
 
+    @RequestMapping(value="/user/friends")
+    public Result getFriends();
+
+    @RequestMapping(value="/user/bind/friend/{id}")
+    public Result bindFriend(@PathVariable String id);
 
     @RequestMapping("/user/homepage")
     public Result<IUser> fetchHomepage();
