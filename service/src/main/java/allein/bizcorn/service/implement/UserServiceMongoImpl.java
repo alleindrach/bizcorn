@@ -383,6 +383,12 @@ public class UserServiceMongoImpl implements IUserService {
                         kid.addFriend(binder);
                         isDirt=true;
                     }
+                    else if(kid.getParent()!=null && kid.getParent().getId().compareToIgnoreCase(binder.getId())==0)
+                    {
+                        kid.setCurPartner(binder);
+                        binder.setCurPartner(kid);
+                        isDirt=true;
+                    }
                     else
                     {
                         return Result.failWithException(new CommonException(ExceptionEnum.BIND_USER_INVALID));

@@ -72,7 +72,7 @@ spring:
 #redis
 
     redis:
-        host: 192.168.2.233
+        host: localhost
         port: 6379
         #password=bigdata123
         #database=15

@@ -144,6 +144,20 @@ public class User   implements IUser, JSONSerializable {
     {
         if(this.friends==null)
             this.friends= new ArrayList<>(10);
+        for (Object o :this.friends
+             ) {
+            User friend=null;
+            if(o instanceof LazyLoadingProxy)
+            {
+                friend= (User) ((LazyLoadingProxy) o).getTarget();
+            }
+            else
+                friend=(User )o;
+            if(friend.getId().compareToIgnoreCase(user.getId())==0)
+            {
+                return;
+            }
+        }
         this.friends.add(user);
     }
     public  String fullJsonString(){
