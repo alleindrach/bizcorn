@@ -250,6 +250,27 @@
         /sound/msg/copy/{id}
         参数：id为消息id,如果为"all",则设置所有未读消息为已读
         返回：result
+    * 声音变变变消息维护
+        POST /sound/msg/{action}/{id}
+        Content-Type=application/json
+        参数:
+        路径参数：action: 
+                        delete 删除，只能是talker或者talker的父母方
+                        publish 发布，只能是talker或者talker的父母方
+                        send 发给绑定方，可以是公共库转发，转发会复制一份消息。
+                        edit 编辑，只能是talker或者talker的父母方，其状态为未公开
+                id:消息id
+        RequestBody  param:
+                delete: null
+                publish：{
+                    name: 命名
+                    desc: 描述
+                    tags: [标签数组]
+                }
+                send:null
+                edit: 同publish
+        返回：
+            除send 公共库转发外，其他都为空字符串，公共库转发返回复制的消息id
     * 声音变变变消息获取
         POST /sound/msg/list
         Content-Type=application/json
@@ -260,6 +281,8 @@
                filters:[ {key:'status',op:'is',val:'INIT'}...], 过滤器
                sorters:[ {key:'createTime',dir:'desc'}...] 排序字段
                setCopied:0/1  是否标记为已读
+               repo:0=私有对话，只读取talkee/talker为当前用户的消息，1=公有库里的消息,auditStatus=APPROVIED的消息
+               
            }
         返回：
             result.data => {count:xxx,list:[{

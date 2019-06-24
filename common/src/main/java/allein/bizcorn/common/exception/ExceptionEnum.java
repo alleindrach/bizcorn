@@ -43,8 +43,9 @@ public enum ExceptionEnum {
     FILE_NOT_EXISTS("020002", "素材不存在"),
     CHANNELS_NOT_INITED("020101", "频道未初始化"),
 
-    MESSAGE_NOT_EXIST("020102", "文件不存在"),
-
+    MESSAGE_NOT_EXIST("020102", "信息不存在"),
+    MESSAGE_AUDIT_STATUS_ERROR("020103", "信息审核状态错误"),
+    MESSAGE_ACTION_ERROR("020104", "信息操作符错误"),
 
     ADMIN_USER_ACCOUNT_NOT_EXIST("100001","用户账户错误"),
     ADMIN_USER_AUTORITIES_INVALID("100002","用户权限错误"),

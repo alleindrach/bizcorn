@@ -78,6 +78,11 @@ public class StoryServiceControl implements IStoryServiceGate {
     }
 
     @Override
+    public Result msgAction(@PathVariable("action") String action,@PathVariable("id") String msgId,@RequestBody(required=false) JSONObject param) {
+        return storyService.msgAction(action,msgId,param);
+    }
+
+    @Override
     public Result msgCopy(@PathVariable("id") String  messageId) {
         return storyService.msgCopy(messageId);
     }

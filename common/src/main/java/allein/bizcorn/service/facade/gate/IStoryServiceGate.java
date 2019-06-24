@@ -50,6 +50,33 @@ public interface IStoryServiceGate {
     @ResponseBody
     public Result msg(@PathVariable("id") String msgId);
 
+/*
+@Description:消息操作
+@Param:
+action: delete 删除，只能是talker或者talker的父母方
+        publish 发布，只能是talker或者talker的父母方
+        send 发给绑定方，可以是公共库转发
+        edit 编辑，只能是talker或者talker的父母方
+param:
+        delete: null
+        publish：{
+            name: 命名
+            desc: 描述
+            tags: [标签数组]
+        }
+        send:null
+        edit: 同publish
+
+@Return:
+@Author:Alleindrach@gmail.com
+@Date:2019/6/24
+@Time:9:03 AM
+*/
+    @RequestMapping(value="/sound/msg/{action}/{id}")
+    @ResponseBody
+    public Result msgAction(@PathVariable("action") String action,@PathVariable("id") String msgId,@RequestBody(required = false) JSONObject param);
+
+
     @RequestMapping(value="/sound/msg/copy/{id}")
     @ResponseBody
     /*
@@ -73,6 +100,7 @@ public interface IStoryServiceGate {
         filters:[ {key:'status',op:'is',val:'INIT'}...], 过滤器
         sorters:[ {key:'createTime',dir:'desc'}...] 排序字段
         setCopied:0/1  是否标记为已读
+        repo: 0=私有对话,1=公有库,2=其他，自定义
     }
     @Return:allein.bizcorn.model.output.Result
     @Author:Alleindrach@gmail.com

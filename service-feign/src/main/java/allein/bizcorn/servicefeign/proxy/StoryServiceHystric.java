@@ -67,6 +67,11 @@ public class StoryServiceHystric implements  StoryServiceProxy{
         return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
     }
 
+    @Override
+    public Result msgAction(String action, String msgId, JSONObject param) {
+        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
+    }
+
 
     @Override
     public Result msgCopy(String messageId) {

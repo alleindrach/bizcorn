@@ -22,6 +22,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializeConfig;
 import org.bson.types.ObjectId;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -356,6 +357,98 @@ public class StoryServiceMongoImpl implements IStoryService{
 
     @Override
     @PreAuthorize("hasAnyRole('USER','user')")
+    public Result msgAction(@PathVariable("action") String action,@PathVariable("id") String msgId,@RequestBody(required=false) JSONObject param) {
+        User user=userService.getUserFromSession();
+        SoundMessage soundMessage=soundMessageDAO.get(msgId);
+        if(soundMessage==null)
+            return Result.failWithException(new CommonException(ExceptionEnum.MESSAGE_NOT_EXIST));
+        if(action!=null)
+        {
+           if(action.compareToIgnoreCase("delete")==0 )
+           {
+                if(!soundMessage.isValidOwner(user)){
+                    return Result.failWithException(new CommonException(ExceptionEnum.USER_NOT_AUHTORIZED));
+                }
+               soundMessageDAO.deleteById(soundMessage);
+               return Result.successWithMessage("");
+           }else if(action.compareToIgnoreCase("send")==0)
+           {
+               if(soundMessage.getTalker().getId().compareToIgnoreCase(user.getId())==0){
+                   //私有对话重发
+                   Message wsMsg = Message.SoundMorphyArrivedMessage(soundMessage);
+                   messageBrokerService.send(wsMsg);
+                   return Result.successWithMessage("");
+               }
+               else if(soundMessage.isPublished())
+               {
+                   //从库里转发
+                   SoundMessage soundMessageReplicated=new SoundMessage();
+                   BeanUtils.copyProperties(soundMessage,soundMessageReplicated);
+                   soundMessageReplicated.setTalker(user);
+                   soundMessageReplicated.setTalkee(user.getCurPartner());
+                   soundMessageReplicated.setCreateDate(new Date());
+                   soundMessageReplicated.setAuditDate(null);
+                   soundMessageReplicated.setAuditStatus(AuditStatus.NONE);
+                   soundMessageReplicated.setDeliverDate(new Date());
+                   soundMessageDAO.save(soundMessageReplicated);
+                   Message wsMsg = Message.SoundMorphyArrivedMessage(soundMessageReplicated);
+                   messageBrokerService.send(wsMsg);
+                   return Result.successWithData(soundMessageReplicated.getId());
+               }
+
+           }else if(action.compareToIgnoreCase("publish")==0)
+           {
+               if(!soundMessage.isValidOwner(user)){
+                   return Result.failWithException(new CommonException(ExceptionEnum.USER_NOT_AUHTORIZED));
+               }
+               if(soundMessage.getAuditStatus()==AuditStatus.NONE)
+               {
+                   soundMessage.setAuditFireDate(new  Date());
+                   soundMessage.setAuditStatus(AuditStatus.PENDING);
+                   if(param!=null) {
+                       if(param.getString("name")!=null)
+                        soundMessage.setName(param.getString("name"));
+                       if(param.getString("desc")!=null)
+                           soundMessage.setDesc(param.getString("desc"));
+                       if(param.getJSONArray("tags")!=null) {
+                           soundMessage.setTags(param.getJSONArray("tags").toJavaList(String.class));
+                       }
+                   }
+                   soundMessageDAO.save(soundMessage);
+                   return Result.successWithMessage("");
+               }
+               else
+               {
+                   return Result.failWithException(new CommonException(ExceptionEnum.MESSAGE_AUDIT_STATUS_ERROR));
+               }
+
+           }else if(action.compareToIgnoreCase("edit")==0)
+           {
+               if(!soundMessage.isValidOwner(user)){
+                   return Result.failWithException(new CommonException(ExceptionEnum.USER_NOT_AUHTORIZED));
+               }
+               soundMessage.setAuditFireDate(new  Date());
+               soundMessage.setAuditStatus(AuditStatus.PENDING);
+               if(param!=null) {
+                   if(param.getString("name")!=null)
+                       soundMessage.setName(param.getString("name"));
+                   if(param.getString("desc")!=null)
+                       soundMessage.setDesc(param.getString("desc"));
+                   if(param.getJSONArray("tags")!=null) {
+                       soundMessage.setTags(param.getJSONArray("tags").toJavaList(String.class));
+                   }
+               }
+               //修改过的mesg，审核状态置为未审核，未发布
+               soundMessage.setAuditStatus(AuditStatus.NONE);
+               soundMessageDAO.save(soundMessage);
+               return Result.successWithMessage("");
+           }
+        }
+        return  Result.failWithException(new CommonException(ExceptionEnum.MESSAGE_ACTION_ERROR));
+    }
+
+    @Override
+    @PreAuthorize("hasAnyRole('USER','user')")
     public Result msgCopy(@PathVariable("id") String  messageId) {
         User user=userDAO.select(SecurityUtil.getUserName());
         if(user==null)
@@ -397,7 +490,21 @@ public class StoryServiceMongoImpl implements IStoryService{
         if(filters==null)
             filters=new JSONArray();
 
-        filters.add(JSON.toJSON(new Filter("talkee.$id","is",user.getId())));
+        if(params.getInteger("repo")==null||params.getInteger("repo")==0)
+        {
+            JSONObject filter=new JSONObject();
+            filter.put("op","or");
+            JSONArray subFilters=new JSONArray();
+            subFilters.add(JSON.toJSON(new Filter("talkee.$id","is",user.getId())));
+            subFilters.add(JSON.toJSON(new Filter("talker.$id","is",user.getId())));
+            filter.put("val",subFilters);
+            filters.add(filter);
+        }
+        else if(params.getInteger("repo")==1)
+        {
+            filters.add(JSON.toJSON(new Filter("auditStatus","is",AuditStatus.APPROVED)));
+        }
+
 
         params.put("filters",filters);
 

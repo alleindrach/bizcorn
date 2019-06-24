@@ -17,6 +17,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.convert.LazyLoadingProxy;
 import org.springframework.data.mongodb.core.index.IndexDirection;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -40,12 +41,12 @@ public class SoundMessage implements  Serializable //,JSONSerializable
     private String id;
 
     @DBRef(lazy = true)
-    @Getter @Setter
+    @Setter
     @JSONField(serializeUsing =  UserSerializer.class)
     private User talker;
 
     @DBRef(lazy = true)
-    @Setter @Getter
+    @Setter
     @JSONField(serializeUsing =  UserSerializer.class)
     private User talkee;
 
@@ -84,7 +85,45 @@ public class SoundMessage implements  Serializable //,JSONSerializable
     @Setter @Getter
     private Date copyDate;//阅读时间
     @Setter @Getter
+    private Date auditFireDate;//送审时间
+    @Setter @Getter
     private Date auditDate;//审核时间
 
+    public User getTalker() {
+        if(this.talker instanceof LazyLoadingProxy)
+            return (User) ((LazyLoadingProxy)talker).getTarget();
+        return talker;
+    }
+
+
+    public User getTalkee() {
+        if(this.talkee instanceof LazyLoadingProxy)
+            return (User) ((LazyLoadingProxy)talkee).getTarget();
+        return talkee;
+    }
+
+
+    public Boolean isValidOwner(User user)
+    {
+        if(getTalker().getId().compareToIgnoreCase(user.getId())==0)
+        {
+            return true;
+        }
+        if(getTalkee().getId().compareToIgnoreCase(user.getId())==0)
+        {
+            return true;
+        }
+        if(getTalkee() instanceof  Kid
+                && (Kid)((Kid) getTalkee()).getParent() !=null
+                && ((Kid)((Kid) getTalkee())).getParent().getId().compareToIgnoreCase(user.getId())==0)
+        {
+            return true;
+        }
+        return false;
+    }
+    public boolean isPublished()
+    {
+        return auditStatus.equals(AuditStatus.APPROVED);
+    }
 
 }

@@ -159,7 +159,7 @@ public class BaseDAOImpl<T extends Serializable> implements  BaseDAO<T>{
         }
         if(con.compareToIgnoreCase("or")==0)
         {
-            return new Criteria().andOperator(defines);
+            return new Criteria().orOperator(defines);
         }
         return null;
     }
