@@ -182,13 +182,24 @@ public class UserServiceMongoImpl implements IUserService {
 
     @Override
     @PreAuthorize("hasAnyRole('USER','user')")
+    public Result getSelfInfo() {
+        User user=getUserFromSession();
+        SerializeConfig config=new SerializeConfig();
+        config.put(User.class,new User.SimpleSerializer());
+        config.put(Kid.class,new User.SimpleSerializer());
+        JSONObject result=JSON.parseObject(JSON.toJSONString(user,config));
+        return Result.successWithData(result);
+    }
+
+    @Override
+    @PreAuthorize("hasAnyRole('USER','user')")
     public Result getFriends() {
         User  user=getUserFromSession();
 
         SerializeConfig config=new SerializeConfig();
         config.put(User.class,new User.SimpleSerializer());
         config.put(Kid.class,new User.SimpleSerializer());
-        String result=JSON.toJSONString(user.getFriends(),config);
+        JSONArray result=JSONArray.parseArray( JSON.toJSONString(user.getFriends(),config));
         return Result.successWithData(result);
     }
 

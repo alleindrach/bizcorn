@@ -82,6 +82,11 @@
             "sex":"F",
             "tags":["a","b","c"]
            }
+    * 用户获取自身信息id/username/profile
+        只有用户是小童的Parent 才可以获取
+            POST/GET /user/self
+            无参数
+            返回：Result.data 
     * 用户获取绑定小童Profile
     只有用户是小童的Parent 才可以获取
             POST/GET /user/kid/profile/get
@@ -281,7 +286,7 @@
                filters:[ {key:'status',op:'is',val:'INIT'}...], 过滤器
                sorters:[ {key:'createTime',dir:'desc'}...] 排序字段
                setCopied:0/1  是否标记为已读
-               repo:0=私有对话，只读取talkee/talker为当前用户的消息，1=公有库里的消息,auditStatus=APPROVIED的消息
+               repo:0=私有对话，只读取talkee/talker为当前用户的消息，1=（默认）公有库里的消息,auditStatus=APPROVIED的消息
                
            }
         返回：

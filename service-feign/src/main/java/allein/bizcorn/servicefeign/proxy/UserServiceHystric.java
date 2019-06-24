@@ -52,6 +52,11 @@ public class UserServiceHystric implements  UserServiceProxy{
     }
 
     @Override
+    public Result getSelfInfo() {
+        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
+    }
+
+    @Override
     public Result getFriends() {
         return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
     }

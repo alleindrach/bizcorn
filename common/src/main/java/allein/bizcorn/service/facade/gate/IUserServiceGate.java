@@ -66,6 +66,9 @@ public interface IUserServiceGate {
     @RequestMapping(value="/user/kid/profile/get")
     public Result<Profile> getKidProfile();
 
+    @RequestMapping(value="/user/self")
+    public Result getSelfInfo();
+
     @RequestMapping(value="/user/friends")
     public Result getFriends();
 

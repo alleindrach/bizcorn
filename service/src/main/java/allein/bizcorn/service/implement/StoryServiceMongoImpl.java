@@ -500,7 +500,7 @@ public class StoryServiceMongoImpl implements IStoryService{
             filter.put("val",subFilters);
             filters.add(filter);
         }
-        else if(params.getInteger("repo")==1)
+        else
         {
             filters.add(JSON.toJSON(new Filter("auditStatus","is",AuditStatus.APPROVED)));
         }

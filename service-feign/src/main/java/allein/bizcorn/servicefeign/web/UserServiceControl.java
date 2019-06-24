@@ -98,15 +98,18 @@ public class UserServiceControl implements IUserServiceGate{
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('USER','user')")
     public Result updateKidProfile(@RequestBody  JSONObject profile) {
         return userService.updateKidProfile(profile);
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('USER','user')")
     public Result<Profile> getKidProfile() {
         return userService.getKidProfile();
+    }
+
+    @Override
+    public Result getSelfInfo() {
+        return userService.getSelfInfo();
     }
 
     @Override
