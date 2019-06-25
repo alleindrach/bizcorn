@@ -241,7 +241,7 @@ public class StoryServiceMongoImpl implements IStoryService{
         JSONArray channels=new JSONArray();
         soundChannels.forEach(channel->{
             JSONObject channelJson=new JSONObject();
-            channelJson.put("img",fileService.getFileUrl(channel.getImg()));
+            channelJson.put("img",channel.getImg());
             channels.add(channelJson);
 
         });
