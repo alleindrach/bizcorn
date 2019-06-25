@@ -239,13 +239,8 @@ public class StoryServiceMongoImpl implements IStoryService{
             return Result.failWithException(new CommonException(ExceptionEnum.CHANNELS_NOT_INITED));
         }
         JSONArray channels=new JSONArray();
-        soundChannels.forEach(channel->{
-            JSONObject channelJson=new JSONObject();
-            channelJson.put("img",channel.getImg());
-            channels.add(channelJson);
 
-        });
-        return Result.successWithData(channels);
+        return Result.successWithData(soundChannels);
     }
     @PreAuthorize("hasAnyRole('ADMIN','admin')")
     @Override
