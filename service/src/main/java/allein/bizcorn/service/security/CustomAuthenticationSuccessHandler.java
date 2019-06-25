@@ -46,7 +46,9 @@ public class CustomAuthenticationSuccessHandler extends SavedRequestAwareAuthent
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
         String username = request.getParameter("username");
-        userService.rstUserLoginErrorTimes(username);
+        User user = userService.getUser(username);
+        if (user!=null)
+            userService.rstUserLoginErrorTimes(user.getUsername());
 //        HttpSession session = request.getSession(false);
 //        if (session != null) {
 //            session.setAttribute("username", username);
@@ -59,7 +61,7 @@ public class CustomAuthenticationSuccessHandler extends SavedRequestAwareAuthent
         if (isAjax) {
             response.setCharacterEncoding("UTF-8");
             response.setContentType("application/json; charset=utf-8");
-            User user= userService.getUser( ((UserDetails) authentication.getPrincipal()).getUsername());
+            user= userService.getUser( ((UserDetails) authentication.getPrincipal()).getUsername());
             SerializeConfig config=new SerializeConfig();
             config.put(user.getClass(),new User.FullSerializer());
             JSONObject jsonUser= (JSONObject) JSON.parse( JSON.toJSONString(user,config));
