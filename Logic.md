@@ -354,7 +354,8 @@
     * 消息定义:
         声音变变变消息到达:
         {action:"sound-message",parameters:{id="",snd:"xxx" }}
-              
+             
+    * 断连：/admin/user/wsclose/{username},必须是管理员
 * 业务逻辑
     1.  注册
         普通用户注册需要提供用户名及手机号码，并需要验证手机验证码，用户名不能全部为数字

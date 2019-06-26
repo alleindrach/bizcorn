@@ -218,5 +218,9 @@ public interface IUserServiceGate {
 //
 //    @RequestMapping(value = "/user/message/")
 //    Result msg(@RequestBody JSONObject jsoUser);
+
+    @RequestMapping(value="/admin/user/wsclose/{username}")
+    Result adminCloseWS(@PathVariable("username") String username);
+
 }
 

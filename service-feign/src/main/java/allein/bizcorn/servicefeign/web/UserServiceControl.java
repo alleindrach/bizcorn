@@ -200,6 +200,11 @@ public class UserServiceControl implements IUserServiceGate{
         return userService.adminImportUser(file);
     }
 
+    @Override
+    public Result adminCloseWS(String username) {
+        return userService.adminCloseWS(username);
+    }
+
     @RequestMapping(value = "/register")
     public Result register(
             @RequestParam(value = "username") String username,

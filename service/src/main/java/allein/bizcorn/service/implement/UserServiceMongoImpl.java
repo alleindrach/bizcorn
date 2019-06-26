@@ -23,6 +23,7 @@ import allein.bizcorn.service.db.mongo.dao.UserDAO;
 import allein.bizcorn.service.facade.IMessageBrokerService;
 import allein.bizcorn.service.facade.IMessageQueueService;
 import allein.bizcorn.service.facade.IUserService;
+import allein.bizcorn.service.websocket.WebsocketUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -708,6 +709,7 @@ public class UserServiceMongoImpl implements IUserService {
     }
 
     @Override
+    @PreAuthorize("hasAnyRole('ADMIN','admin')")
     public Result adminUpdateUser(@RequestBody JSONObject user) {
 //        User user=JSON.parseObject(userJson,User.class);
         User userInDB=userDAO.get(user.getString("id"));
@@ -720,7 +722,7 @@ public class UserServiceMongoImpl implements IUserService {
         userDAO.save(userInDB);
         return Result.successWithData(userInDB.fullJsonString());
     }
-
+    @PreAuthorize("hasAnyRole('ADMIN','admin')")
     @RequestMapping(value = "/admin/user/add",consumes={ "application/json", "text/plain" },produces = {"application/json"})
     public Result adminAddUser(
             @RequestBody JSONObject jsoUser)
@@ -747,6 +749,7 @@ public class UserServiceMongoImpl implements IUserService {
     @Date:2019/5/24
     @Time:11:05 AM
     */
+    @PreAuthorize("hasAnyRole('ADMIN','admin')")
     @RequestMapping(value = "/admin/user/import",consumes = MediaType.MULTIPART_FORM_DATA_VALUE,produces = {"application/json"})
     public Result adminImportUser(
             @RequestPart MultipartFile file) throws Exception {
@@ -786,6 +789,13 @@ public class UserServiceMongoImpl implements IUserService {
             }
         }
         return Result.successWithData(results);
+    }
+
+    @Override
+    @PreAuthorize("hasAnyRole('ADMIN','admin')")
+    public Result adminCloseWS(@PathVariable("username")  String username) {
+        WebsocketUtil.removeSession(username,true);
+        return Result.successWithMessage("");
     }
 
 
