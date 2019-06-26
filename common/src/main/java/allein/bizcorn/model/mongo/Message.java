@@ -81,7 +81,7 @@ public class Message implements IMessage {
         msg.setStatus(MessageStatus.INIT);
         return msg;
     }
-    static public  Message SoundMorphyArrivedMessage(SoundMessage message){
+    static public  Message SoundMorphyArrivedMessage(Story message){
         Message msg=new Message();
         msg.setDestName(message.getTalkee().getUsername());
         msg.setSrcName(message.getTalker().getUsername());

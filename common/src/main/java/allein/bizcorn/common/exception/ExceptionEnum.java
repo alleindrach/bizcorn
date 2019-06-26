@@ -41,6 +41,7 @@ public enum ExceptionEnum {
     BIND_FRIEND_NOT_EXIST("010011","绑定朋友关系对象错误"),
     FILE_UPLOAD_FAIL("020001", "素材上传错误"),
     FILE_NOT_EXISTS("020002", "素材不存在"),
+    FILE_UPLOAD_STORY_ERROR("020003", "故事错误"),
     CHANNELS_NOT_INITED("020101", "频道未初始化"),
 
     MESSAGE_NOT_EXIST("020102", "信息不存在"),

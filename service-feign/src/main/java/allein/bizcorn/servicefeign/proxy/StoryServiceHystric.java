@@ -21,70 +21,39 @@ public class StoryServiceHystric implements  StoryServiceProxy{
 
 
     @Override
-    public Result syncStory(MultipartFile[] files, String id, String work) {
-        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
-
-    }
-
-    @Override
-    public Result getOneStory(String id) {
-        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
-
-    }
-
-    @Override
-    public Result getAllStory(String username) {
-        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
-
-    }
-
-    @Override
-    public Result deleteStory(String id) {
-        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
-
-    }
-
-    @Override
-    public Result getSoundChannelBGs() {
-        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
-
-    }
-
-    @Override
-    public Result setSoundChannelBG(MultipartFile[] files, String channelsJson) {
-        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
-
-    }
-
-    @Override
-    public Result msgUp(MultipartFile[] files, String messageJson) {
-        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
-
-    }
-
-    @Override
-    public Result msg(String msgId) {
+    public Result getSoundChannels() {
         return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
     }
 
     @Override
-    public Result msgAction(String action, String msgId, JSONObject param) {
+    public Result setSoundChannels(MultipartFile[] files, String channelsJson) {
         return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
-    }
-
-
-    @Override
-    public Result msgCopy(String messageId) {
-        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
-
     }
 
     @Override
-    public Result msgList(JSONObject filter) {
+    public Result tell(MultipartFile[] files, String info) {
         return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
     }
 
+    @Override
+    public Result get(String id) {
+        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
+    }
 
+    @Override
+    public Result action(String action, String msgId, JSONObject param) {
+        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
+    }
+
+    @Override
+    public Result copy(String messageId) {
+        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
+    }
+
+    @Override
+    public Result list(JSONObject filter) {
+        return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
+    }
     @Override
     public Result adminGetSoundChannels() {
         return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));

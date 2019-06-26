@@ -184,16 +184,36 @@
         file控件的name 为 'file'
         返回：Result，data字段为fileId
         
-    * 声音变变变消息上传一体接口
-         POST /sound/msg/up    
+    * 消息上传一体接口
+         POST /story  
          Content-Type=multipart/form-data
          参数：
-            files:频道背景图片数组，注意，所有file控件的name字段必须为"files" 
-            message:字符串，JSON格式，
-            {
-                channel:1
-            }
-         返回：Result,data为messageId
+            files:频道背景图片数组，注意，所有file控件的name字段必须为"files" ,filename 为原始文件名，必填，且报文内唯一
+            info:字符串，JSON格式，
+                {
+                    id:可以为null、不传
+                    name:'作品',
+                    desc:'作品描述',
+                    channel:1,
+                    type: 'SOUND':声音变变变，'SLIDE' 超级变变变
+                    scenes:[ //超级变变变
+                         {
+                             img:'22.jpg',
+                             snd:'test1.mp3'
+                         }
+                                   ,
+                         {
+                             img:'23.jpg',
+                             snd:'test2.mp3'
+                          },
+                          {
+                             img:'23.jpg',
+                             snd:'test3.mp3'
+                          }
+                    ],
+                    snd:test4.mp3 //声音变变变
+                }
+         返回：Result,data为story 内容，如Info，含有实际id
          
     * 声音变变变频道背景图片设置
         POST /sound/channels/up
@@ -227,8 +247,8 @@
                   
             ] `
                    state =0 表明失败，reason为异常原因。
-    * 声音变变变消息获取
-        /sound/msg/{id}
+    * 变变变消息获取
+        GET /story/{id}
         参数：id为消息id
         返回：result.data 为消息实体，
             "talker":{
@@ -251,12 +271,12 @@
             "desc": null,
             "status": "INIT"
             
-    * 声音变变变阅读回执
-        /sound/msg/copy/{id}
+    * 变变变阅读回执
+        /story/copy/{id}
         参数：id为消息id,如果为"all",则设置所有未读消息为已读
         返回：result
-    * 声音变变变消息维护
-        POST /sound/msg/{action}/{id}
+    * 变变变消息维护
+        POST /story/{action}/{id}
         Content-Type=application/json
         参数:
         路径参数：action: 
@@ -276,8 +296,8 @@
                 edit: 同publish
         返回：
             除send 公共库转发外，其他都为空字符串，公共库转发返回复制的消息id
-    * 声音变变变消息获取
-        POST /sound/msg/list
+    * 变变变消息获取
+        POST /story/list
         Content-Type=application/json
         参数:
            {
@@ -287,7 +307,7 @@
                sorters:[ {key:'createTime',dir:'desc'}...] 排序字段
                setCopied:0/1  是否标记为已读
                repo:0=私有对话，只读取talkee/talker为当前用户的消息，1=（默认）公有库里的消息,auditStatus=APPROVIED的消息
-               
+               type:1=超级变变变，0=声音变变变
            }
         返回：
             result.data => {count:xxx,list:[{

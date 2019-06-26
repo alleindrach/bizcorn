@@ -31,66 +31,8 @@ public class StoryServiceControl implements IStoryServiceGate {
 
     private static final Logger logger = LoggerFactory.getLogger(StoryServiceControl.class);
 
-
     @Autowired
     StoryServiceProxy storyService;
-    @RequestMapping("/story/sync")
-    @ResponseBody
-    public Result syncStory(@RequestPart MultipartFile [] files, @RequestParam("id") String id, @RequestParam("work") String work)
-    {
-        return    storyService.syncStory(files,id,work);
-    }
-
-
-    @RequestMapping("/story/{id}")
-    @ResponseBody
-    public Result getOneStory(@PathVariable("id") String id)
-    {
-        return storyService.getOneStory(id);
-    }
-
-    @RequestMapping("/story/of/{username}")
-    @ResponseBody
-    public Result getAllStory(@PathVariable("username") String username)
-    {
-        return storyService.getAllStory(username);
-    }
-
-    @DeleteMapping("/story/{id}")
-    @ResponseBody
-    public Result deleteStory( @PathVariable("id") String id)
-    {
-        return storyService.deleteStory(id);
-    }
-
-    public Result getSoundChannelBGs() {
-        return storyService.getSoundChannelBGs();
-    }
-
-    @Override
-    public Result msgUp(@RequestPart MultipartFile[] files,@RequestParam("message") String messageJson) {
-        return storyService.msgUp(files,messageJson);
-    }
-
-    @Override
-    public Result msg(@PathVariable("id") String msgId) {
-        return storyService.msg(msgId);
-    }
-
-    @Override
-    public Result msgAction(@PathVariable("action") String action,@PathVariable("id") String msgId,@RequestBody(required=false) JSONObject param) {
-        return storyService.msgAction(action,msgId,param);
-    }
-
-    @Override
-    public Result msgCopy(@PathVariable("id") String  messageId) {
-        return storyService.msgCopy(messageId);
-    }
-
-    @Override
-    public Result msgList(@RequestBody  JSONObject filter) {
-        return  storyService.msgList(filter);
-    }
 
     @Override
     @ResponseBody
@@ -126,8 +68,41 @@ public class StoryServiceControl implements IStoryServiceGate {
         return storyService.adminAuditSound(data);
     }
 
+
+    @ResponseBody
+    public Result tell(@RequestPart() MultipartFile[] files,@RequestParam("info") String info){
+        return    storyService.tell(files,info);
+    }
+
+    @ResponseBody
+    public Result get(@PathVariable("id") String id)
+    {
+        return storyService.get(id);
+    }
+
     @Override
-    public Result setSoundChannelBG(@RequestPart MultipartFile[] files,@RequestParam("channels")String channelsJson) {
-        return storyService.setSoundChannelBG(files,channelsJson);
+    public Result action(@PathVariable("action") String action,@PathVariable("id") String id,@RequestBody(required = false) JSONObject param){
+
+        return storyService.action(action,id,param);
+    }
+
+    @Override
+    public Result copy(@PathVariable("id") String  messageId) {
+        return storyService.copy(messageId);
+    }
+
+    @Override
+    public Result list(@RequestBody JSONObject filter) {
+        return storyService.list(filter);
+    }
+
+
+    public Result getSoundChannels() {
+        return storyService.getSoundChannels();
+    }
+
+    @Override
+    public Result setSoundChannels(@RequestPart MultipartFile[] files,@RequestParam("channels")String channelsJson) {
+        return storyService.setSoundChannels(files,channelsJson);
     }
 }

@@ -17,38 +17,22 @@ import java.util.List;
 
 public interface IStoryServiceGate {
 
-    @RequestMapping(value="/story/sync",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @ResponseBody
-    public Result syncStory(@RequestPart MultipartFile[] files, @RequestParam("id") String id, @RequestParam("work") String work);
-
-
-    @RequestMapping("/story/{id}")
-    @ResponseBody
-    public Result getOneStory(@PathVariable("id") String id);
-
-    @RequestMapping("/story/of/{username}")
-    @ResponseBody
-    public Result getAllStory(@PathVariable("username") String username);
-
-    @DeleteMapping("/story/{id}")
-    @ResponseBody
-    public Result deleteStory(@PathVariable("id") String id);
-
     @RequestMapping("/sound/channels/down")
     @ResponseBody
-    public Result getSoundChannelBGs();
+    public Result getSoundChannels();
 
     @RequestMapping(value="/sound/channels/up",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseBody
-    public Result setSoundChannelBG(@RequestPart MultipartFile[] files,@RequestParam("channels")String channelsJson);
+    public Result setSoundChannels(@RequestPart MultipartFile[] files,@RequestParam("channels")String channelsJson);
 
-    @RequestMapping(value="/sound/msg/up",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value="/story",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseBody
-    public Result msgUp(@RequestPart MultipartFile[] files,@RequestParam("message") String messageJson);
+    public Result tell(@RequestPart MultipartFile[] files, @RequestParam("info") String info);
 
-    @RequestMapping(value="/sound/msg/{id}")
+
+    @GetMapping("/story/{id}")
     @ResponseBody
-    public Result msg(@PathVariable("id") String msgId);
+    public Result get(@PathVariable("id") String id);
 
 /*
 @Description:消息操作
@@ -72,12 +56,12 @@ param:
 @Date:2019/6/24
 @Time:9:03 AM
 */
-    @RequestMapping(value="/sound/msg/{action}/{id}")
+    @RequestMapping(value="/story/{action}/{id}")
     @ResponseBody
-    public Result msgAction(@PathVariable("action") String action,@PathVariable("id") String msgId,@RequestBody(required = false) JSONObject param);
+    public Result action(@PathVariable("action") String action,@PathVariable("id") String msgId,@RequestBody(required = false) JSONObject param);
 
 
-    @RequestMapping(value="/sound/msg/copy/{id}")
+    @RequestMapping(value="/story/copy/{id}")
     @ResponseBody
     /*
     @Description:
@@ -87,9 +71,9 @@ param:
     @Date:2019/6/6
     @Time:11:16 AM
     */
-    public Result msgCopy(@PathVariable("id") String  messageId);
+    public Result copy(@PathVariable("id") String  messageId);
 
-    @RequestMapping(value="/sound/msg/list")
+    @RequestMapping(value="/story/list")
     @ResponseBody
     /*
     @Description:
@@ -107,7 +91,7 @@ param:
     @Date:2019/6/6
     @Time:10:00 AM
     */
-    public Result msgList(@RequestBody JSONObject filter);
+    public Result list(@RequestBody JSONObject filter);
 
     @RequestMapping("/admin/sound/channel/list")
     @ResponseBody

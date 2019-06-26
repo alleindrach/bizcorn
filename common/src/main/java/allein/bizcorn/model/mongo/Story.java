@@ -1,107 +1,143 @@
+/*
+ * Copyright (c) 2019.
+ * Alleindrach@gmail.com
+ */
+
 package allein.bizcorn.model.mongo;
 
-import allein.bizcorn.common.util.UrlUtil;
 import allein.bizcorn.model.facade.IStory;
-import allein.bizcorn.model.facade.IUser;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.convert.LazyLoadingProxy;
+import org.springframework.data.mongodb.core.index.IndexDirection;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * @program: bizcorn
+ * @description:
+ * @author: Alleindrach@gmail.com
+ * @create: 2019-06-25 17:17
+ **/
 @Document(collection="Story")
-public class Story implements IStory {
+public abstract class  Story implements IStory,Serializable {
+
     @Id
     @Getter
     @Setter
-    private String id;
+    protected String id;
+
     @DBRef(lazy = true)
+    @Setter
+    @JSONField(serializeUsing =  UserSerializer.class)
+    protected User talker;
+
+    @DBRef(lazy = true)
+    @Setter
+    @JSONField(serializeUsing =  UserSerializer.class)
+    protected User talkee;
+
+
+    @Setter @Getter
+    protected Integer channel;
+
     @Getter
     @Setter
-    private IUser author;
+    protected List<String> tags;
+
     @Getter
     @Setter
-    private List<Scene> scenes;
+    protected String name;
+
     @Getter
     @Setter
-    private List<String> tags;
+    protected StoryType type=StoryType.SOUND;
+
+
     @Getter
     @Setter
-    private String channel;
-    @Getter
-    @Setter
-    private Date createTime;
-    @Getter
-    @Setter
-    private Integer downloads;
+    protected String desc;
+
+
     @Getter
     @Setter
     @DBRef(lazy = true)
-    private List<Comment> comments;
+    protected List<Comment> comments;
+
+
     @Getter
     @Setter
-    private Integer likes;
+    protected Integer likes;
+
     @Getter
     @Setter
-    private Integer published;
+    protected Integer downloads;
     @Getter
     @Setter
-    private String title;
-    @Getter
-    @Setter
-    private String description;
+    protected AuditStatus auditStatus=AuditStatus.NONE;
 
 
-    public String toString(String filebase){
+    @Setter @Getter
+    @Indexed(direction = IndexDirection.DESCENDING)
+    @JSONField(serialzeFeatures = {SerializerFeature.WriteDateUseDateFormat})
+    protected Date createDate;
+    @Setter @Getter
+    protected MessageStatus status=MessageStatus.INIT;//0=已收到， 1=已送达， 2=已阅读
+    @Setter @Getter
+    @JSONField(serialzeFeatures = {SerializerFeature.WriteDateUseDateFormat})
+    protected Date deliverDate;//送达时间
+    @Setter @Getter
+    protected Date copyDate;//阅读时间
+    @Setter @Getter
+    protected Date auditFireDate;//送审时间
+    @Setter @Getter
+    protected Date auditDate;//审核时间
 
-        Story story=this;
-        JSONObject jsonObject=new JSONObject ();//JSONObject) JSON.toJSON(story);
-        jsonObject.put("id",this.getId());
-        jsonObject.put("author",this.getAuthor().getId());
-        jsonObject.put("channel",this.getChannel());
-        jsonObject.put("createTime",this.getCreateTime());
-        jsonObject.put("downloads",this.getDownloads());
-        jsonObject.put("likes",this.getLikes());
-        jsonObject.put("published",this.getPublished());
-        jsonObject.put("description",this.getDescription());
-        jsonObject.put("title",this.getTitle());
-        JSONArray scenes;
-        scenes = new JSONArray();
-        this.getScenes().forEach(
-                scene-> {
-                    JSONObject jsonScene = new JSONObject();
-
-                    String imageSource = scene.getImg();
-                    String soundSource = scene.getSnd();
-                    if (!UrlUtil.isUrl(imageSource)) {
-                        imageSource = filebase + imageSource;
-                    }
-                    if (!UrlUtil.isUrl(soundSource)) {
-                        soundSource = filebase + soundSource;
-                    }
-                    jsonScene.put("img", imageSource);
-                    jsonScene.put("snd", soundSource);
-                    scenes.add(jsonScene);
-                }
-        );
-        jsonObject.put("scenes",scenes);
-
-
-//            if(story.getSceneList()!=null&& story.getSceneList().size()>0){
-//                story.getSceneList().forEach(scene->{
-//                    scene.setSoundSource(this.filebase+scene.getSoundSource());
-//                    scene.setImageSource(this.filebase+scene.getImageSource());
-//                });
-//            }
-        String result=jsonObject.toJSONString();// JSON.toJSONString(story);
-
-        return result;
-
+    public User getTalker() {
+        if(this.talker instanceof LazyLoadingProxy)
+            return (User) ((LazyLoadingProxy)talker).getTarget();
+        return talker;
     }
+
+
+    public User getTalkee() {
+        if(this.talkee instanceof LazyLoadingProxy)
+            return (User) ((LazyLoadingProxy)talkee).getTarget();
+        return talkee;
+    }
+
+
+    public Boolean isValidOwner(User user)
+    {
+        if(getTalker().getId().compareToIgnoreCase(user.getId())==0)
+        {
+            return true;
+        }
+        if(getTalkee().getId().compareToIgnoreCase(user.getId())==0)
+        {
+            return true;
+        }
+        if(getTalkee() instanceof  Kid
+                && (Kid)((Kid) getTalkee()).getParent() !=null
+                && ((Kid)((Kid) getTalkee())).getParent().getId().compareToIgnoreCase(user.getId())==0)
+        {
+            return true;
+        }
+        return false;
+    }
+    public boolean isPublished()
+    {
+        return auditStatus.equals(AuditStatus.APPROVED);
+    }
+
+    public abstract Object getData();
+    public abstract void setData(Object v);
 }
