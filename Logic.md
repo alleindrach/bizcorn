@@ -212,6 +212,9 @@
                           }
                     ],
                     snd:test4.mp3 //声音变变变
+                    publish:true/false 是否发布
+                    sync:true/false 是否发送给绑定方
+                    echo:true/false 是否发给自己
                 }
          返回：Result,data为story 内容，如Info，含有实际id
          
@@ -308,6 +311,7 @@
                setCopied:0/1  是否标记为已读
                repo:0=私有对话，只读取talkee/talker为当前用户的消息，1=（默认）公有库里的消息,auditStatus=APPROVIED的消息
                type:1=超级变变变，0=声音变变变
+               
            }
         返回：
             result.data => {count:xxx,list:[{

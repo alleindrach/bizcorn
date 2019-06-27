@@ -144,6 +144,7 @@ public class StoryServiceMongoImpl implements IStoryService{
         Story story= checkStoryParam(infoJso);
         story=process(uploadResult,story);
 
+
 //        HttpServletRequest request=((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();
 
         if(story.getId()==null || story.getId().isEmpty()) {
@@ -151,7 +152,9 @@ public class StoryServiceMongoImpl implements IStoryService{
             story.setTalker(user);
             story.setTalkee(user.getCurPartner());
             story.setCreateDate(new Date());
-
+            if(infoJso.getBoolean("publish")) {
+                story.setAuditStatus(AuditStatus.PENDING);
+            }
             storyDAO.save((SoundStory) story);
         }
         else
@@ -177,14 +180,17 @@ public class StoryServiceMongoImpl implements IStoryService{
                 storyInDB.setTags(story.getTags());
             if(story.getType()!=null)
                 storyInDB.setTags(story.getTags());
-
+            if(infoJso.getBoolean("publish")) {
+                storyInDB.setAuditStatus(AuditStatus.PENDING);
+            }
             storyDAO.save( storyInDB);
 
         }
 
-        userService.rebind(user,(Kid)story.getTalkee());
+
 
         if(infoJso.getBoolean("sync")) {
+            userService.rebind(user,(Kid)story.getTalkee());
             Message wsMsg = Message.SoundMorphyArrivedMessage(story);
             messageBrokerService.send(wsMsg);
 
