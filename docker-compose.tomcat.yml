@@ -1,0 +1,87 @@
+version: '3.4'
+
+services:
+  zoo1:
+    image: wurstmeister/zookeeper 
+    restart: always
+    hostname: zoo1
+    container_name: zoo1
+    ports:
+    - 2181:2181
+    environment:
+      ZOO_MY_ID: 1
+      ZOO_SERVERS: server.1=0.0.0.0:2888:3888 
+    networks:
+      default:
+        ipv4_address: 172.23.0.11
+
+  kafka1:
+    image: wurstmeister/kafka
+    restart: always
+    hostname: kafka1
+    container_name: kafka1
+    depends_on: 
+     - zoo1
+    ports:
+    - "9092:9092"
+    expose: 
+    - "9093"
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka1:9093,OUTSIDE://192.168.2.233:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_LISTENERS: INSIDE://0.0.0.0:9093,OUTSIDE://0.0.0.0:9092
+      KAFKA_ZOOKEEPER_CONNECT: zoo1:2181
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_BROKER_ID: 1
+      JMX_PORT: 9999 
+    networks:
+      default:
+        ipv4_address: 172.23.0.14
+  redis:
+    image: redis
+    container_name: redis
+    ports: 
+      - "6379:6379"
+    depends_on: 
+      - zoo1
+      - kafka1
+    networks:
+      default:
+        ipv4_address: 172.23.0.15
+
+  mongodb:
+    image: mongo
+    restart: always
+    hostname: mongodb
+    container_name: mongodb
+    ports:
+    - "27018:27017"
+    networks:
+      default:
+        ipv4_address: 172.23.0.16
+    volumes:
+    - /data/docker/mongodb:/data/db
+    - /data/docker/mongodb.bk:/data/dbbk
+
+  tomcat:
+    build: ./docker
+    hostname: tomcat
+    container_name: tomcat
+    ports:
+     - "8080:8080"
+     - "9761:8761"
+     - "9888:8888"
+     - "9762:8762"
+     - "9765:8765"
+    volumes:
+     - "/data/web/apps:/usr/local/webserver/tomcat/webapps"
+     - "/data/log/:/data/log"
+    networks:
+      default:
+        ipv4_address: 172.23.0.18
+
+networks:
+  default:
+    external:
+      name: zookeeper_network
+

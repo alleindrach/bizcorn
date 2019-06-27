@@ -5,10 +5,11 @@
     <parent>
         <artifactId>bizcorn</artifactId>
         <groupId>allein</groupId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0</version>
     </parent>
     <groupId>allein.bizcorn</groupId>
     <artifactId>eureka-server</artifactId>
+    <version>1.0</version>
     <name>eureka-server</name>
     <packaging>jar</packaging>
     <description>allein project for Spring Boot</description>
@@ -28,8 +29,17 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <jvmArguments>
-                        -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8088
+                        -Xms1024m -Xmx4096m -Xss256K -XX:MaxPermSize=256m -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8088
                     </jvmArguments>
+                    <executable>true</executable>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.19.1</version>
+                <configuration>
+                    <skipTests>true</skipTests>
                 </configuration>
             </plugin>
         </plugins>

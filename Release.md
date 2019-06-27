@@ -1,3 +1,17 @@
+2019-06-27
+修改编译目标参数，编译成可执行文件
+例如，编译运行 service
+cd service
+mvn package
+cp service-1.0.conf target/
+./target/service-1.0.jar
+
+其中，service-1.0.conf 是同名jar的配置文件，里面的JAVA_OPTS是java jvm的配置参数
+
+
+参考 https://docs.spring.io/spring-boot/docs/current/reference/html/deployment-install.html#deployment-script-customization-conf-file
+
+
 2019-05-10
 1 Feign Header 穿透问题
 入向：client---request1-->feign.encoder--request2--->service
