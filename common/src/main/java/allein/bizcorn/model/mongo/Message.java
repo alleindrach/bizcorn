@@ -4,6 +4,7 @@ import allein.bizcorn.common.websocket.Action;
 import allein.bizcorn.model.facade.IMessage;
 import allein.bizcorn.model.output.Result;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
@@ -58,7 +59,7 @@ public class Message implements IMessage {
     @Setter
     private Date copyDate;//阅读时间
     @Getter @Setter
-    private ContentType contentType=ContentType.SOUND_MESSAGE;
+    private ContentType contentType=ContentType.SOUND_STORY;
     static public  Message BindRequireMessage(BindToken token){
         Message msg=new Message();
         msg.setDestName(token.getBindee().getUsername());
@@ -81,14 +82,42 @@ public class Message implements IMessage {
         msg.setStatus(MessageStatus.INIT);
         return msg;
     }
-    static public  Message SoundMorphyArrivedMessage(Story message){
+    static public  Message StoryArrivedMessage(Story message){
         Message msg=new Message();
         msg.setDestName(message.getTalkee().getUsername());
         msg.setSrcName(message.getTalker().getUsername());
-        msg.setContentType(ContentType.SOUND_MESSAGE);
+        msg.setContentType(message.type==StoryType.SLIDE? ContentType.SLIDE_STORY:ContentType.SOUND_STORY);
         msg.setContent(JSON.toJSONString(message));
-        msg.setAction(Action.SOUND_ARRIVED);
+        msg.setAction(message.type==StoryType.SLIDE?Action.SLIDE_ARRIVED:Action.SOUND_ARRIVED);
         msg.setCreateDate(message.getCreateDate());
+        msg.setStatus(MessageStatus.INIT);
+        return msg;
+    }
+
+    static public  Message StoryAckMessage(Story message){
+        Message msg=new Message();
+        msg.setDestName(message.getTalker().getUsername());
+        msg.setSrcName(message.getTalkee().getUsername());
+        msg.setContentType(message.type==StoryType.SLIDE? ContentType.SLIDE_STORY:ContentType.SOUND_STORY);
+        msg.setContent(JSON.toJSONString(message));
+        msg.setAction(message.type==StoryType.SLIDE?Action.SLIDE_ACK:Action.SOUND_ACK);
+        msg.setCreateDate(message.getCreateDate());
+        msg.setStatus(MessageStatus.INIT);
+        return msg;
+    }
+    static public  Message AckMessage(JSONObject message,User sender){
+        Message msg=new Message();
+        msg.setDestName(sender.getUsername());
+        msg.setSrcName("Center");
+        msg.setContentType(ContentType.ACK);
+
+        JSONObject ack=new JSONObject();
+        ack.put("origin",message);
+        ack.put("target", JSON.toJSON( sender.getCurPartner()));
+//        ack.put("sendTime",System.currentTimeMillis());
+        msg.setContent(JSON.toJSONString(ack));
+        msg.setAction(Action.MESSAGE_ACK);
+        msg.setCreateDate(new Date());
         msg.setStatus(MessageStatus.INIT);
         return msg;
     }

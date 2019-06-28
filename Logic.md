@@ -212,7 +212,7 @@
                           }
                     ],
                     snd:test4.mp3 //声音变变变
-                    publish:true/false 是否发布
+                    publish:true/false 是否发布,true的时候将auditStatus->PENDING,等待审核
                     sync:true/false 是否发送给绑定方
                     echo:true/false 是否发给自己
                 }

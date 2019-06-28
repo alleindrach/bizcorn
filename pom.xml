@@ -22,7 +22,7 @@
         <module>service</module>
         <module>config-server</module>
         <module>service-feign</module>
-        <module>service-router-zuul</module>
+        <!--<module>service-router-zuul</module>-->
     </modules>
 
     <properties>

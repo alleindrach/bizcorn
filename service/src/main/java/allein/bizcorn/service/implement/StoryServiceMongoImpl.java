@@ -191,13 +191,16 @@ public class StoryServiceMongoImpl implements IStoryService{
 
         if(infoJso.getBoolean("sync")) {
             userService.rebind(user,(Kid)story.getTalkee());
-            Message wsMsg = Message.SoundMorphyArrivedMessage(story);
+            Message wsMsg = Message.StoryArrivedMessage(story);
             messageBrokerService.send(wsMsg);
-
+            wsMsg=Message.StoryAckMessage(story);
+            messageBrokerService.send(wsMsg);
         }
         if(isDebug && infoJso.getBoolean("echo")){
             story.setTalkee(story.getTalker());
-            Message wsMsg = Message.SoundMorphyArrivedMessage(story);
+            Message wsMsg = Message.StoryArrivedMessage(story);
+            messageBrokerService.send(wsMsg);
+            wsMsg=Message.StoryAckMessage(story);
             messageBrokerService.send(wsMsg);
         }
         return Result.successWithData(story.toString());
@@ -363,7 +366,9 @@ public class StoryServiceMongoImpl implements IStoryService{
            {
                if(story.getTalker().getId().compareToIgnoreCase(user.getId())==0){
                    //私有对话重发
-                   Message wsMsg = Message.SoundMorphyArrivedMessage(story);
+                   Message wsMsg = Message.StoryArrivedMessage(story);
+                   messageBrokerService.send(wsMsg);
+                   wsMsg = Message.StoryAckMessage(story);
                    messageBrokerService.send(wsMsg);
                    return Result.successWithMessage("");
                }
@@ -387,7 +392,9 @@ public class StoryServiceMongoImpl implements IStoryService{
                    soundMessageReplicated.setAuditStatus(AuditStatus.NONE);
                    soundMessageReplicated.setDeliverDate(new Date());
                    storyDAO.save(soundMessageReplicated);
-                   Message wsMsg = Message.SoundMorphyArrivedMessage(soundMessageReplicated);
+                   Message wsMsg = Message.StoryArrivedMessage(soundMessageReplicated);
+                   messageBrokerService.send(wsMsg);
+                   wsMsg = Message.StoryAckMessage(soundMessageReplicated);
                    messageBrokerService.send(wsMsg);
                    return Result.successWithData(soundMessageReplicated.getId());
                }
