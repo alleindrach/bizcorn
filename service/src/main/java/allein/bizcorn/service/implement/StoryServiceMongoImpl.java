@@ -129,10 +129,12 @@ public class StoryServiceMongoImpl implements IStoryService{
     @Override
     @PreAuthorize("hasAnyRole('USER','user')")
     public Result tell(@RequestPart() MultipartFile[] files,@RequestParam("info") String info){
-        String username= SecurityUtil.getUserName();
+
+        User user=userService.getUserFromSession();
+
         JSONObject infoJso=JSON.parseObject(info);
 
-        User user=userDAO.selectByName(username);
+
         if (user == null) {
             throw new CommonException(ExceptionEnum.USER_ACCOUNT_NOT_EXIST);
         }
@@ -190,7 +192,8 @@ public class StoryServiceMongoImpl implements IStoryService{
 
 
         if(infoJso.getBoolean("sync")) {
-            userService.rebind(user,(Kid)story.getTalkee());
+            if(user instanceof  User && story.getTalkee() instanceof  Kid)
+                userService.rebind(user,(Kid)story.getTalkee());
             Message wsMsg = Message.StoryArrivedMessage(story);
             messageBrokerService.send(wsMsg);
             wsMsg=Message.StoryAckMessage(story);
@@ -478,7 +481,7 @@ public class StoryServiceMongoImpl implements IStoryService{
     @PreAuthorize("hasAnyRole('USER','user')")
     public Result list(@RequestBody JSONObject params)
     {
-        User user=userDAO.select(SecurityUtil.getUserName());
+        User user=userService.getUserFromSession();
         if(user==null)
         {
             return Result.failWithException(new CommonException(ExceptionEnum.USER_NOT_LOGIN));
