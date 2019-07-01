@@ -77,7 +77,7 @@ public class MessageController {
     @Date:2019/6/28
     @Time:9:51 AM
     */
-    @MessageMapping("/partner/")
+    @MessageMapping("/partner")
     public void talk(JSONObject message,
                                @Header(value="simpUser") UsernamePasswordAuthenticationToken user,
                                @Header(value="simpSessionId") String sessionId) throws Exception {

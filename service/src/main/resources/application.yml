@@ -14,13 +14,13 @@ spring:
         multipart:
             max-file-size: 20Mb
             max-request-size: 60Mb
-    cloud:
-        config:
-            label: master
-            profile: dev
-        discovery:
-            enabled: true
-            service-id: config-server
+#    cloud:
+#        config:
+#            label: master
+#            profile: dev
+#        discovery:
+#            enabled: true
+#            service-id: config-server
 #      uri: http://localhost:8888/
         stream:
             kafka:
@@ -159,6 +159,13 @@ bizcorn:
             height: 200
     bind:
         timeout: 1800
+    debug: true
+    user:
+        login:
+            errortimes:
+                cache:
+                    key:
+                        prefix: user_login_error_times_cache_
 #
 #endpoints:
 #  refresh:

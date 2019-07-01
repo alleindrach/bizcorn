@@ -27,13 +27,13 @@ spring:
             max-file-size: 20Mb
             max-request-size: 60Mb
     cloud:
-        config:
-            label: master
-            profile: dev
-        discovery:
-            enabled: true
-            service-id: config-server
-#      uri: http://localhost:8888/
+#        config:
+#            label: master
+#            profile: dev
+#        discovery:
+#            enabled: true
+#            service-id: config-server
+
         stream:
             kafka:
                 binder:

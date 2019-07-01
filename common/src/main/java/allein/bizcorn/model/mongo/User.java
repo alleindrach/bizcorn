@@ -198,4 +198,16 @@ public class User   implements IUser, JSONSerializable {
         config.put(Kid.class,new User.FullSerializer());
         return JSON.toJSONString(this,config);
     }
+    public Kid getKid(){
+        if(this instanceof  Kid)
+            return (Kid) this;
+        else
+        {
+            if(this.getCurPartner()==null)
+                return null;
+            if(this.getCurPartner() instanceof Kid)
+                return (Kid) this.getCurPartner();
+        }
+        return null;
+    }
 }

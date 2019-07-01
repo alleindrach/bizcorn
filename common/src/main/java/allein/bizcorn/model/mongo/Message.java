@@ -121,4 +121,17 @@ public class Message implements IMessage {
         msg.setStatus(MessageStatus.INIT);
         return msg;
     }
+
+    static public  Message GiftMessage(Gift gift,String from ,String to){
+        Message msg=new Message();
+//
+        msg.setDestName(from);
+        msg.setSrcName(to);
+        msg.setContentType(ContentType.GIFT);
+        msg.setAction(Action.GIFT_ACTION);
+        msg.setCreateDate(gift.getCreateDate());
+        msg.setContent(JSON.toJSONString(gift));
+        msg.setStatus(MessageStatus.INIT);
+        return msg;
+    }
 }

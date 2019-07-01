@@ -34,6 +34,7 @@ public enum Action {
 //        target:接收方,
 //
 //    }
+    GIFT_ACTION("gift.action"),
     MESSAGE_ACK("message.ack");
 
 

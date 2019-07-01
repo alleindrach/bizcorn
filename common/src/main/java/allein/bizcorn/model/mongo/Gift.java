@@ -25,10 +25,23 @@ public class Gift implements Serializable{
     @DBRef
     @Getter
     @Setter
-    private User owner;
+    private User owner;//所有人
     @Getter
     @Setter
-    private Date createTime;
+    private String picture;
+    @DBRef
+    @Getter
+    @Setter
+    private User operator;//当前的操作方
+
+    @DBRef
+    @Getter
+    @Setter
+    private Integer operation=0;//当前的操作
+
+    @Getter
+    @Setter
+    private Date createDate;
     @Getter
     @Setter
     private String name;
@@ -40,10 +53,12 @@ public class Gift implements Serializable{
     private String sndMsg;//留言
     @Getter
     @Setter
-    private String frame;//相框
+    @DBRef
+    private Frame frame;//相框
     @Getter
     @Setter
-    private String packageBox;//包装盒
+    @DBRef
+    private PackageBox packageBox;//包装盒
     @Getter
     @Setter
     private Integer status;//状态
