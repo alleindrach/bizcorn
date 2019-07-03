@@ -195,7 +195,7 @@
                     name:'作品',
                     desc:'作品描述',
                     channel:1,
-                    type: 'SOUND':声音变变变，'SLIDE' 超级变变变
+                    type: 0='SOUND':声音变变变/ 1='SLIDE' 超级变变变
                     scenes:[ //超级变变变
                          {
                              img:'22.jpg',
@@ -347,8 +347,19 @@
             ]
         }
         
-    
-            
+        filters:
+        [
+                {       key:"status",        op:"eq",        val:"INIT"        },
+                {       key:"talkee.$id" ,   op:"ne",        val:"1232323232"  }
+        ]
+        翻译成：
+        {$and:
+            [
+                {$eq:{"status","INIT"}},
+                {$ne:{"talkee.$id",ObjectId("1232323232")}},
+            ]
+        }  
+        
 * websocket
     * 连接地址:[service]/websocket 注意，这里是service服务器的地址，目前无法使用feign进行转发。
     * 服务器消息订阅地址: /topic/message

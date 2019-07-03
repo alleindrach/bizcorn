@@ -156,6 +156,7 @@ public class StoryServiceMongoImpl implements IStoryService{
             story.setCreateDate(new Date());
             if(infoJso.getBoolean("publish")) {
                 story.setAuditStatus(AuditStatus.PENDING);
+                story.setAuditFireDate(new Date());
             }
             storyDAO.save((SoundStory) story);
         }
@@ -184,6 +185,7 @@ public class StoryServiceMongoImpl implements IStoryService{
                 storyInDB.setTags(story.getTags());
             if(infoJso.getBoolean("publish")) {
                 storyInDB.setAuditStatus(AuditStatus.PENDING);
+                storyInDB.setAuditFireDate(new Date());
             }
             storyDAO.save( storyInDB);
 
@@ -622,5 +624,24 @@ public class StoryServiceMongoImpl implements IStoryService{
         config.put(Kid.class,new User.SimpleSerializer());
         JSONArray result= JSONArray.parseArray( JSON.toJSONString(messages,config));
         return Result.successWithData(result);
+    }
+
+    @Override
+    public void auditStory() {
+        JSONObject params=new JSONObject();
+        storyDAO.update(Query.query(
+                Criteria.where("auditStatus").is(AuditStatus.PENDING)).with(Sort.by(Sort.Direction.ASC,"auditFireDate")).limit(10),
+                Update.update("auditStatus",AuditStatus.APPROVED));
+        return;
+//
+//        Filter filter=Filter.From("auditStatus","is",AuditStatus.PENDING);
+//
+//        Sorter sorter=Sorter.From("auditFireDate","asc");
+//        JSONObject param=Filter.ToQueryParam(0,10,filter,sorter);
+//        JSONObject messages=storyDAO.list(params);
+//        if(messages.getInteger("count")>0){
+//            List<Story> list= (List<Story>) messages.get("list");
+//            for(each)
+//        }
     }
 }

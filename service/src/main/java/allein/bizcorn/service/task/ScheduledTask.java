@@ -3,6 +3,7 @@ package allein.bizcorn.service.task;
 import allein.bizcorn.model.mongo.Story;
 import allein.bizcorn.service.db.mongo.dao.SoundChannelDAO;
 import allein.bizcorn.service.db.mongo.dao.StoryDAO;
+import allein.bizcorn.service.facade.IStoryService;
 import com.mongodb.Block;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSFindIterable;
@@ -46,6 +47,8 @@ public class ScheduledTask {
     @Autowired
     private SoundChannelDAO soundChannelDAO;
 
+    @Autowired
+    private IStoryService storyService;
     private static final Logger logger = LoggerFactory.getLogger(ScheduledTask.class);
     private static final SimpleDateFormat formate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -72,7 +75,7 @@ public class ScheduledTask {
 //    @Scheduled(cron = "0 0 0/4 * * ? ")
 //    @Async("ScheduleTaskAsyncExecutor")
     public void scheduledImageFileRecycleTask() {
-        logger.info("scheduled - cron - print time every 10 seconds:{}", formate.format(new Date()));
+        logger.info("scheduled - scheduledImageFileRecycleTask ");
         GridFSFindIterable filesIterable= gridFsTemplate.find(Query.query(Criteria.where("uploadDate").lt(new Date(System.currentTimeMillis()-1*86400000))).with(Sort.by(new Sort.Order(Sort.Direction.ASC,"uploadDate"))));
         filesIterable.forEach((Block)(gridFSFile -> {
             String md5name = ((GridFSFile) gridFSFile).getFilename();
@@ -86,5 +89,10 @@ public class ScheduledTask {
             }
         }
         ));
+    }
+    @Scheduled(fixedRate = 5000)
+    public void scheduledSoundStoryAuditTask() {
+        logger.info("scheduled - scheduledSoundStoryAuditTask");
+        storyService.auditStory();
     }
 }
