@@ -161,7 +161,7 @@ public class StoryServiceMongoImpl implements IStoryService{
                 story.setAuditStatus(AuditStatus.PENDING);
                 story.setAuditFireDate(new Date());
             }
-            storyDAO.save((SoundStory) story);
+            storyDAO.save(story);
         }
         else
         {
