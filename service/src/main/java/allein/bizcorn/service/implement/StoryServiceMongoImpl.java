@@ -121,7 +121,7 @@ public class StoryServiceMongoImpl implements IStoryService{
         }else if  (storyType==SLIDE.getValue())
         {
            SlideStory slideStory=JSON.parseObject(info.toJSONString(),SlideStory.class);
-            return soundStory;
+           return  slideStory;
         }
 
         return null;
