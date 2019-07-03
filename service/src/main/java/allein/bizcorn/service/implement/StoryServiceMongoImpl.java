@@ -94,8 +94,10 @@ public class StoryServiceMongoImpl implements IStoryService{
         if(story.getType()==StoryType.SLIDE) {
             for (Scene scene :(List<Scene>) story.getData()) {
 
-                scene.setImg(fileService.getFileID(uploadResult, scene.getImg()));
-                scene.setSnd(fileService.getFileID(uploadResult, scene.getSnd()));
+                if(scene.getImg()!=null)
+                    scene.setImg(fileService.getFileID(uploadResult, scene.getImg()));
+                if(scene.getSnd()!=null)
+                    scene.setSnd(fileService.getFileID(uploadResult, scene.getSnd()));
 
             }
             return story;
