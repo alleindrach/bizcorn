@@ -10,6 +10,7 @@ import allein.bizcorn.model.input.SoundChannelIO;
 import allein.bizcorn.model.input.SoundMessageIO;
 import allein.bizcorn.model.mongo.*;
 import allein.bizcorn.model.output.Result;
+import allein.bizcorn.service.db.mongo.dao.ComplaintDAO;
 import allein.bizcorn.service.db.mongo.dao.SoundChannelDAO;
 import allein.bizcorn.service.db.mongo.dao.StoryDAO;
 import allein.bizcorn.service.db.mongo.dao.UserDAO;
@@ -46,6 +47,8 @@ import static allein.bizcorn.model.mongo.StoryType.*;
 public class StoryServiceMongoImpl implements IStoryService{
     @Autowired
     UserDAO userDAO;
+    @Autowired
+    ComplaintDAO complaintDAO;
     @Autowired
     StoryDAO storyDAO;
     @Autowired
@@ -211,7 +214,7 @@ public class StoryServiceMongoImpl implements IStoryService{
             wsMsg=Message.StoryAckMessage(story);
             messageBrokerService.send(wsMsg);
         }
-        return Result.successWithData(story.toString());
+        return Result.successWithData(story);
 
     }
 
@@ -282,78 +285,6 @@ public class StoryServiceMongoImpl implements IStoryService{
 
     }
 
-//    @Override
-//    @PreAuthorize("hasAnyRole('USER','user')")
-//    public Result msgUp(@RequestPart MultipartFile[] files,@RequestParam("message") String msgJson) {
-//        User user=userDAO.select(SecurityUtil.getUserName());
-//        if(user==null)
-//        {
-//            return Result.failWithException(new CommonException(ExceptionEnum.USER_NOT_LOGIN));
-//        }
-//        if(user.getCurPartner()==null)
-//        {
-//            return Result.failWithException(new CommonException(ExceptionEnum.BIND_NOT_EXIST));
-//        }
-//
-//        User talkee=user.getCurPartner();
-//        if(talkee instanceof LazyLoadingProxy)
-//            talkee= (User) ((LazyLoadingProxy) talkee).getTarget();
-//
-//        Result fileResult=fileService.upload(files);
-//        SoundMessageIO msg=JSON.parseObject(msgJson,SoundMessageIO.class);
-//        String fileID=fileService.getFileID(fileResult,msg.getSnd());
-//
-//        msg.setSnd(fileID);
-//
-//        userService.rebind(user,(Kid)talkee);
-//
-//        SoundMessage soundMessage=new SoundMessage();
-//        soundMessage.setChannel(msg.getChannel());
-//        soundMessage.setCreateDate(new Date());
-//        soundMessage.setTalker(user);
-//        soundMessage.setTalkee(user.getCurPartner());
-//        soundMessage.setSnd(fileID);
-//        soundMessage.setStatus(MessageStatus.INIT);
-//        SoundMessage savedSoundMessage= soundMessageDAO.save(soundMessage);
-//
-//        if(msg.getSync()) {
-//            Message wsMsg = Message.SoundMorphyArrivedMessage(soundMessage);
-//            messageBrokerService.send(wsMsg);
-//
-//        }
-//        if(isDebug && msg.getEcho()){
-//            soundMessage.setTalkee(soundMessage.getTalker());
-//            Message wsMsg = Message.SoundMorphyArrivedMessage(soundMessage);
-//            messageBrokerService.send(wsMsg);
-//        }
-//        return  Result.successWithData(savedSoundMessage.getId());
-//
-//    }
-
-//    @Override
-//    @PreAuthorize("hasAnyRole('USER','user')")
-//    public Result msg(@PathVariable("id") String messageId) {
-//        User user=userDAO.select(SecurityUtil.getUserName());
-//        if(user==null)
-//        {
-//            return Result.failWithException(new CommonException(ExceptionEnum.USER_NOT_LOGIN));
-//        }
-//
-//        SoundStory savedSoundMessage= soundStoryDAO.get(messageId);
-//        if(savedSoundMessage!=null){
-//            if(user.getId().compareToIgnoreCase(savedSoundMessage.getTalkee().getId())!=0)
-//            {
-//                return Result.failWithException(new CommonException(ExceptionEnum.USER_NOT_AUHTORIZED));
-//            }
-////            SerializeConfig config=new SerializeConfig();
-////            config.put(User.class,new User.SimpleSerializer());
-////            config.put(Kid.class,new User.SimpleSerializer());
-//
-//            return Result.successWithData(savedSoundMessage);
-//        }
-//        return Result.failWithException(new CommonException(ExceptionEnum.MESSAGE_NOT_EXIST));
-//    }
-
     @Override
     @PreAuthorize("hasAnyRole('USER','user')")
     public Result action(@PathVariable("action") String action,@PathVariable("id") String id,@RequestBody(required=false) JSONObject param) {
@@ -416,6 +347,7 @@ public class StoryServiceMongoImpl implements IStoryService{
                {
                    story.setAuditFireDate(new  Date());
                    story.setAuditStatus(AuditStatus.PENDING);
+                   story.setManualAudited(false);
                    if(param!=null) {
                        if(param.getString("name")!=null)
                            story.setName(param.getString("name"));
@@ -451,8 +383,29 @@ public class StoryServiceMongoImpl implements IStoryService{
                }
                //修改过的mesg，审核状态置为未审核，未发布
                story.setAuditStatus(AuditStatus.NONE);
+               story.setManualAudited(false);
                storyDAO.save(story);
                return Result.successWithMessage("");
+           }
+           else if(action.compareToIgnoreCase("complaint")==0) //投诉，只有未经人工审核的才可以投诉
+           {
+               if(!story.getManualAudited() && story.getAuditStatus()==AuditStatus.APPROVED)
+               {
+                   Complaint complaint=new Complaint();
+
+                   if(param.getString("content")!=null)
+                        complaint.setAuditComment(param.getString("content"));
+                   complaint.setCreateDate(new Date());
+                   complaint.setComplaintorID(user.getId());
+                   complaint=complaintDAO.save(complaint);
+                   story.setLastComplaint(complaint);
+                   story.setAuditStatus(AuditStatus.COMPLAINT);
+                   story.setManualAudited(false);
+                   story.setManualAuditDate(null);
+                   storyDAO.save(story);
+                   return Result.successWithMessage("");
+               }
+
            }
         }
         return  Result.failWithException(new CommonException(ExceptionEnum.MESSAGE_ACTION_ERROR));
@@ -593,7 +546,7 @@ public class StoryServiceMongoImpl implements IStoryService{
 
     @Override
     @PreAuthorize("hasAnyRole('ADMIN','admin')")
-    public Result adminGetSounds(@RequestBody  JSONObject params) {
+    public Result adminGetStories(@RequestBody  JSONObject params) {
         JSONArray filters=params.getJSONArray("filters");
 
         if(filters==null)
@@ -612,16 +565,53 @@ public class StoryServiceMongoImpl implements IStoryService{
 
     }
 
+    /*
+    @Description:
+    @Param:
+    data:{
+    "data":
+    [
+     {"id": xxx, "audit":true/false, "comment":xxxxx},
+     ....
+    ]
+    }
+    @Return:
+    @Author:Alleindrach@gmail.com
+    @Date:2019/7/4
+    @Time:9:36 AM
+    */
     @Override
     @PreAuthorize("hasAnyRole('ADMIN','admin')")
-    public Result adminAuditSound(@RequestBody  JSONObject data) {
-        JSONArray ids=data.getJSONArray("ids");
-
-        Boolean audit=data.getBoolean("audit");
-        storyDAO.update(Query.query(Criteria.where("_id").in(ids.toJavaList(String.class))),
-                Update.update("auditStatus",audit?AuditStatus.APPROVED:AuditStatus.REJECTED).set("auditDate",new Date()));
-
-        List<Story> messages=storyDAO.find(Query.query(Criteria.where("_id").in(ids.toJavaList(String.class))));
+    public Result adminAuditStory(@RequestBody  JSONObject data) {
+        User user=userService.getUserFromSession();
+        List<Story> messages=new ArrayList();
+        JSONArray items=data.getJSONArray("data");
+        for (Object aud:items.toArray()
+             ) {
+            JSONObject jsoAud= (JSONObject) aud;
+            Story story=storyDAO.get(jsoAud.getString("id"));
+            Date today=new Date();
+            if(jsoAud.getBoolean("audit"))
+            {
+                story.setAuditStatus(AuditStatus.APPROVED);
+            }
+            else {
+                story.setAuditStatus(AuditStatus.REJECTED);
+            }
+            story.setManualAudited(true);
+            story.setManualAuditDate(today);
+            Complaint complaint=story.getLastComplaint();
+            if(complaint!=null) {
+                complaint.setAuditorID(user.getId());
+                complaint.setAuditDate(today);
+                if (jsoAud.get("comment") != null)
+                    complaint.setAuditComment(jsoAud.getString("comment"));
+                complaint.setApproved(jsoAud.getBoolean("audit"));
+                complaintDAO.save(complaint);
+            }
+            storyDAO.save(story);
+            messages.add(story);
+        }
         SerializeConfig config=new SerializeConfig();
         config.put(User.class,new User.SimpleSerializer());
         config.put(Kid.class,new User.SimpleSerializer());

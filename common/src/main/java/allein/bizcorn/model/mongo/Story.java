@@ -18,6 +18,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -83,6 +84,20 @@ public abstract class  Story implements IStory,Serializable {
     @Getter
     @Setter
     protected AuditStatus auditStatus=AuditStatus.NONE;
+
+    @Getter
+    @Setter
+    protected Boolean manualAudited=false;
+
+    @Getter
+    @Setter
+    protected Date manualAuditDate=null;
+
+//当前complaint
+    @Getter
+    @Setter
+    @DBRef
+    protected Complaint lastComplaint;
 
 
     @Setter @Getter

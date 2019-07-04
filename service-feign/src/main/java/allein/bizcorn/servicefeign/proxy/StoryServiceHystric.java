@@ -75,13 +75,14 @@ public class StoryServiceHystric implements  StoryServiceProxy{
     }
 
     @Override
-    public Result adminGetSounds(JSONObject filter) {
+    public Result adminGetStories(JSONObject filter) {
         return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
     }
 
     @Override
-    public Result adminAuditSound(JSONObject data) {
+    public Result adminAuditStory(JSONObject data) {
         return Result.failWithException(new CommonException(ExceptionEnum.LOST_CONNECTION_TO_SERVER));
     }
+
 
 }

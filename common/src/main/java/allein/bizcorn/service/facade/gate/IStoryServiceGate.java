@@ -109,11 +109,12 @@ param:
     @ResponseBody
     public Result adminDeleteSoundChannel(@RequestBody JSONObject channel);
 
-    @RequestMapping("/admin/sound/audit/list")
+    @RequestMapping("/admin/story/audit/list")
     @ResponseBody
-    public Result adminGetSounds(@RequestBody JSONObject filter);
+    public Result adminGetStories(@RequestBody JSONObject filter);
 
-    @RequestMapping("/admin/sound/audit")
+    @RequestMapping("/admin/story/audit")
     @ResponseBody
-    public Result adminAuditSound(@RequestBody JSONObject data);
+    public Result adminAuditStory(@RequestBody JSONObject data);
+
 }

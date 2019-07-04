@@ -59,13 +59,13 @@ public class StoryServiceControl implements IStoryServiceGate {
     }
 
     @Override
-    public Result adminGetSounds(@RequestBody  JSONObject filter) {
-        return storyService.adminGetSounds(filter);
+    public Result adminGetStories(@RequestBody  JSONObject filter) {
+        return storyService.adminGetStories(filter);
     }
 
     @Override
-    public Result adminAuditSound(@RequestBody JSONObject data) {
-        return storyService.adminAuditSound(data);
+    public Result adminAuditStory(@RequestBody JSONObject data) {
+        return storyService.adminAuditStory(data);
     }
 
 
