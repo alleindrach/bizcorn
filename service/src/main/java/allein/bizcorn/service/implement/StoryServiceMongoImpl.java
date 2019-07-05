@@ -527,6 +527,7 @@ public class StoryServiceMongoImpl implements IStoryService{
         if(soundChannel==null)
             return Result.failWithException(new CommonException(ExceptionEnum.ADMIN_SOUND_CHANNEL_NOT_EXIST));
         soundChannel.setImg(channel.getString("img"));
+        soundChannel.setAni(channel.getString("ani"));
         soundChannel.setIndex(channel.getInteger("index"));
         soundChannel.setDesc(channel.getString("desc"));
         soundChannel.setName(channel.getString("name"));
