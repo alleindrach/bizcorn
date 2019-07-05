@@ -5,6 +5,7 @@ import allein.bizcorn.model.facade.IMessage;
 import allein.bizcorn.model.output.Result;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
@@ -76,7 +77,7 @@ public class Message implements IMessage {
         msg.setSrcName(token.getBindee().getUsername());
         msg.setDestName(token.getBinder().getUsername());
         msg.setContentType(ContentType.RESULT);
-        msg.setContent(JSON.toJSONString(result));
+        msg.setContent(JSON.toJSONString(result,SerializerFeature.DisableCircularReferenceDetect));
         msg.setAction(Action.BIND_ACK);
         msg.setCreateDate(token.getCreateDate());
         msg.setStatus(MessageStatus.INIT);
@@ -87,7 +88,7 @@ public class Message implements IMessage {
         msg.setDestName(message.getTalkee().getUsername());
         msg.setSrcName(message.getTalker().getUsername());
         msg.setContentType(message.type==StoryType.SLIDE? ContentType.SLIDE_STORY:ContentType.SOUND_STORY);
-        msg.setContent(JSON.toJSONString(message));
+        msg.setContent(JSON.toJSONString(message, SerializerFeature.DisableCircularReferenceDetect));
         msg.setAction(message.type==StoryType.SLIDE?Action.SLIDE_ARRIVED:Action.SOUND_ARRIVED);
         msg.setCreateDate(message.getCreateDate());
         msg.setStatus(MessageStatus.INIT);
@@ -99,7 +100,7 @@ public class Message implements IMessage {
         msg.setDestName(message.getTalker().getUsername());
         msg.setSrcName(message.getTalkee().getUsername());
         msg.setContentType(message.type==StoryType.SLIDE? ContentType.SLIDE_STORY:ContentType.SOUND_STORY);
-        msg.setContent(JSON.toJSONString(message));
+        msg.setContent(JSON.toJSONString(message,SerializerFeature.DisableCircularReferenceDetect));
         msg.setAction(message.type==StoryType.SLIDE?Action.SLIDE_ACK:Action.SOUND_ACK);
         msg.setCreateDate(message.getCreateDate());
         msg.setStatus(MessageStatus.INIT);
@@ -115,7 +116,7 @@ public class Message implements IMessage {
         ack.put("origin",message);
         ack.put("target", JSON.toJSON( sender.getCurPartner()));
 //        ack.put("sendTime",System.currentTimeMillis());
-        msg.setContent(JSON.toJSONString(ack));
+        msg.setContent(JSON.toJSONString(ack,SerializerFeature.DisableCircularReferenceDetect));
         msg.setAction(Action.MESSAGE_ACK);
         msg.setCreateDate(new Date());
         msg.setStatus(MessageStatus.INIT);
@@ -130,7 +131,7 @@ public class Message implements IMessage {
         msg.setContentType(ContentType.GIFT);
         msg.setAction(Action.GIFT_ACTION);
         msg.setCreateDate(gift.getCreateDate());
-        msg.setContent(JSON.toJSONString(gift));
+        msg.setContent(JSON.toJSONString(gift,SerializerFeature.DisableCircularReferenceDetect));
         msg.setStatus(MessageStatus.INIT);
         return msg;
     }
