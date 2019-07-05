@@ -284,9 +284,11 @@
         参数:
         路径参数：action: 
                         delete 删除，只能是talker或者talker的父母方
-                        publish 发布，只能是talker或者talker的父母方
-                        send 发给绑定方，可以是公共库转发，转发会复制一份消息。
-                        edit 编辑，只能是talker或者talker的父母方，其状态为未公开
+                        publish 发布，只能是talker或者talker的父母方，发布后，其auditStatus为PENDING,后台任务会自动将其置为APPROVED
+                        send 发给绑定方，可以是公共库转发，转发会复制一份消息。其auditStatus为NONE，不公开，其人工审核状态为FALSE
+                        edit 编辑，只能是talker或者talker的父母方，其状态为未公开，其人工审核状态为FALSE
+                        complaint:投诉,只有未经人工审核的才可以投诉（人工审核状态=FALSE），投诉后，其auditstatus=COMPLAINT，需要后台人工审核。
+                        
                 id:消息id
         RequestBody  param:
                 delete: null
@@ -297,6 +299,7 @@
                 }
                 send:null
                 edit: 同publish
+                complaint： {content:投诉内容}
         返回：
             除send 公共库转发外，其他都为空字符串，公共库转发返回复制的消息id
     * 变变变消息获取

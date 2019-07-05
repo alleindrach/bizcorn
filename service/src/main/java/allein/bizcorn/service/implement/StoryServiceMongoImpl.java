@@ -330,6 +330,8 @@ public class StoryServiceMongoImpl implements IStoryService{
                    soundMessageReplicated.setAuditDate(null);
                    soundMessageReplicated.setAuditStatus(AuditStatus.NONE);
                    soundMessageReplicated.setDeliverDate(new Date());
+                   soundMessageReplicated.setManualAudited(false);
+                   soundMessageReplicated.setManualAuditDate(null);
                    storyDAO.save(soundMessageReplicated);
                    Message wsMsg = Message.StoryArrivedMessage(soundMessageReplicated);
                    messageBrokerService.send(wsMsg);
