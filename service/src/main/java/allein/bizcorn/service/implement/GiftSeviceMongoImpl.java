@@ -22,6 +22,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializeConfig;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -42,6 +43,8 @@ import static allein.bizcorn.model.mongo.GiftActionType.TAKE_PICTURE;
  * @author: Alleindrach@gmail.com
  * @create: 2019-06-28 14:08
  **/
+@RestController
+@RefreshScope
 public class GiftSeviceMongoImpl implements IGiftService {
     @Resource
     private FrameDAO frameDAO;
@@ -65,7 +68,7 @@ public class GiftSeviceMongoImpl implements IGiftService {
     @PreAuthorize("hasAnyRole('ADMIN','admin')")
     public Result adminAddOrUpdateFrame(@RequestBody JSONObject frameJson) {
         try {
-            Frame frame = (Frame) JSON.toJSON(frameJson);
+            Frame frame = (Frame) frameJson.toJavaObject(Frame.class);
             frame=frameDAO.save(frame);
             return Result.successWithData(frame);
         }catch(Exception ex)
@@ -99,7 +102,7 @@ public class GiftSeviceMongoImpl implements IGiftService {
     public Result adminAddOrUpdatePackageBox(@RequestBody JSONObject packageboxJson)
     {
         try {
-            PackageBox packageBox = (PackageBox) JSON.toJSON(packageboxJson);
+            PackageBox packageBox = (PackageBox) packageboxJson.toJavaObject(PackageBox.class);
             packageBox=packageBoxDAO.save(packageBox);
             return Result.successWithData(packageBox);
         }catch(Exception ex)

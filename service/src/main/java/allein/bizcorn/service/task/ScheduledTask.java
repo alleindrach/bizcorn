@@ -90,7 +90,7 @@ public class ScheduledTask {
         }
         ));
     }
-    @Scheduled(fixedRate = 5000)
+    @Scheduled(fixedRate = 300000)
     public void scheduledSoundStoryAuditTask() {
         logger.info("scheduled - scheduledSoundStoryAuditTask");
         storyService.auditStory();

@@ -195,7 +195,12 @@ public class BaseDAOImpl<T extends Serializable> implements  BaseDAO<T>{
                     if(criteria.getKey().endsWith("$id")){
                         criteria=criteria.is(new ObjectId( jso.getString("val")));
                     }else
-                        criteria=criteria.is(jso.getString("val"));
+                        if(jso.getString("val").compareToIgnoreCase("false")==0||
+                                jso.getString("val").compareToIgnoreCase("true")==0)
+                        {
+                            criteria=criteria.is(jso.getBooleanValue("val"));
+                        }else
+                            criteria=criteria.is(jso.getString("val"));
 
                     break;
                 }
@@ -222,8 +227,15 @@ public class BaseDAOImpl<T extends Serializable> implements  BaseDAO<T>{
                     if(criteria.getKey().endsWith("$id")){
                         criteria=criteria.ne(new ObjectId( jso.getString("val")));
                     }else
-                        criteria=criteria.ne(jso.getString("val"));
+                    {
+                        if(jso.getString("val").compareToIgnoreCase("false")==0||
+                                jso.getString("val").compareToIgnoreCase("true")==0)
+                        {
+                            criteria=criteria.ne(jso.getBooleanValue("val"));
+                        }else
+                            criteria=criteria.ne(jso.getString("val"));
 
+                    }
                     break;
                 case "has":
                     criteria=criteria.all(jso.getString("val").split(","));

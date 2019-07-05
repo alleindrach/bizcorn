@@ -211,6 +211,7 @@ public class FileServiceImpl implements IFileService {
                 break;
         }
         in.close();
+        in=null;
         JSONObject result=new JSONObject();
         result.put("headers",headers);
         result.put("body",fileBuffer);
@@ -224,7 +225,7 @@ public class FileServiceImpl implements IFileService {
         JSONObject jsoResult=this.getFileEntity(fileId);
         ResponseEntity entity = new ResponseEntity<byte[]>(
                 jsoResult.getBytes("body"),(HttpHeaders) jsoResult.get("headers"),HttpStatus.OK);
-
+        jsoResult=null;
         return entity;
     }
 

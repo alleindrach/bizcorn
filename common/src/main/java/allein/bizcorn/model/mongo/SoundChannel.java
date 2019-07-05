@@ -30,6 +30,9 @@ public class SoundChannel implements Serializable {
     private String  img;
     @Getter
     @Setter
+    private String  ani;
+    @Getter
+    @Setter
     @Indexed(unique = true)
     private String name;
     @Getter
