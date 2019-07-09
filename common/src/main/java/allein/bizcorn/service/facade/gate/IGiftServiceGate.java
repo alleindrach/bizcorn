@@ -32,15 +32,15 @@ public interface IGiftServiceGate {
     @ResponseBody
     public Result adminDeleteFrame( @PathVariable("id")String id);
 
-    @RequestMapping("/admin/gift/packagebox/list")
+    @RequestMapping("/admin/gift/box/list")
     @ResponseBody
     public Result adminGetPackageBoxs( @RequestBody JSONObject params);
 
-    @RequestMapping("/admin/gift/packagebox/set")
+    @RequestMapping("/admin/gift/box/set")
     @ResponseBody
     public Result adminAddOrUpdatePackageBox(@RequestBody JSONObject packagebox);
 
-    @RequestMapping("/admin/gift/package/delete/{id}")
+    @RequestMapping("/admin/gift/box/delete/{id}")
     @ResponseBody
     public Result adminDeletePackageBox(@PathVariable("id") String id);
 
